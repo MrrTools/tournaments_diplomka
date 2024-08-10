@@ -29,8 +29,10 @@ class Tournament: Object, ObjectKeyIdentifiable {
     @Persisted var players: List<Player>
     @Persisted var matches: List<Match>
     @Persisted var table: List<TournamentTable>
+    @Persisted var settings: List<TournamentSettings>
+                   
     
-    convenience init(name: String, owner: String, sport: String, type: String, players: [Player], matches: [Match], table: [TournamentTable]) {
+    convenience init(name: String, owner: String, sport: String, type: String, players: [Player], matches: [Match], table: [TournamentTable], settings: [TournamentSettings]) {
         self.init()
         self.name = name
         self.owner = owner
@@ -39,6 +41,7 @@ class Tournament: Object, ObjectKeyIdentifiable {
         self.players.append(objectsIn: players)
         self.matches.append(objectsIn: matches)
         self.table.append(objectsIn: table)
+        self.settings.append(objectsIn: settings)
     }
 }
 

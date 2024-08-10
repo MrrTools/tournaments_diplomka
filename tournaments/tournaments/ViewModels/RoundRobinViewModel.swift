@@ -18,8 +18,6 @@ class RoundRobinViewModel: ObservableObject {
             loadTable()
         }
     }
-
-    
     private let realm: Realm
     
     init(tournament: Tournament) {
@@ -75,8 +73,13 @@ class RoundRobinViewModel: ObservableObject {
             objectWillChange.send()
         }
     }
+
     
      func updateTable(for match: Match, player1Score: Int, player2Score: Int) {
+         guard let settings = tournament.settings.first else {
+             print("Tournament settings not found")
+             return
+         }
 
         let player1 = match.player1!
         let player2 = match.player2!
@@ -87,17 +90,17 @@ class RoundRobinViewModel: ObservableObject {
                     try? realm.write {
                         if player1Score > player2Score {
                             player1Table.wins += 1
-                            player1Table.points += 3
+                            player1Table.points += settings.winScore + settings.loseScore
                             player2Table.losses += 1
                         } else if player1Score < player2Score {
                             player2Table.wins += 1
-                            player2Table.points += 3
+                            player2Table.points += settings.winScore + settings.loseScore
                             player1Table.losses += 1
                         } else {
                             player1Table.draws += 1
                             player2Table.draws += 1
-                            player1Table.points += 1
-                            player2Table.points += 1
+                            player1Table.points += settings.drawScore
+                            player2Table.points += settings.drawScore
                         }
                         player1Table.goalsScored += player1Score
                         player1Table.goalsConceded += player2Score
@@ -112,6 +115,7 @@ class RoundRobinViewModel: ObservableObject {
         }
     }
 }
+
 // Generování Round Robin zápasů a jejich ukládání do MongoDB Realm
 func generateRoundRobinMatches(players: [Player], tournament: Tournament, riposeMateches: Bool) -> [Match] {
     let matches: [Match] = []

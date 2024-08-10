@@ -78,7 +78,7 @@ struct NewTournamentView: View {
                             HStack {
                                 Button(action: {
                                     selectedPlayerIndex = index
-                                    showImagePicker.toggle()
+                                    showImagePicker = true
                                 }) {
                                     if let image = viewModel.playerPhotos[index] {
                                         Image(uiImage: image)
@@ -122,10 +122,10 @@ struct NewTournamentView: View {
         .foregroundColor(.white)
         .sheet(isPresented: Binding(            get: { showImagePicker },
                                                 set: { showImagePicker = $0 })) {
-            if let index = selectedPlayerIndex {
+            if let selectedPlayerIndex = selectedPlayerIndex {
                 ImagePicker(selectedImage: Binding(
-                    get: { viewModel.playerPhotos[index] },
-                    set: { newImage in viewModel.playerPhotos[index] = newImage }
+                    get: { viewModel.playerPhotos[selectedPlayerIndex] },
+                    set: { newImage in viewModel.playerPhotos[selectedPlayerIndex] = newImage }
                 ))
             }
         }

@@ -32,6 +32,7 @@ struct RoundRobinView: View {
                                         .resizable()
                                         .frame(width: 24, height: 24)
                                         .padding()
+                                       
                                 }
                             }
                             .padding(.trailing)
@@ -42,21 +43,25 @@ struct RoundRobinView: View {
                     .tabItem {
                         Image(systemName: "list.number")
                         Text("Table")
+                            
                     }
 
                 MatchesView(viewModel: viewModel, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
                     .tabItem {
                         Image(systemName: "calendar")
                         Text("Matches")
+                            .foregroundColor(.purple)
                     }
             }
-            .frame(height: 500) // Adjust the height of the TabView
+            .frame(height: 500)
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
-        .sheet(isPresented: $showSettings) {  // Zobrazení modálního okna při kliknutí na ozubené kolo
-            SettingsView(viewModel: viewModel)
-                .background(Color.clear)  // Removes the gray background
-                .frame(maxWidth: .infinity, maxHeight: .infinity)// Propojení s nastavením
+        .sheet(isPresented: $showSettings) {
+            if let settings = viewModel.tournament.settings.first {
+                SettingsView(settings: settings)
+                    .background(Color.clear)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
         .sheet(isPresented: Binding(            get: { showScoreDialog },
                                                 set: { showScoreDialog = $0 }
@@ -97,7 +102,7 @@ struct LeaderboardView: View {
                 }
             }
             
-            TableColumn("Player Name") { table in
+            TableColumn("Player Name"){ table in
                 Text(table.player?.name ?? "TBD")
             }
             TableColumn("Points") { table in

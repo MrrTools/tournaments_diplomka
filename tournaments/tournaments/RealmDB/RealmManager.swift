@@ -73,6 +73,11 @@ class RealmManager: ObservableObject {
                     } else {
                         subs.append(QuerySubscription<Match>(name: "all-matches"))
                     }
+            if let settingsSub = subs.first(named: "all-settings") {
+                return
+            } else {
+                subs.append(QuerySubscription<TournamentSettings>(name: "all-settings"))
+            }
             if let tableSub = subs.first(named: "all-table") {
                 return
             } else {

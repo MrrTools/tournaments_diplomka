@@ -50,12 +50,8 @@ class NewTournamentViewModel: ObservableObject {
             return Player(name: name, photoData: photoData)
         }
         
-        func generateStandings(players: [Player]
-                               , tournament: Tournament
-        ) -> [TournamentTable] {
-            return players.map { TournamentTable(player: $0
-                                                 , tournament: tournament
-            ) }
+        func generateStandings(players: [Player], tournament: Tournament) -> [TournamentTable] {
+            return players.map { TournamentTable(player: $0, tournament: tournament) }
         }
         
         let tournament = Tournament(
@@ -65,28 +61,29 @@ class NewTournamentViewModel: ObservableObject {
             type: self.selectedType,
             players: players,
             matches: [],
-            table: []
+            table: [],
+            settings: []
         )
         
-        
-        // Použití RealmManager pro uložení turnaje
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 realm.add(tournament)
+                let settings = TournamentSettings(tournament: tournament)
+                realm.add(settings)
             }
+            
+            onSave()
         }
         
-        let matches: [Match] = self.selectedType == "Round Robin" ? generateRoundRobinMatches(players: players
-,tournament: tournament, riposeMateches: riposeMateches
-        ) : []
-        let table: [TournamentTable] = generateStandings(players: players
-                                                         , tournament: tournament
-        )
+        let matches: [Match] = self.selectedType == "Round Robin" ? generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches) : []
+        let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
+        let settings = TournamentSettings(tournament: tournament)
         
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.matches.append(objectsIn: matches)
                 tournament.table.append(objectsIn: table)
+                tournament.settings.append(settings)
                 realm.add(tournament, update: .modified)
             }
         }

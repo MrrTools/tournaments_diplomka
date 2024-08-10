@@ -6,10 +6,22 @@
 //
 
 import SwiftUI
+import RealmSwift
 
 struct SettingsView: View {
-    @ObservedObject var viewModel: RoundRobinViewModel
+    var settings: TournamentSettings
     @Environment(\.presentationMode) var presentationMode
+    
+    @State private var winScore: Int
+    @State private var loseScore: Int
+    @State private var drawScore: Int
+    
+    init(settings: TournamentSettings) {
+        self.settings = settings
+        _winScore = State(initialValue: settings.winScore)
+        _loseScore = State(initialValue: settings.loseScore)
+        _drawScore = State(initialValue: settings.drawScore)
+    }
     
     var body: some View {
         ZStack {
@@ -28,15 +40,15 @@ struct SettingsView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            if viewModel.selectedRound > 0 {
-                                viewModel.selectedRound -= 1
+                            if winScore > 0 {
+                                winScore -= 1
                             }
                         }) {
                             Image(systemName: "chevron.left")
                         }
-                        Text("\(viewModel.selectedRound)")
+                        Text("\(winScore)")
                         Button(action: {
-                            viewModel.selectedRound += 1
+                            winScore += 1
                         }) {
                             Image(systemName: "chevron.right")
                         }
@@ -49,15 +61,15 @@ struct SettingsView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            if viewModel.selectedRound > 0 {
-                                viewModel.selectedRound -= 1
+                            if loseScore > 0 {
+                                loseScore -= 1
                             }
                         }) {
                             Image(systemName: "chevron.left")
                         }
-                        Text("\(viewModel.selectedRound)")
+                        Text("\(loseScore)")
                         Button(action: {
-                            viewModel.selectedRound += 1
+                            loseScore += 1
                         }) {
                             Image(systemName: "chevron.right")
                         }
@@ -70,15 +82,15 @@ struct SettingsView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            if viewModel.selectedRound > 0 {
-                                viewModel.selectedRound -= 1
+                            if drawScore > 0 {
+                                drawScore -= 1
                             }
                         }) {
                             Image(systemName: "chevron.left")
                         }
-                        Text("\(viewModel.selectedRound)")
+                        Text("\(drawScore)")
                         Button(action: {
-                            viewModel.selectedRound += 1
+                            drawScore += 1
                         }) {
                             Image(systemName: "chevron.right")
                         }
@@ -89,7 +101,7 @@ struct SettingsView: View {
                 Spacer()
                 
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    saveSettings()
                 }) {
                     Text("Save")
                         .frame(maxWidth: .infinity)
@@ -104,5 +116,18 @@ struct SettingsView: View {
             .background(Color.black)
             .cornerRadius(8)
         }
+    }
+    
+    private func saveSettings() {
+        guard let realm = RealmManager.shared.realm else { return }
+        
+        try? realm.write {
+            settings.winScore = winScore
+            settings.loseScore = loseScore
+            settings.drawScore = drawScore
+            realm.add(settings, update: .modified)
+        }
+        
+        presentationMode.wrappedValue.dismiss()
     }
 }
