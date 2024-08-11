@@ -70,7 +70,7 @@ struct MainPageView: View {
         if tournament.type == "Round Robin" {
             RoundRobinView(viewModel: RoundRobinViewModel(tournament: tournament))
         } else if tournament.type == "Single Elimination" {
-           // SingleEliminationView(viewModel: SingleEliminationViewModel(tournament: tournament))
+           SingleEliminationView(tournament: tournament)
         } else {
             Text("Unsupported tournament type")
         }

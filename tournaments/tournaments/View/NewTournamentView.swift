@@ -7,16 +7,13 @@
 
 import SwiftUI
 
-
 struct NewTournamentView: View {
     @ObservedObject var viewModel: NewTournamentViewModel
     @State private var showImagePicker = false
-    @State private var selectedPlayerIndex: Int?
-    @Environment(\.presentationMode) var presentationMode
-    
+    @State private var selectedPlayerIndex: Int? = nil
     @State private var showCamera = false
     @State private var selectedImage: UIImage?
-    @State var image: UIImage?
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack {
@@ -73,32 +70,58 @@ struct NewTournamentView: View {
                     }
                 }
                 Section(header: Text("Players")) {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
                         ForEach(0..<Int(viewModel.numberOfPlayers), id: \.self) { index in
                             HStack {
-                                Button(action: {
-                                    selectedPlayerIndex = index
-                                    showImagePicker = true
-                                }) {
-                                    if let image = viewModel.playerPhotos[index] {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                            .clipShape(Circle())
-                                    } else {
-                                        Image(systemName: "camera")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                            .foregroundColor(.gray)
-                                            .clipShape(Circle())
-                                    }
+                                if let image = viewModel.playerPhotos[index] {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                        .clipShape(Circle())
+                                } else {
+                                    Image(systemName: "camera")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.gray)
+                                        .clipShape(Circle())
                                 }
                                 TextField("Player \(index + 1)", text: $viewModel.players[index])
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .multilineTextAlignment(.center)
+
                             }
+                            .padding(.vertical)
                         }
                     }
-                    .padding(.vertical)
+                }
+                
+                Section(header: Text("Add Player Photo")) {
+                    HStack {
+                        Picker("Select Player", selection: $selectedPlayerIndex) {
+                            Text("Select a Player").tag(Int?.none)
+                            ForEach(0..<Int(viewModel.numberOfPlayers), id: \.self) { index in
+                                Text(viewModel.players[index].isEmpty ? "Player \(index + 1)" : viewModel.players[index])
+                                    .tag(Int?.some(index))
+                                    .foregroundColor(.purple)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            if selectedPlayerIndex != nil {
+                                showImagePicker = true
+                            }
+                        }) {
+                            Text("Add Photo")
+                                .padding(.horizontal)
+                                .padding(.vertical, 10)
+                                .background(Color.purple)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
                 }
             }
             .padding()
@@ -120,13 +143,9 @@ struct NewTournamentView: View {
         }
         .background(Color.black.opacity(0.9))
         .foregroundColor(.white)
-        .sheet(isPresented: Binding(            get: { showImagePicker },
-                                                set: { showImagePicker = $0 })) {
+        .sheet(isPresented: $showImagePicker) {
             if let selectedPlayerIndex = selectedPlayerIndex {
-                ImagePicker(selectedImage: Binding(
-                    get: { viewModel.playerPhotos[selectedPlayerIndex] },
-                    set: { newImage in viewModel.playerPhotos[selectedPlayerIndex] = newImage }
-                ))
+                ImagePicker(selectedImage: $viewModel.playerPhotos[selectedPlayerIndex], sourceType: .camera)
             }
         }
     }
@@ -135,3 +154,6 @@ struct NewTournamentView: View {
 #Preview {
     NewTournamentView(viewModel: NewTournamentViewModel(onSave: { }))
 }
+
+
+

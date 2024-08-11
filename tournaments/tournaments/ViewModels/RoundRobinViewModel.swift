@@ -90,17 +90,17 @@ class RoundRobinViewModel: ObservableObject {
                     try? realm.write {
                         if player1Score > player2Score {
                             player1Table.wins += 1
-                            player1Table.points += settings.winScore + settings.loseScore
+                            player1Table.points += settings.winPoints + settings.losePoints
                             player2Table.losses += 1
                         } else if player1Score < player2Score {
                             player2Table.wins += 1
-                            player2Table.points += settings.winScore + settings.loseScore
+                            player2Table.points += settings.winPoints + settings.losePoints
                             player1Table.losses += 1
                         } else {
                             player1Table.draws += 1
                             player2Table.draws += 1
-                            player1Table.points += settings.drawScore
-                            player2Table.points += settings.drawScore
+                            player1Table.points += settings.drawPoints
+                            player2Table.points += settings.drawPoints
                         }
                         player1Table.goalsScored += player1Score
                         player1Table.goalsConceded += player2Score
@@ -130,7 +130,10 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
         for j in 0..<players.count / 2 {
             let homeTeam = players[j]
             let awayTeam = players[players.count - 1 - j]
-            
+            print("Round: \(i) Home: \(homeTeam.name) Away: \(awayTeam.name)")
+            if homeTeam.name == "BYE" || awayTeam.name == "BYE" {
+                continue
+            }
             let match = Match()
             match.player1 = homeTeam
             match.player2 = awayTeam

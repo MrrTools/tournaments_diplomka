@@ -39,7 +39,7 @@ struct RoundRobinView: View {
                         }
                         .padding(.top)
             TabView {
-                LeaderboardView(table: viewModel.table)
+                LeaderboardView(table: viewModel.table, viewModel: viewModel)
                     .tabItem {
                         Image(systemName: "list.number")
                         Text("Table")
@@ -80,6 +80,7 @@ struct RoundRobinView: View {
 
 struct LeaderboardView: View {
     var table: [TournamentTable]
+    @ObservedObject var viewModel: RoundRobinViewModel
     
     var sortedTable: [TournamentTable] {
         return table.sorted {
@@ -121,8 +122,8 @@ struct LeaderboardView: View {
                 Text("\(table.losses)")
             }
         }
-        .onAppear {
-            print("LeaderboardView is being re-rendered with \(sortedTable.count) entries")
+        .refreshable {
+            viewModel.loadTable()  // Trigger table reload on pull-to-refresh
         }
     }
 }
@@ -212,9 +213,18 @@ struct ScoreInputDialog: View {
                 HStack {
                     VStack {
                         Text(match.player1?.name ?? "TBD")
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: 50, height: 50)
+                        if let photoData = match.player1?.photoData, let uiImage = UIImage(data: photoData) {
+                             Image(uiImage: uiImage)
+                                 .resizable()
+                                 .frame(width: 50, height: 50)
+                                 .clipShape(Circle())
+                         } else {
+                             Image(systemName: "person.crop.circle")
+                                 .resizable()
+                                 .frame(width: 50, height: 50)
+                                 .foregroundColor(.gray)
+                                 .clipShape(Circle())
+                         }
                         TextField("-", text: $player1Score)
                             .keyboardType(.numberPad)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -235,9 +245,18 @@ struct ScoreInputDialog: View {
                     
                     VStack {
                         Text(match.player2?.name ?? "TBD")
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: 50, height: 50)
+                        if let photoData = match.player2?.photoData, let uiImage = UIImage(data: photoData) {
+                             Image(uiImage: uiImage)
+                                 .resizable()
+                                 .frame(width: 50, height: 50)
+                                 .clipShape(Circle())
+                         } else {
+                             Image(systemName: "person.crop.circle")
+                                 .resizable()
+                                 .frame(width: 50, height: 50)
+                                 .foregroundColor(.gray)
+                                 .clipShape(Circle())
+                         }
                         TextField("-", text: $player2Score)
                             .keyboardType(.numberPad)
                             .textFieldStyle(RoundedBorderTextFieldStyle())

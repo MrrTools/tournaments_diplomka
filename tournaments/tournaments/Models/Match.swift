@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 
 class Match: Object, ObjectKeyIdentifiable {
-    @Persisted(primaryKey: true) var _id: ObjectId = ObjectId.generate()
+    @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var player1: Player?
     @Persisted var player2: Player?
     @Persisted var player1Score: Int = 0

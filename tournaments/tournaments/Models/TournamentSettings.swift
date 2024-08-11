@@ -10,16 +10,16 @@ import RealmSwift
 
 class TournamentSettings: Object, ObjectKeyIdentifiable {
     @Persisted(primaryKey: true) var _id: ObjectId
-    @Persisted var winScore: Int = 3
-    @Persisted var loseScore: Int = 0
-    @Persisted var drawScore: Int = 1
+    @Persisted var winPoints: Int = 3
+    @Persisted var losePoints: Int = 0
+    @Persisted var drawPoints: Int = 1
     @Persisted var tournament: Tournament?
     
-    convenience init(winScore: Int = 3, loseScore: Int = 0, drawScore: Int = 1, tournament: Tournament?) {
+    convenience init(winPoints: Int = 3, losePoints: Int = 0, drawPoints: Int = 1, tournament: Tournament?) {
             self.init()
-            self.winScore = winScore
-            self.loseScore = loseScore
-            self.drawScore = loseScore
+            self.winPoints = winPoints
+            self.losePoints = losePoints
+            self.drawPoints = drawPoints
             self.tournament = tournament
         }
 }

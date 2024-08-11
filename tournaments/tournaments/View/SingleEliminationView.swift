@@ -18,7 +18,6 @@ struct SingleEliminationView: View {
                     .font(.title)
                     .padding()
 
-                // Začátek pavouka
                 VStack {
                     if let bracket = createBracket(from: Array(tournament.players)) {
                         BracketColumnView(matches: bracket)
@@ -50,41 +49,40 @@ struct SingleEliminationView: View {
     }
 }
 
-
 struct BracketColumnView: View {
     var matches: [[(Player?, Player?)]]
 
     var body: some View {
-        HStack(alignment: .top, spacing: 50) {
+        HStack(alignment: .top, spacing: 80) { // Zvýšené rozestupy mezi koly
             ForEach(matches.indices, id: \.self) { roundIndex in
-                VStack(spacing: 40) {
+                VStack(spacing: 60) { // Zvýšené rozestupy mezi zápasy
                     ForEach(matches[roundIndex].indices, id: \.self) { matchIndex in
-                        ZStack(alignment: .topLeading) {
-                            MatchView(player1: matches[roundIndex][matchIndex].0,
+                        ZStack {
+                            MatchViewv(player1: matches[roundIndex][matchIndex].0,
                                       player2: matches[roundIndex][matchIndex].1)
-                            
+                                .frame(width: 120, height: 80) // Zvýšená šířka a výška zápasů
+
                             if roundIndex < matches.count - 1 {
                                 Path { path in
-                                    let midX = CGFloat(100)
-                                    _ = CGFloat(40)
-                                    let currentY = CGFloat(matchIndex * 160 + 40)
-                                    let nextMatchIndex = matchIndex / 2
-                                    let nextY = CGFloat(nextMatchIndex * 160 + 80)
-                                    
-                                    // Draw line from player1 to center
-                                    path.move(to: CGPoint(x: midX, y: currentY - 20))
-                                    path.addLine(to: CGPoint(x: midX + 50, y: currentY - 20))
-                                    
-                                    // Draw line from player2 to center
-                                    path.move(to: CGPoint(x: midX, y: currentY + 20))
-                                    path.addLine(to: CGPoint(x: midX + 50, y: currentY + 20))
-                                    
-                                    // Draw vertical connecting line
-                                    path.move(to: CGPoint(x: midX + 50, y: currentY - 20))
-                                    path.addLine(to: CGPoint(x: midX + 50, y: nextY))
-                                    
-                                    // Draw horizontal line to next match
-                                    path.move(to: CGPoint(x: midX + 50, y: nextY))
+                                    let midX = CGFloat(120)
+                                    let currentY = CGFloat(80)
+                                    let spacing = CGFloat(60)
+                                    let nextY = CGFloat(matchIndex / 2 * Int(currentY + spacing) + Int(currentY / 2))
+
+                                    // Čára z hráče 1 do středu
+                                    path.move(to: CGPoint(x: midX, y: 0))
+                                    path.addLine(to: CGPoint(x: midX + 50, y: 0))
+
+                                    // Čára z hráče 2 do středu
+                                    path.move(to: CGPoint(x: midX, y: currentY))
+                                    path.addLine(to: CGPoint(x: midX + 50, y: currentY))
+
+                                    // Svislá čára spojující
+                                    path.move(to: CGPoint(x: midX + 50, y: 0))
+                                    path.addLine(to: CGPoint(x: midX + 50, y: currentY))
+
+                                    // Vodorovná čára k dalšímu zápasu
+                                    path.move(to: CGPoint(x: midX + 50, y: currentY / 2))
                                     path.addLine(to: CGPoint(x: midX + 100, y: nextY))
                                 }
                                 .stroke(Color.green, lineWidth: 2)
@@ -98,9 +96,25 @@ struct BracketColumnView: View {
 }
 
 
+struct MatchViewv: View {
+    var player1: Player?
+    var player2: Player?
 
-
-
+    var body: some View {
+        VStack {
+            Text(player1?.name ?? "TBD")
+            Text("vs")
+            Text(player2?.name ?? "TBD")
+        }
+        .padding()
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.white, lineWidth: 1)
+        )
+    }
+}
 
 extension Array {
     func chunked(into size: Int) -> [[Element]] {
@@ -112,6 +126,3 @@ extension Array {
         return chunks
     }
 }
-
-
-

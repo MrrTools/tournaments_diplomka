@@ -18,9 +18,9 @@ struct SettingsView: View {
     
     init(settings: TournamentSettings) {
         self.settings = settings
-        _winScore = State(initialValue: settings.winScore)
-        _loseScore = State(initialValue: settings.loseScore)
-        _drawScore = State(initialValue: settings.drawScore)
+        _winScore = State(initialValue: settings.winPoints)
+        _loseScore = State(initialValue: settings.losePoints)
+        _drawScore = State(initialValue: settings.drawPoints)
     }
     
     var body: some View {
@@ -36,7 +36,7 @@ struct SettingsView: View {
                 Spacer()
                 
                 HStack {
-                    Text("Win score")
+                    Text("Win Points")
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
@@ -57,7 +57,7 @@ struct SettingsView: View {
                 .padding()
                 
                 HStack {
-                    Text("Lose score")
+                    Text("Lose Points")
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
@@ -78,7 +78,7 @@ struct SettingsView: View {
                 .padding()
                 
                 HStack {
-                    Text("Draw score")
+                    Text("Draw Points")
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
@@ -122,9 +122,9 @@ struct SettingsView: View {
         guard let realm = RealmManager.shared.realm else { return }
         
         try? realm.write {
-            settings.winScore = winScore
-            settings.loseScore = loseScore
-            settings.drawScore = drawScore
+            settings.winPoints = winScore
+            settings.losePoints = loseScore
+            settings.drawPoints = drawScore
             realm.add(settings, update: .modified)
         }
         
