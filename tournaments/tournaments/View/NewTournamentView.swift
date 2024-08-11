@@ -1,10 +1,3 @@
-//
-//  NewTournamentView.swift
-//  tournaments
-//
-//  Created by Lukas Sarocky on 07.07.2024.
-//
-
 import SwiftUI
 
 struct NewTournamentView: View {
@@ -88,7 +81,8 @@ struct NewTournamentView: View {
                                 TextField("Player \(index + 1)", text: $viewModel.players[index])
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .multilineTextAlignment(.center)
-
+                                
+                                Spacer() // Přidání Spaceru
                             }
                             .padding(.vertical)
                         }
@@ -131,7 +125,7 @@ struct NewTournamentView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 HStack {
-                    Text("Generate Tournament")
+                    Text("Create Tournament")
                     Image(systemName: "checkmark.circle")
                 }
                 .padding()
@@ -150,10 +144,3 @@ struct NewTournamentView: View {
         }
     }
 }
-
-#Preview {
-    NewTournamentView(viewModel: NewTournamentViewModel(onSave: { }))
-}
-
-
-

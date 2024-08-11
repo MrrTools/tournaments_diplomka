@@ -17,7 +17,7 @@ class Match: Object, ObjectKeyIdentifiable {
     @Persisted var fixturesRound: Int = 0
     @Persisted var matchDate: Date = Date()
     @Persisted var tournament: Tournament?
-
+    
     convenience init(player1: Player?, player2: Player?, player1Score: Int = 0, player2Score: Int = 0, fixturesRound: Int = 0, matchDate: Date = Date(), tournament: Tournament?) {
         self.init()
         self.player1 = player1
