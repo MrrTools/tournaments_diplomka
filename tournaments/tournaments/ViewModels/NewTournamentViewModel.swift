@@ -54,6 +54,9 @@ class NewTournamentViewModel: ObservableObject {
             return players.map { TournamentTable(player: $0, tournament: tournament) }
         }
         
+        
+        
+        
         let tournament = Tournament(
             name: self.tournamentName,
             owner: self.owner,
@@ -75,7 +78,13 @@ class NewTournamentViewModel: ObservableObject {
             onSave()
         }
         
-        let matches: [Match] = self.selectedType == "Round Robin" ? generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches) : []
+        var matches: [Match] = []  // Tady deklarujeme prázdné pole
+        
+        if self.selectedType == "Round Robin" {
+            matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches)
+        } else if self.selectedType == "Single Elimination" || self.selectedType == "Double Elimination" {
+            matches = generateElimination(players: players, tournament: tournament)
+        }
         let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
         let settings = TournamentSettings(tournament: tournament)
         

@@ -8,7 +8,7 @@
 import SwiftUI
 import RealmSwift
 
-class RoundRobinViewModel: ObservableObject {
+class TournamentGenerateModel: ObservableObject {
     @Published var tournament: Tournament
     @Published var table: [TournamentTable] = []
     @Published var matches: [Match] = []
@@ -173,3 +173,34 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
     
     return matches
 }
+
+
+func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
+    var matches: [Match] = []
+    var shuffledPlayers = players.shuffled()
+    let numberOfMatches = shuffledPlayers.count / 2
+    
+    for i in 0..<numberOfMatches {
+        let player1 = shuffledPlayers[i * 2]
+        let player2 = shuffledPlayers[i * 2 + 1]
+        
+        // Vytvoření zápasu
+        let match = Match()
+        match.player1 = player1
+        match.player2 = player2
+        match.fixturesRound = 1  
+        match.tournament = tournament
+        
+        // Použití RealmManager pro uložení turnaje
+        if let realm = RealmManager.shared.realm {
+            try? realm.write {
+                realm.add(match)
+            }
+        }
+        
+        matches.append(match)
+    }
+    
+    return matches
+}
+

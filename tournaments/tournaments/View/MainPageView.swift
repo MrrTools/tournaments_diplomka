@@ -68,9 +68,9 @@ struct MainPageView: View {
     @ViewBuilder
     private func destinationView(for tournament: Tournament) -> some View {
         if tournament.type == "Round Robin" {
-            RoundRobinView(viewModel: RoundRobinViewModel(tournament: tournament))
+            RoundRobinView(viewModel: TournamentGenerateModel(tournament: tournament))
         } else if tournament.type == "Single Elimination" {
-           SingleEliminationView(tournament: tournament)
+           SingleEliminationView(viewModel: TournamentGenerateModel(tournament: tournament))
         } else {
             Text("Unsupported tournament type")
         }

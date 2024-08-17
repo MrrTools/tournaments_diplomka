@@ -13,6 +13,8 @@
 		462FA4BF2BD2E45800175699 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 462FA4BE2BD2E45800175699 /* Assets.xcassets */; };
 		462FA4C22BD2E45800175699 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 462FA4C12BD2E45800175699 /* Preview Assets.xcassets */; };
 		464657A02BE6758400A963C2 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4646579F2BE6758400A963C2 /* Launch Screen.storyboard */; };
+		465554212C714A3500C1CB7C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465554202C714A3500C1CB7C /* Player.swift */; };
+		465554232C714A8D00C1CB7C /* EditModalDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465554222C714A8D00C1CB7C /* EditModalDialogView.swift */; };
 		466B70BD2C3AA8FE00BF7426 /* MainPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70BC2C3AA8FE00BF7426 /* MainPageView.swift */; };
 		466B70BF2C3AAACA00BF7426 /* NewTournamentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70BE2C3AAACA00BF7426 /* NewTournamentView.swift */; };
 		466B70C12C3AAEE700BF7426 /* MainPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70C02C3AAEE700BF7426 /* MainPageViewModel.swift */; };
@@ -24,7 +26,7 @@
 		466B70DF2C3C813700BF7426 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 466B70DA2C3B126D00BF7426 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		466B70E22C45AF1900BF7426 /* SingleEliminationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70E12C45AF1900BF7426 /* SingleEliminationView.swift */; };
 		466B70E62C45C56B00BF7426 /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70E52C45C56B00BF7426 /* Match.swift */; };
-		466B70E82C45C73100BF7426 /* RoundRobinViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70E72C45C73100BF7426 /* RoundRobinViewModel.swift */; };
+		466B70E82C45C73100BF7426 /* TournamentGenerateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */; };
 		467E9A022C46FDDC00F9774E /* TournamentTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467E9A012C46FDDC00F9774E /* TournamentTable.swift */; };
 		469CDB1D2C66C9EC00B1143F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1C2C66C9EC00B1143F /* SettingsView.swift */; };
 		469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */; };
@@ -53,6 +55,8 @@
 		462FA4BE2BD2E45800175699 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		462FA4C12BD2E45800175699 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4646579F2BE6758400A963C2 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		465554202C714A3500C1CB7C /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		465554222C714A8D00C1CB7C /* EditModalDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModalDialogView.swift; sourceTree = "<group>"; };
 		466B70BC2C3AA8FE00BF7426 /* MainPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPageView.swift; sourceTree = "<group>"; };
 		466B70BE2C3AAACA00BF7426 /* NewTournamentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTournamentView.swift; sourceTree = "<group>"; wrapsLines = 1; };
 		466B70C02C3AAEE700BF7426 /* MainPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPageViewModel.swift; sourceTree = "<group>"; };
@@ -63,7 +67,7 @@
 		466B70D02C3B0D7A00BF7426 /* Tournaments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournaments.swift; sourceTree = "<group>"; };
 		466B70E12C45AF1900BF7426 /* SingleEliminationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleEliminationView.swift; sourceTree = "<group>"; };
 		466B70E52C45C56B00BF7426 /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
-		466B70E72C45C73100BF7426 /* RoundRobinViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundRobinViewModel.swift; sourceTree = "<group>"; };
+		466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentGenerateModel.swift; sourceTree = "<group>"; };
 		467E9A012C46FDDC00F9774E /* TournamentTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentTable.swift; sourceTree = "<group>"; };
 		469CDB1C2C66C9EC00B1143F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentSettings.swift; sourceTree = "<group>"; };
@@ -129,6 +133,7 @@
 				462102CA2C5818D100924E6E /* RoudRobinView.swift */,
 				462102CE2C5956D700924E6E /* MatchView.swift */,
 				469CDB1C2C66C9EC00B1143F /* SettingsView.swift */,
+				465554222C714A8D00C1CB7C /* EditModalDialogView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -138,7 +143,7 @@
 			children = (
 				466B70C02C3AAEE700BF7426 /* MainPageViewModel.swift */,
 				466B70C22C3AB51200BF7426 /* NewTournamentViewModel.swift */,
-				466B70E72C45C73100BF7426 /* RoundRobinViewModel.swift */,
+				466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */,
 				469CDB202C677BEA00B1143F /* SettingsViewModel.swift */,
 			);
 			path = ViewModels;
@@ -151,6 +156,7 @@
 				466B70E52C45C56B00BF7426 /* Match.swift */,
 				467E9A012C46FDDC00F9774E /* TournamentTable.swift */,
 				469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */,
+				465554202C714A3500C1CB7C /* Player.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -252,8 +258,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				465554232C714A8D00C1CB7C /* EditModalDialogView.swift in Sources */,
 				466B70D12C3B0D7A00BF7426 /* Tournaments.swift in Sources */,
-				466B70E82C45C73100BF7426 /* RoundRobinViewModel.swift in Sources */,
+				466B70E82C45C73100BF7426 /* TournamentGenerateModel.swift in Sources */,
 				466B70E22C45AF1900BF7426 /* SingleEliminationView.swift in Sources */,
 				462102CF2C5956D700924E6E /* MatchView.swift in Sources */,
 				469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */,
@@ -268,6 +275,7 @@
 				466B70BD2C3AA8FE00BF7426 /* MainPageView.swift in Sources */,
 				462FA4BB2BD2E45700175699 /* tournamentsApp.swift in Sources */,
 				466B70C32C3AB51200BF7426 /* NewTournamentViewModel.swift in Sources */,
+				465554212C714A3500C1CB7C /* Player.swift in Sources */,
 				469CDB212C677BEA00B1143F /* SettingsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
