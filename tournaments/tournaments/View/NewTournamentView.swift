@@ -7,6 +7,7 @@ struct NewTournamentView: View {
     @State private var showCamera = false
     @State private var selectedImage: UIImage?
     @Environment(\.presentationMode) var presentationMode
+    let eliminationPlayerCounts = [2, 4, 8, 16, 32, 64]
     
     var body: some View {
         VStack {
@@ -50,16 +51,33 @@ struct NewTournamentView: View {
                 }
                 Section(header: Text("Number of Players")) {
                     VStack {
-                        Slider(
-                            value: $viewModel.numberOfPlayers,
-                            in: 2...64,
-                            step: 1,
-                            onEditingChanged: { editing in
-                                viewModel.isEditing = editing
-                            }
-                        )
-                        Text("Number of Players: \(Int(viewModel.numberOfPlayers))")
-                            .foregroundColor(viewModel.isEditing ? .red : .purple)
+                        if viewModel.selectedType == "Single Elimination" || viewModel.selectedType == "Double Elimination" {
+                            Slider(
+                                value: Binding(
+                                    get: {
+                                        Double(eliminationPlayerCounts.first(where: { $0 >= Int(viewModel.numberOfPlayers) }) ?? 2)
+                                    },
+                                    set: { newValue in
+                                        viewModel.numberOfPlayers = Double(eliminationPlayerCounts.min(by: { abs($0 - Int(newValue)) < abs($1 - Int(newValue)) }) ?? 2)
+                                    }
+                                ),
+                                in: 2...64,
+                                step: 1
+                            )
+                            Text("Number of Players: \(Int(viewModel.numberOfPlayers))")
+                                .foregroundColor(viewModel.isEditing ? .red : .purple)
+                        } else {
+                            Slider(
+                                value: $viewModel.numberOfPlayers,
+                                in: 2...64,
+                                step: 1,
+                                onEditingChanged: { editing in
+                                    viewModel.isEditing = editing
+                                }
+                            )
+                            Text("Number of Players: \(Int(viewModel.numberOfPlayers))")
+                                .foregroundColor(viewModel.isEditing ? .red : .purple)
+                        }
                     }
                 }
                 Section(header: Text("Players")) {

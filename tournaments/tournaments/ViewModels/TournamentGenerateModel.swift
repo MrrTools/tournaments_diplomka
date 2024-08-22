@@ -65,16 +65,66 @@ class TournamentGenerateModel: ObservableObject {
                 match.player2Score = player2Score
                 
                 realm.add(match, update: .modified)
-                
             }
             updateTable(for: match, player1Score: player1Score, player2Score: player2Score)
             loadMatches()
             loadTable()
             objectWillChange.send()
         }
+        
+        if let tournament = match.tournament {
+            if tournament.type == "Single Elimination" {
+                // Zjistěte, kdo vyhrál
+                var winner: Player?
+                if player1Score > player2Score {
+                    winner = match.player1
+                } else if player2Score > player1Score {
+                    winner = match.player2
+                }
+
+                guard let actualWinner = winner else { return }
+
+                // Přidáme vítěze do dalšího kola
+                addWinnerToNextRound(winner: actualWinner, match: match)
+            }
+        }
     }
 
-    
+    func addWinnerToNextRound(winner: Player, match: Match) {
+        let nextRound = match.fixturesRound + 1
+        let nextMatchIndex = match.matchIndex + 4
+
+        guard let realm = RealmManager.shared.realm else { return }
+
+        // Hledáme zápas s daným `nextMatchIndex` v dalším kole
+        if let nextMatch = match.tournament?.matches.filter({ $0.matchIndex == nextMatchIndex + 1 && $0.fixturesRound == nextRound }).first {
+            print("Found existing match with index \(nextMatchIndex + 1) in round \(nextRound)")
+            // Zápas s daným indexem existuje, přidáme vítěze
+            try? realm.write {
+                if nextMatch.player1 == nil {
+                    nextMatch.player1 = winner
+                } else if nextMatch.player2 == nil {
+                    nextMatch.player2 = winner
+                }
+                realm.add(nextMatch, update: .modified)
+            }
+        } else {
+            // Zápas s daným indexem neexistuje, vytvoříme nový
+            let newMatch = Match()
+            newMatch.fixturesRound = nextRound
+            newMatch.matchIndex = nextMatchIndex + 1
+            newMatch.tournament = match.tournament
+            
+            try? realm.write {
+                newMatch.player1 = winner
+                realm.add(newMatch)
+            }
+        }
+    }
+
+
+
+
      func updateTable(for match: Match, player1Score: Int, player2Score: Int) {
          guard let settings = tournament.settings.first else {
              print("Tournament settings not found")
@@ -190,6 +240,7 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
         match.player2 = player2
         match.fixturesRound = 1  
         match.tournament = tournament
+        match.matchIndex = i + 1
         
         // Použití RealmManager pro uložení turnaje
         if let realm = RealmManager.shared.realm {
@@ -203,4 +254,6 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
     
     return matches
 }
+
+
 

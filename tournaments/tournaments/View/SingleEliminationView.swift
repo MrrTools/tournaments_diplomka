@@ -32,7 +32,7 @@ struct SingleEliminationView: View {
                         
                         ForEach(0..<matchesInSection[roundIndex], id: \.self) { matchIndex in
                             ZStack {
-                                if roundIndex == 0 && matchIndex < matchesForRound.count {
+                                if matchIndex < matchesForRound.count {
                                     MatchViewv(match: matchesForRound[matchIndex], showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
                                 } else {
                                     MatchViewv(match: nil, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch) // Zobrazí TBD
@@ -115,6 +115,7 @@ struct MatchViewv: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.purple, lineWidth: 2)
         )
-        .frame(width: 200, height: 100)  // Adjusted width and height to fit the new layout
+        .frame(width: 200, height: 100)
     }
 }
+
