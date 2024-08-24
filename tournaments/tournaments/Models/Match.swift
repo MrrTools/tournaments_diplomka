@@ -5,6 +5,11 @@
 //  Created by Lukas Sarocky on 15.07.2024.
 //
 
+//definition
+//@Persisted data for storage in Realm
+
+
+
 import Foundation
 import RealmSwift
 

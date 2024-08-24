@@ -92,13 +92,14 @@ class TournamentGenerateModel: ObservableObject {
 
     func addWinnerToNextRound(winner: Player, match: Match) {
         let nextRound = match.fixturesRound + 1
-        let nextMatchIndex = match.matchIndex + 4
+        let nextMatchIndex = Int(floor(Double(match.matchIndex + 1) / 2)) + 4
+        print("Found existing match with index \(nextMatchIndex) in round \(nextRound)")
 
         guard let realm = RealmManager.shared.realm else { return }
-
+        
         // Hledáme zápas s daným `nextMatchIndex` v dalším kole
-        if let nextMatch = match.tournament?.matches.filter({ $0.matchIndex == nextMatchIndex + 1 && $0.fixturesRound == nextRound }).first {
-            print("Found existing match with index \(nextMatchIndex + 1) in round \(nextRound)")
+        if let nextMatch = realm.objects(Match.self).filter("matchIndex == %@ AND fixturesRound == %@ AND tournament == %@", nextMatchIndex, nextRound, match.tournament!).first {
+                print("Found existing match with matchIndex \(nextMatchIndex) in round \(nextRound)")
             // Zápas s daným indexem existuje, přidáme vítěze
             try? realm.write {
                 if nextMatch.player1 == nil {
@@ -112,7 +113,7 @@ class TournamentGenerateModel: ObservableObject {
             // Zápas s daným indexem neexistuje, vytvoříme nový
             let newMatch = Match()
             newMatch.fixturesRound = nextRound
-            newMatch.matchIndex = nextMatchIndex + 1
+            newMatch.matchIndex = nextMatchIndex
             newMatch.tournament = match.tournament
             
             try? realm.write {
@@ -227,7 +228,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
 
 func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
     var matches: [Match] = []
-    var shuffledPlayers = players.shuffled()
+    let shuffledPlayers = players.shuffled()
     let numberOfMatches = shuffledPlayers.count / 2
     
     for i in 0..<numberOfMatches {
@@ -238,7 +239,7 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
         let match = Match()
         match.player1 = player1
         match.player2 = player2
-        match.fixturesRound = 1  
+        match.fixturesRound = 1
         match.tournament = tournament
         match.matchIndex = i + 1
         
@@ -254,6 +255,3 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
     
     return matches
 }
-
-
-

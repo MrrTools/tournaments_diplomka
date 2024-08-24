@@ -5,6 +5,9 @@
 //  Created by Lukas Sarocky on 07.07.2024.
 //
 
+//definition
+//@Published checking swiftUI changes and refresh the view
+
 import RealmSwift
 import SwiftUI
 

@@ -5,6 +5,10 @@
 //  Created by Lukas Sarocky on 17.08.2024.
 //
 
+//Definition
+//Binding znamená, že tato proměnná je propojena s nějakým externím stavem, takže změna této proměnné ovlivní stav v rodičovském pohledu.
+//@State znamená, že SwiftUI tuto proměnnou sleduje a znovu vykreslí UI při její změně.
+
 import SwiftUI
 
 struct EditModalDialogView: View {
