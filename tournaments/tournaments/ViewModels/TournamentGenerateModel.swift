@@ -46,6 +46,21 @@ class TournamentGenerateModel: ObservableObject {
         return matches.map { $0.fixturesRound }.max() ?? 0
     }
     
+    var EliminationRounds: Int {
+         return Int(log2(Double(numberOfPlayers)))
+     }
+
+     var numberOfPlayers: Int {
+         return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament }.count * 2
+     }
+    
+    //bitovy posun pre pocet kol pole napr 16 teamov [8,4,2,1]
+    var matchesInSection: [Int] {
+           (0..<EliminationRounds).map { round in
+               numberOfPlayers >> (round + 1)
+           }
+       }
+    
     func loadMatches() {
         let matches = realm.objects(Match.self).filter("tournament == %@", tournament)
         self.matches = Array(matches)
@@ -74,7 +89,6 @@ class TournamentGenerateModel: ObservableObject {
         
         if let tournament = match.tournament {
             if tournament.type == "Single Elimination" {
-                // Zjistěte, kdo vyhrál
                 var winner: Player?
                 if player1Score > player2Score {
                     winner = match.player1
@@ -84,7 +98,6 @@ class TournamentGenerateModel: ObservableObject {
 
                 guard let actualWinner = winner else { return }
 
-                // Přidáme vítěze do dalšího kola
                 addWinnerToNextRound(winner: actualWinner, match: match)
             }
         }
@@ -97,10 +110,8 @@ class TournamentGenerateModel: ObservableObject {
 
         guard let realm = RealmManager.shared.realm else { return }
         
-        // Hledáme zápas s daným `nextMatchIndex` v dalším kole
         if let nextMatch = realm.objects(Match.self).filter("matchIndex == %@ AND fixturesRound == %@ AND tournament == %@", nextMatchIndex, nextRound, match.tournament!).first {
                 print("Found existing match with matchIndex \(nextMatchIndex) in round \(nextRound)")
-            // Zápas s daným indexem existuje, přidáme vítěze
             try? realm.write {
                 if nextMatch.player1 == nil {
                     nextMatch.player1 = winner
@@ -110,7 +121,6 @@ class TournamentGenerateModel: ObservableObject {
                 realm.add(nextMatch, update: .modified)
             }
         } else {
-            // Zápas s daným indexem neexistuje, vytvoříme nový
             let newMatch = Match()
             newMatch.fixturesRound = nextRound
             newMatch.matchIndex = nextMatchIndex

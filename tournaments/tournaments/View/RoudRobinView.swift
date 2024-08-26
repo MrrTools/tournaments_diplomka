@@ -123,7 +123,7 @@ struct LeaderboardView: View {
             }
         }
         .refreshable {
-            viewModel.loadTable()  // Trigger table reload on pull-to-refresh
+            viewModel.loadTable()
         }
     }
 }

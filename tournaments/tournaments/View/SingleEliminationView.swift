@@ -3,14 +3,6 @@
 //  tournaments
 //
 //  Created by Lukas Sarocky on 15.07.2024.
-//SingleElimination
-
-//
-//  SingleElimination.swift
-//  tournaments
-//
-//  Created by Lukas Sarocky on 15.07.2024.
-//SingleElimination
 
 import SwiftUI
 import RealmSwift
@@ -20,17 +12,17 @@ struct SingleEliminationView: View {
     @State private var showScoreDialog = false
     @State private var selectedMatch: Match?
     
-    var rounds: Int = 3
-    var matchesInSection: [Int] = [4, 2, 1]
+    //var rounds: Int = 3
+    //var matchesInSection: [Int] = [4, 2, 1]
     
     var body: some View {
         ScrollView([.horizontal, .vertical], showsIndicators: false) {
             HStack(spacing: 100) {
-                ForEach(0..<rounds, id: \.self) { roundIndex in
+                ForEach(0..<viewModel.EliminationRounds, id: \.self) { roundIndex in
                     VStack(spacing: 40) {
                         let matchesForRound = viewModel.matches.filter { $0.fixturesRound == roundIndex + 1 }
                         
-                        ForEach(0..<matchesInSection[roundIndex], id: \.self) { matchIndex in
+                        ForEach(0..<viewModel.matchesInSection[roundIndex], id: \.self) { matchIndex in
                             ZStack {
                                 if matchIndex < matchesForRound.count {
                                     MatchViewv(match: matchesForRound[matchIndex], showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
@@ -38,7 +30,7 @@ struct SingleEliminationView: View {
                                     MatchViewv(match: nil, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch) // Zobrazí TBD
                                 }
                                 
-                                if roundIndex < rounds - 1 {
+                                if roundIndex < viewModel.EliminationRounds - 1 {
                                     drawLine(matchIndex: matchIndex)
                                 }
                             }

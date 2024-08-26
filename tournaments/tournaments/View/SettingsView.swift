@@ -12,15 +12,15 @@ struct SettingsView: View {
     var settings: TournamentSettings
     @Environment(\.presentationMode) var presentationMode
     
-    @State private var winScore: Int
-    @State private var loseScore: Int
-    @State private var drawScore: Int
+    @State private var winPoints: Int
+    @State private var losePoints: Int
+    @State private var drawPoints: Int
     
     init(settings: TournamentSettings) {
         self.settings = settings
-        _winScore = State(initialValue: settings.winPoints)
-        _loseScore = State(initialValue: settings.losePoints)
-        _drawScore = State(initialValue: settings.drawPoints)
+        _winPoints = State(initialValue: settings.winPoints)
+        _losePoints = State(initialValue: settings.losePoints)
+        _drawPoints = State(initialValue: settings.drawPoints)
     }
     
     var body: some View {
@@ -40,15 +40,15 @@ struct SettingsView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            if winScore > 0 {
-                                winScore -= 1
+                            if winPoints > 0 {
+                                winPoints -= 1
                             }
                         }) {
                             Image(systemName: "chevron.left")
                         }
-                        Text("\(winScore)")
+                        Text("\(winPoints)")
                         Button(action: {
-                            winScore += 1
+                            winPoints += 1
                         }) {
                             Image(systemName: "chevron.right")
                         }
@@ -61,15 +61,15 @@ struct SettingsView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            if loseScore > 0 {
-                                loseScore -= 1
+                            if losePoints > 0 {
+                                losePoints -= 1
                             }
                         }) {
                             Image(systemName: "chevron.left")
                         }
-                        Text("\(loseScore)")
+                        Text("\(losePoints)")
                         Button(action: {
-                            loseScore += 1
+                            losePoints += 1
                         }) {
                             Image(systemName: "chevron.right")
                         }
@@ -82,15 +82,15 @@ struct SettingsView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            if drawScore > 0 {
-                                drawScore -= 1
+                            if drawPoints > 0 {
+                                drawPoints -= 1
                             }
                         }) {
                             Image(systemName: "chevron.left")
                         }
-                        Text("\(drawScore)")
+                        Text("\(drawPoints)")
                         Button(action: {
-                            drawScore += 1
+                            drawPoints += 1
                         }) {
                             Image(systemName: "chevron.right")
                         }
@@ -122,9 +122,9 @@ struct SettingsView: View {
         guard let realm = RealmManager.shared.realm else { return }
         
         try? realm.write {
-            settings.winPoints = winScore
-            settings.losePoints = loseScore
-            settings.drawPoints = drawScore
+            settings.winPoints = winPoints
+            settings.losePoints = losePoints
+            settings.drawPoints = drawPoints
             realm.add(settings, update: .modified)
         }
         
