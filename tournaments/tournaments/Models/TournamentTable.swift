@@ -19,17 +19,15 @@ class TournamentTable: Object, ObjectKeyIdentifiable {
     @Persisted var draws: Int = 0
     @Persisted var tournament: Tournament?
     
-    convenience init(player: Player?
-                     , tournament: Tournament?
-    ) {
+    convenience init(player: Player?, tournament: Tournament?) {
         self.init()
         self.player = player
         self.tournament = tournament
     }
     
     var scoreDifference: Int {
-          return goalsScored - goalsConceded
-      }
+        return goalsScored - goalsConceded
+    }
 }
 
 

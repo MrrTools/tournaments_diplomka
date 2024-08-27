@@ -10,7 +10,7 @@ struct MatchesView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
     @Binding var showScoreDialog: Bool
     @Binding var selectedMatch: Match?
-
+    
     var body: some View {
         VStack {
             Picker("Rounds", selection: $viewModel.selectedRound) {
@@ -20,7 +20,7 @@ struct MatchesView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding()
-
+            
             List {
                 ForEach(viewModel.matchesForSelectedRound, id: \.id) { match in
                     HStack {
@@ -43,7 +43,7 @@ struct MatchesView: View {
                         Spacer()
                         Text(match.player2?.name ?? "TBD")
                             .font(.headline)
-                            .frame(minWidth: 100, alignment: .trailing)  // Nastavení minimální šířky pro zarovnání
+                            .frame(minWidth: 100, alignment: .trailing)
                     }
                     .padding(.vertical, 5)
                     .background(Color.gray.opacity(0.1))

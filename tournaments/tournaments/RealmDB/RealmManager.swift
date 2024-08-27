@@ -23,17 +23,6 @@ class RealmManager: ObservableObject {
         // Konfigurace Realm s možností smazání souboru v případě potřeby migrace
         let config = Realm.Configuration(
             schemaVersion: 3,
-            migrationBlock: { migration, oldSchemaVersion in
-                if oldSchemaVersion < 1 {
-                    // Provádějte migrace, pokud je potřeba
-                }
-                if oldSchemaVersion < 2 {
-                    // Provádějte migrace, pokud je potřeba
-                }
-                if oldSchemaVersion < 3 {
-                    // Provádějte migrace, pokud je potřeba
-                }
-            },
             deleteRealmIfMigrationNeeded: true
         )
         Realm.Configuration.defaultConfiguration = config
@@ -48,20 +37,20 @@ class RealmManager: ObservableObject {
         self.configuration = user?.flexibleSyncConfiguration(initialSubscriptions: { subs in
             
             if subs.first(named: "all-tournaments") == nil {
-                     subs.append(QuerySubscription<Tournament>(name: "all-tournaments"))
-                 }
-                 if subs.first(named: "all-players") == nil {
-                     subs.append(QuerySubscription<Player>(name: "all-players"))
-                 }
-                 if subs.first(named: "all-matches") == nil {
-                     subs.append(QuerySubscription<Match>(name: "all-matches"))
-                 }
-                 if subs.first(named: "all-settings") == nil {
-                     subs.append(QuerySubscription<TournamentSettings>(name: "all-settings"))
-                 }
-                 if subs.first(named: "all-table") == nil {
-                     subs.append(QuerySubscription<TournamentTable>(name: "all-table"))
-                 }
+                subs.append(QuerySubscription<Tournament>(name: "all-tournaments"))
+            }
+            if subs.first(named: "all-players") == nil {
+                subs.append(QuerySubscription<Player>(name: "all-players"))
+            }
+            if subs.first(named: "all-matches") == nil {
+                subs.append(QuerySubscription<Match>(name: "all-matches"))
+            }
+            if subs.first(named: "all-settings") == nil {
+                subs.append(QuerySubscription<TournamentSettings>(name: "all-settings"))
+            }
+            if subs.first(named: "all-table") == nil {
+                subs.append(QuerySubscription<TournamentTable>(name: "all-table"))
+            }
             
         }, rerunOnOpen: true)
         

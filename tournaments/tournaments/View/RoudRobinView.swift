@@ -13,39 +13,39 @@ struct RoundRobinView: View {
     @State var showScoreDialog = false
     @State private var selectedMatch: Match?
     @State private var showSettings = false
-
+    
     var body: some View {
         VStack {
             ZStack {
-                            Text(viewModel.tournament.name)
-                                .font(.largeTitle)
-                                .bold()
-                                .padding(.horizontal)
-
-                            HStack {
-                                Spacer()
-                                
-                                Button(action: {
-                                    showSettings.toggle()  // Při kliknutí se zobrazí nastavení
-                                }) {
-                                    Image(systemName: "gearshape.fill")
-                                        .resizable()
-                                        .frame(width: 24, height: 24)
-                                        .padding()
-                                       
-                                }
-                            }
-                            .padding(.trailing)
-                        }
-                        .padding(.top)
+                Text(viewModel.tournament.name)
+                    .font(.largeTitle)
+                    .bold()
+                    .padding(.horizontal)
+                
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        showSettings.toggle()
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .padding()
+                        
+                    }
+                }
+                .padding(.trailing)
+            }
+            .padding(.top)
             TabView {
                 LeaderboardView(table: viewModel.table, viewModel: viewModel)
                     .tabItem {
                         Image(systemName: "list.number")
                         Text("Table")
-                            
+                        
                     }
-
+                
                 MatchesView(viewModel: viewModel, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
                     .tabItem {
                         Image(systemName: "calendar")

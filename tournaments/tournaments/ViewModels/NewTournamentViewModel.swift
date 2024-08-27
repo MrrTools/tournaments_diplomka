@@ -81,7 +81,7 @@ class NewTournamentViewModel: ObservableObject {
             onSave()
         }
         
-        var matches: [Match] = []  // Tady deklarujeme prázdné pole
+        var matches: [Match] = []
         
         if self.selectedType == "Round Robin" {
             matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches)
@@ -91,6 +91,7 @@ class NewTournamentViewModel: ObservableObject {
         let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
         let settings = TournamentSettings(tournament: tournament)
         
+        //if let optional konstrukcia swift kde sa telo vykona ak nie je nill
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.matches.append(objectsIn: matches)

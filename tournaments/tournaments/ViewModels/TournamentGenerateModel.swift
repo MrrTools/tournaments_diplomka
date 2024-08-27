@@ -27,7 +27,7 @@ class TournamentGenerateModel: ObservableObject {
         loadMatches()
         loadTable()
     }
-
+    
     var rounds: [[Match]] {
         var rounds: [[Match]] = []
         print("Number of Rounds: \(numberOfRounds)")
@@ -37,29 +37,34 @@ class TournamentGenerateModel: ObservableObject {
         }
         return rounds
     }
-
+    
     var matchesForSelectedRound: [Match] {
         rounds[selectedRound - 1]
     }
-
+    
     var numberOfRounds: Int {
         return matches.map { $0.fixturesRound }.max() ?? 0
     }
     
     var EliminationRounds: Int {
-         return Int(log2(Double(numberOfPlayers)))
-     }
-
-     var numberOfPlayers: Int {
-         return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament }.count * 2
-     }
+        return Int(log2(Double(numberOfPlayers)))
+    }
+    
+    var numberOfPlayers: Int {
+        return numberOfFixtures * 2
+    }
+    
+    //$0 swift uzaver aktualna hodnota v poli
+    var numberOfFixtures: Int {
+        return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament }.count
+    }
     
     //bitovy posun pre pocet kol pole napr 16 teamov [8,4,2,1]
     var matchesInSection: [Int] {
-           (0..<EliminationRounds).map { round in
-               numberOfPlayers >> (round + 1)
-           }
-       }
+        (0..<EliminationRounds).map { round in
+            numberOfPlayers >> (round + 1)
+        }
+    }
     
     func loadMatches() {
         let matches = realm.objects(Match.self).filter("tournament == %@", tournament)
@@ -71,7 +76,7 @@ class TournamentGenerateModel: ObservableObject {
         let table = realm.objects(TournamentTable.self).filter("tournament == %@", tournament)
         self.table = Array(table)
         objectWillChange.send()
-     }
+    }
     
     func updateMatchScore(match: Match, player1Score: Int, player2Score: Int) {
         if let realm = RealmManager.shared.realm {
@@ -95,23 +100,23 @@ class TournamentGenerateModel: ObservableObject {
                 } else if player2Score > player1Score {
                     winner = match.player2
                 }
-
+                
                 guard let actualWinner = winner else { return }
-
+                
                 addWinnerToNextRound(winner: actualWinner, match: match)
             }
         }
     }
-
+    
     func addWinnerToNextRound(winner: Player, match: Match) {
         let nextRound = match.fixturesRound + 1
-        let nextMatchIndex = Int(floor(Double(match.matchIndex + 1) / 2)) + 4
+        let nextMatchIndex = Int(floor(Double(match.matchIndex + 1) / 2)) + numberOfFixtures
         print("Found existing match with index \(nextMatchIndex) in round \(nextRound)")
-
+        
         guard let realm = RealmManager.shared.realm else { return }
         
         if let nextMatch = realm.objects(Match.self).filter("matchIndex == %@ AND fixturesRound == %@ AND tournament == %@", nextMatchIndex, nextRound, match.tournament!).first {
-                print("Found existing match with matchIndex \(nextMatchIndex) in round \(nextRound)")
+            print("Found existing match with matchIndex \(nextMatchIndex) in round \(nextRound)")
             try? realm.write {
                 if nextMatch.player1 == nil {
                     nextMatch.player1 = winner
@@ -132,16 +137,16 @@ class TournamentGenerateModel: ObservableObject {
             }
         }
     }
-
-
-
-
-     func updateTable(for match: Match, player1Score: Int, player2Score: Int) {
-         guard let settings = tournament.settings.first else {
-             print("Tournament settings not found")
-             return
-         }
-
+    
+    
+    
+    
+    func updateTable(for match: Match, player1Score: Int, player2Score: Int) {
+        guard let settings = tournament.settings.first else {
+            print("Tournament settings not found")
+            return
+        }
+        
         let player1 = match.player1!
         let player2 = match.player2!
         
@@ -186,7 +191,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
     if players.count % 2 != 0 {
         players.append(Player(name: "BYE"))
     }
-
+    
     for i in 1..<players.count {
         for j in 0..<players.count / 2 {
             let homeTeam = players[j]
@@ -208,11 +213,11 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
                     realm.add(match)
                 }
             }
-
+            
             
             // odvety
             if riposeMateches {
-                 let riposeMatch = Match()
+                let riposeMatch = Match()
                 riposeMatch.player1 = awayTeam
                 riposeMatch.player2 = homeTeam
                 riposeMatch.fixturesRound = players.count - 1 + i

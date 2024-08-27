@@ -10,7 +10,7 @@ import RealmSwift
 
 struct MainPageView: View {
     @ObservedObject var viewModel = MainPageViewModel()
-
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -38,6 +38,9 @@ struct MainPageView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                                 Text("Type: \(tournament.type)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                Text("Owner: \(tournament.owner)")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                             }
@@ -70,7 +73,7 @@ struct MainPageView: View {
         if tournament.type == "Round Robin" {
             RoundRobinView(viewModel: TournamentGenerateModel(tournament: tournament))
         } else if tournament.type == "Single Elimination" {
-           SingleEliminationView(viewModel: TournamentGenerateModel(tournament: tournament))
+            SingleEliminationView(viewModel: TournamentGenerateModel(tournament: tournament))
         } else {
             Text("Unsupported tournament type")
         }

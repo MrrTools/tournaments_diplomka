@@ -18,7 +18,7 @@ class Tournament: Object, ObjectKeyIdentifiable {
     @Persisted var matches: List<Match>
     @Persisted var table: List<TournamentTable>
     @Persisted var settings: List<TournamentSettings>
-                   
+    
     
     convenience init(name: String, owner: String, sport: String, type: String, players: [Player], matches: [Match], table: [TournamentTable], settings: [TournamentSettings]) {
         self.init()

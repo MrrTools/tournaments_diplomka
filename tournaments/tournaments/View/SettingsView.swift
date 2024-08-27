@@ -18,6 +18,7 @@ struct SettingsView: View {
     
     init(settings: TournamentSettings) {
         self.settings = settings
+        //zalohovan premenna
         _winPoints = State(initialValue: settings.winPoints)
         _losePoints = State(initialValue: settings.losePoints)
         _drawPoints = State(initialValue: settings.drawPoints)

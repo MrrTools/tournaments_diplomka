@@ -27,7 +27,7 @@ struct SingleEliminationView: View {
                                 if matchIndex < matchesForRound.count {
                                     MatchViewv(match: matchesForRound[matchIndex], showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
                                 } else {
-                                    MatchViewv(match: nil, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch) // Zobrazí TBD
+                                    MatchViewv(match: nil, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
                                 }
                                 
                                 if roundIndex < viewModel.EliminationRounds - 1 {
@@ -56,7 +56,7 @@ struct SingleEliminationView: View {
             
         }
     }
-
+    
     @ViewBuilder
     func drawLine(matchIndex: Int) -> some View {
         Path { path in
@@ -70,6 +70,7 @@ struct SingleEliminationView: View {
     }
 }
 
+//? optional nabyva hodnotu nill? ... ?? nahrada za nill hodnotu
 struct MatchViewv: View {
     var match: Match?
     @Binding var showScoreDialog: Bool

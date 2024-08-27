@@ -16,10 +16,10 @@ class TournamentSettings: Object, ObjectKeyIdentifiable {
     @Persisted var tournament: Tournament?
     
     convenience init(winPoints: Int = 3, losePoints: Int = 0, drawPoints: Int = 1, tournament: Tournament?) {
-            self.init()
-            self.winPoints = winPoints
-            self.losePoints = losePoints
-            self.drawPoints = drawPoints
-            self.tournament = tournament
-        }
+        self.init()
+        self.winPoints = winPoints
+        self.losePoints = losePoints
+        self.drawPoints = drawPoints
+        self.tournament = tournament
+    }
 }

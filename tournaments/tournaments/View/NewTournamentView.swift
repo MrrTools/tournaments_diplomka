@@ -47,6 +47,7 @@ struct NewTournamentView: View {
                 if let selectedSport = viewModel.selectedSport {
                     Section(header: Text("Tournament mod")) {
                         Picker("Tournament", selection: $viewModel.selectedType) {
+                            Text("Select a Type").tag(String?.none)
                             ForEach(viewModel.sportTypes[selectedSport] ?? [], id: \.self) { type in
                                 Text(type).tag(type)
                             }

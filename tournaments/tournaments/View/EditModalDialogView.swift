@@ -17,7 +17,7 @@ struct EditModalDialogView: View {
     @State private var player1Score: String = ""
     @State private var player2Score: String = ""
     var onSave: (Match, Int, Int) -> Void
-
+    
     var body: some View {
         ZStack {
             Color.black.opacity(0.8).edgesIgnoringSafeArea(.all)
@@ -34,26 +34,26 @@ struct EditModalDialogView: View {
                     }
                     .padding()
                 }
-
+                
                 Text("Enter Score")
                     .font(.headline)
                     .padding()
-
+                
                 HStack {
                     VStack {
                         Text(match.player1?.name ?? "TBD")
                         if let photoData = match.player1?.photoData, let uiImage = UIImage(data: photoData) {
-                             Image(uiImage: uiImage)
-                                 .resizable()
-                                 .frame(width: 50, height: 50)
-                                 .clipShape(Circle())
-                         } else {
-                             Image(systemName: "person.crop.circle")
-                                 .resizable()
-                                 .frame(width: 50, height: 50)
-                                 .foregroundColor(.gray)
-                                 .clipShape(Circle())
-                         }
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.crop.circle")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .foregroundColor(.gray)
+                                .clipShape(Circle())
+                        }
                         TextField("-", text: $player1Score)
                             .keyboardType(.numberPad)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -75,17 +75,17 @@ struct EditModalDialogView: View {
                     VStack {
                         Text(match.player2?.name ?? "TBD")
                         if let photoData = match.player2?.photoData, let uiImage = UIImage(data: photoData) {
-                             Image(uiImage: uiImage)
-                                 .resizable()
-                                 .frame(width: 50, height: 50)
-                                 .clipShape(Circle())
-                         } else {
-                             Image(systemName: "person.crop.circle")
-                                 .resizable()
-                                 .frame(width: 50, height: 50)
-                                 .foregroundColor(.gray)
-                                 .clipShape(Circle())
-                         }
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.crop.circle")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .foregroundColor(.gray)
+                                .clipShape(Circle())
+                        }
                         TextField("-", text: $player2Score)
                             .keyboardType(.numberPad)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -99,11 +99,11 @@ struct EditModalDialogView: View {
                     }
                 }
                 .padding()
-
+                
                 DatePicker("Date", selection: .constant(Date()), displayedComponents: .date)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-
+                
                 Button(action: {
                     if let p1Score = Int(player1Score), let p2Score = Int(player2Score) {
                         onSave(match, p1Score, p2Score)
