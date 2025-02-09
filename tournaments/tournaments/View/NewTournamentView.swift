@@ -1,70 +1,121 @@
 import SwiftUI
 
 struct NewTournamentView: View {
-    // Vytvoření pozorovaného objektu, který bude obsahovat data pro turnaj
     @ObservedObject var viewModel: NewTournamentViewModel
-    // Stavové proměnné pro správu zobrazení a interakce
+    
     @State private var showImagePicker = false
     @State private var selectedPlayerIndex: Int? = nil
-    @State private var showCamera = false
-    @State private var selectedImage: UIImage?
+    
     @Environment(\.presentationMode) var presentationMode
+    
     let eliminationPlayerCounts = [2, 4, 8, 16, 32, 64]
+    let groupStageKO = [ 4, 8, 16, 32, 64]
+    
+    // Chybové zprávy
+    @State private var nameError: String?
+    @State private var ownerError: String?
+    @State private var sportError: String?
+    @State private var typeError: String?
+    @State private var playersErrors: [Int: String] = [:]
+    @State private var f1TeamsError: [Int: String] = [:]
     
     var body: some View {
         VStack {
-            // Záhlaví obrazovky
-            Text("Create Tournament")
+            Text("Vytvořit turnaj")
                 .font(.largeTitle)
                 .bold()
                 .padding()
             
             Form {
-                // Sekce pro zadání názvu turnaje
-                Section(header: Text("Name your tournament")) {
-                    TextField("Tournament Name", text: $viewModel.tournamentName)
+                // Název turnaje
+                Section(header: Text("Název turnaje")) {
+                    TextField("Název turnaje", text: $viewModel.tournamentName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    // Zobrazení chyby
+                    if let nameError = nameError {
+                        Text(nameError)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
                 }
                 
-                // Sekce pro zadání jména vlastníka turnaje
-                Section(header: Text("Owner")) {
-                    TextField("Owner Name", text: $viewModel.owner)
+                // Majitel turnaje
+                Section(header: Text("Majitel turnaje")) {
+                    TextField("Vaše jméno", text: $viewModel.owner)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    // Zobrazení chyby
+                    if let ownerError = ownerError {
+                        Text(ownerError)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
                 }
                 
-                // Sekce pro výběr sportu
-                Section(header: Text("Select sport")) {
+                // Výběr sportu
+                Section(header: Text("Zvolte sport")) {
                     Picker("Sport", selection: $viewModel.selectedSport) {
-                        Text("Select a sport").tag(String?.none)
+                        Text("Vyberte sport").tag(String?.none)
                         ForEach(viewModel.sportTypes.keys.sorted(), id: \.self) { sport in
                             Text(sport).tag(String?.some(sport))
                         }
                     }
                     .pickerStyle(.navigationLink)
+                    
+                    if let sportError = sportError {
+                        Text(sportError)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
                 }
                 
-                // Podmíněná sekce pro výběr turnajového modu
+                // Výběr turnajového módu
                 if let selectedSport = viewModel.selectedSport {
-                    Section(header: Text("Tournament mod")) {
-                        Picker("Tournament", selection: $viewModel.selectedType) {
-                            Text("Select a Type").tag(String?.none)
+                    Section(header: Text("Typ turnaje")) {
+                        Picker("Typ", selection: $viewModel.selectedType) {
+                            Text("Vyberte typ turnaje").tag(String?.none)
                             ForEach(viewModel.sportTypes[selectedSport] ?? [], id: \.self) { type in
                                 Text(type).tag(type)
                             }
                         }
                         .pickerStyle(.navigationLink)
+                        
+                        if let typeError = typeError {
+                            Text(typeError)
+                                .foregroundColor(.red)
+                                .font(.caption)
+                        }
                     }
                 }
                 
-                // Přepínač pro zahrnutí ripose zápasů, pokud je vybrán Round Robin
+                // Možnost zapnout ripose zápasy, pokud je vybrán Round Robin
                 if viewModel.selectedType == "Round Robin" {
                     Toggle(isOn: $viewModel.riposeMateches) {
-                        Text("Include ripose Matches")
+                        Text("Zahrnout ripose zápasy")
+                    }
+                }
+                else if viewModel.selectedType == "Championship" {
+                    Section(header: Text("Počet pretekov")) {
+                    VStack {
+                            Slider(
+                                value: $viewModel.numberOfRaces,
+                                in: 3...30,
+                                step: 1,
+                                onEditingChanged: { editing in
+                                    viewModel.isEditing = editing
+                                }
+                            )
+                            Text("Počet pretekov: \(Int(viewModel.numberOfRaces))")
+                                .foregroundColor(viewModel.isEditing ? .red : .purple)
+                        }
                     }
                 }
                 
-                // Sekce pro výběr počtu hráčů
-                Section(header: Text("Number of Players")) {
+    
+                
+                // Počet hráčů
+                Section(header: Text("Počet hráčů")) {
                     VStack {
                         if viewModel.selectedType == "Single Elimination" || viewModel.selectedType == "Double Elimination" {
                             Slider(
@@ -73,13 +124,17 @@ struct NewTournamentView: View {
                                         Double(eliminationPlayerCounts.first(where: { $0 >= Int(viewModel.numberOfPlayers) }) ?? 2)
                                     },
                                     set: { newValue in
-                                        viewModel.numberOfPlayers = Double(eliminationPlayerCounts.min(by: { abs($0 - Int(newValue)) < abs($1 - Int(newValue)) }) ?? 2)
+                                        viewModel.numberOfPlayers = Double(
+                                            eliminationPlayerCounts.min(by: {
+                                                abs($0 - Int(newValue)) < abs($1 - Int(newValue))
+                                            }) ?? 2
+                                        )
                                     }
                                 ),
                                 in: 2...64,
                                 step: 1
                             )
-                            Text("Number of Players: \(Int(viewModel.numberOfPlayers))")
+                            Text("Počet hráčů: \(Int(viewModel.numberOfPlayers))")
                                 .foregroundColor(viewModel.isEditing ? .red : .purple)
                         } else {
                             Slider(
@@ -90,47 +145,68 @@ struct NewTournamentView: View {
                                     viewModel.isEditing = editing
                                 }
                             )
-                            Text("Number of Players: \(Int(viewModel.numberOfPlayers))")
+                            Text("Počet hráčů: \(Int(viewModel.numberOfPlayers))")
                                 .foregroundColor(viewModel.isEditing ? .red : .purple)
                         }
                     }
                 }
                 
-                // Sekce pro zadání hráčů a jejich fotografií
-                Section(header: Text("Players")) {
+                // Zadávání hráčů
+                Section(header: Text("Hráči")) {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
                         ForEach(0..<Int(viewModel.numberOfPlayers), id: \.self) { index in
-                            HStack {
-                                if let image = viewModel.playerPhotos[index] {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                        .clipShape(Circle())
-                                } else {
-                                    Image(systemName: "camera")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                        .foregroundColor(.gray)
-                                        .clipShape(Circle())
+                            VStack {
+                                HStack {
+                                    if let image = viewModel.playerPhotos[index] {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                            .clipShape(Circle())
+                                    } else {
+                                        Image(systemName: "camera")
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(.gray)
+                                            .clipShape(Circle())
+                                    }
+                                    TextField("Hráč \(index + 1)", text: $viewModel.players[index])
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .multilineTextAlignment(.center)
+                                    
+                                    Spacer()
+                                    
+                                    if viewModel.selectedType == "Championship" {
+                                        TextField("Team F1", text: $viewModel.f1Teams[index])
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .multilineTextAlignment(.center)
+                                    }
+                                    Spacer()
                                 }
-                                TextField("Player \(index + 1)", text: $viewModel.players[index])
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .multilineTextAlignment(.center)
+                                .padding(.vertical, 6)
                                 
-                                Spacer()
+                                // Zobrazení chyby pod polem pro každého hráče
+                                if let error = playersErrors[index] {
+                                    Text(error)
+                                        .foregroundColor(.red)
+                                        .font(.caption)
+                                }
+                                if let error = f1TeamsError[index] {
+                                    Text(error)
+                                        .foregroundColor(.red)
+                                        .font(.caption)
+                                }
                             }
-                            .padding(.vertical)
                         }
                     }
                 }
                 
-                // Sekce pro přidání fotografie hráče
-                Section(header: Text("Add Player Photo")) {
+                // Přidání fotky hráče
+                Section(header: Text("Přidat fotku hráče")) {
                     HStack {
-                        Picker("Select Player", selection: $selectedPlayerIndex) {
-                            Text("Select a Player").tag(Int?.none)
+                        Picker("Vyberte hráče", selection: $selectedPlayerIndex) {
+                            Text("Vyberte hráče").tag(Int?.none)
                             ForEach(0..<Int(viewModel.numberOfPlayers), id: \.self) { index in
-                                Text(viewModel.players[index].isEmpty ? "Player \(index + 1)" : viewModel.players[index])
+                                Text(viewModel.players[index].isEmpty ? "Hráč \(index + 1)" : viewModel.players[index])
                                     .tag(Int?.some(index))
                                     .foregroundColor(.purple)
                             }
@@ -144,7 +220,7 @@ struct NewTournamentView: View {
                                 showImagePicker = true
                             }
                         }) {
-                            Text("Add Photo")
+                            Text("Přidat fotku")
                                 .padding(.horizontal)
                                 .padding(.vertical, 10)
                                 .background(Color.purple)
@@ -156,13 +232,12 @@ struct NewTournamentView: View {
             }
             .padding()
             
-            // Tlačítko pro vytvoření turnaje
+            // Tlačítko Vytvořit turnaj
             Button(action: {
-                viewModel.saveTournament()
-                presentationMode.wrappedValue.dismiss()
+                validateForm()
             }) {
                 HStack {
-                    Text("Create Tournament")
+                    Text("Vytvořit turnaj")
                     Image(systemName: "checkmark.circle")
                 }
                 .padding()
@@ -175,9 +250,85 @@ struct NewTournamentView: View {
         .background(Color.black.opacity(0.9))
         .foregroundColor(.white)
         .sheet(isPresented: $showImagePicker) {
-            if let selectedPlayerIndex = selectedPlayerIndex {
-                ImagePicker(selectedImage: $viewModel.playerPhotos[selectedPlayerIndex], sourceType: .camera)
+            if let selectedIndex = selectedPlayerIndex {
+                ImagePicker(
+                    selectedImage: $viewModel.playerPhotos[selectedIndex],
+                    sourceType: .camera
+                )
             }
+        }
+    }
+    
+    // MARK: - Validace formuláře
+    private func validateForm() {
+        // Nejprve vynulujeme chyby
+        nameError = nil
+        ownerError = nil
+        sportError = nil
+        typeError = nil
+        playersErrors = [:]
+        
+        var isValid = true
+        
+        // 1) Validace názvu turnaje
+        if viewModel.tournamentName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            nameError = "Název turnaje je povinný."
+            isValid = false
+        }
+        
+        // 2) Validace jména majitele
+        if viewModel.owner.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            ownerError = "Jméno majitele je povinné."
+            isValid = false
+        }
+        
+        // 3) Validace sportu
+        if viewModel.selectedSport == nil {
+            sportError = "Musíte vybrat sport."
+            isValid = false
+        }
+        
+        // 4) Validace typu turnaje
+        if viewModel.selectedType == nil {
+            typeError = "Musíte vybrat typ turnaje."
+            isValid = false
+        }
+        
+        // 5) Validace hráčů
+        let maxPlayers = Int(viewModel.numberOfPlayers)
+        for i in 0..<maxPlayers {
+            if viewModel.players[i].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                playersErrors[i] = "Jméno hráče je povinné."
+                isValid = false
+            }
+        }
+        
+        // 6) F1 validacie
+            var teamFrequencies: [String: Int] = [:]
+            for team in viewModel.f1Teams {
+                let trimmedTeam = team.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmedTeam.isEmpty {
+                    teamFrequencies[trimmedTeam, default: 0] += 1
+                }
+            }
+            
+            // Nyní ověříme každý textfield
+      /*      for (index, team) in viewModel.f1Teams.enumerated() {
+                let trimmedTeam = team.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmedTeam.isEmpty {
+                    f1TeamsError[index] = "Jméno teamu je povinné."
+                    isValid = false
+                } else if let count = teamFrequencies[trimmedTeam], count >= 3 {
+                    f1TeamsError[index] = "Maximálně 2 hráči mohou mít stejný tým."
+                    isValid = false
+                }
+            }*/
+
+        
+        // Pokud je formulář validní, teprve potom uložíme a zavřeme obrazovku
+        if isValid {
+            viewModel.saveTournament()
+            presentationMode.wrappedValue.dismiss()
         }
     }
 }

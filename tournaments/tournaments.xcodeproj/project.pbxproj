@@ -31,6 +31,7 @@
 		469CDB1D2C66C9EC00B1143F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1C2C66C9EC00B1143F /* SettingsView.swift */; };
 		469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */; };
 		469CDB212C677BEA00B1143F /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB202C677BEA00B1143F /* SettingsViewModel.swift */; };
+		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -72,6 +73,7 @@
 		469CDB1C2C66C9EC00B1143F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentSettings.swift; sourceTree = "<group>"; };
 		469CDB202C677BEA00B1143F /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSKOView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +136,7 @@
 				462102CE2C5956D700924E6E /* MatchView.swift */,
 				469CDB1C2C66C9EC00B1143F /* SettingsView.swift */,
 				465554222C714A8D00C1CB7C /* EditModalDialogView.swift */,
+				46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -270,6 +273,7 @@
 				466B70E62C45C56B00BF7426 /* Match.swift in Sources */,
 				469CDB1D2C66C9EC00B1143F /* SettingsView.swift in Sources */,
 				466B70CF2C3B0D3800BF7426 /* RealmManager.swift in Sources */,
+				46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */,
 				466B70BF2C3AAACA00BF7426 /* NewTournamentView.swift in Sources */,
 				467E9A022C46FDDC00F9774E /* TournamentTable.swift in Sources */,
 				466B70BD2C3AA8FE00BF7426 /* MainPageView.swift in Sources */,

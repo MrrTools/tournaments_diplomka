@@ -156,11 +156,13 @@ class TournamentGenerateModel: ObservableObject {
                     try? realm.write {
                         if player1Score > player2Score {
                             player1Table.wins += 1
-                            player1Table.points += settings.winPoints + settings.losePoints
+                            player1Table.points += settings.winPoints
+                            player2Table.points += settings.losePoints
                             player2Table.losses += 1
                         } else if player1Score < player2Score {
                             player2Table.wins += 1
-                            player2Table.points += settings.winPoints + settings.losePoints
+                            player2Table.points += settings.winPoints
+                            player1Table.points += settings.losePoints
                             player1Table.losses += 1
                         } else {
                             player1Table.draws += 1
@@ -189,7 +191,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
     
     // Pokud je počet týmů lichý, přidejte "BYE"
     if players.count % 2 != 0 {
-        players.append(Player(name: "BYE"))
+        players.append(Player(name: "BYE", team: ""))
     }
     
     for i in 1..<players.count {
@@ -270,3 +272,62 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
     
     return matches
 }
+
+func generateGSKO(players: [Player], numberOfGroups: Int, advancingPerGroup: Int, groupMatchesCount: Int, tournament: Tournament) -> [Match]  {
+    let matches: [Match] = []
+    
+    // 1. Rozdelenie hráčov do skupín
+    let allPlayers = players.shuffled()
+    var groups: [[Player]] = Array(repeating: [], count: numberOfGroups)
+    for (i, player) in allPlayers.enumerated() {
+        groups[i % numberOfGroups].append(player)
+    }
+    
+    // 2. Vygenerovanie skupinových zápasov
+    var groupMatches: [Match] = []
+    for (groupIndex, groupPlayers) in groups.enumerated() {
+        let numPlayers = groupPlayers.count
+        // Preskočíme skupiny, ktoré majú menej ako 2 hráčov
+        guard numPlayers >= 2 else { continue }
+        for _ in 0..<groupMatchesCount {
+            // Náhodný výber dvoch rôznych hráčov zo skupiny
+            let idx1 = Int.random(in: 0..<numPlayers)
+            var idx2 = Int.random(in: 0..<numPlayers)
+            while idx2 == idx1 {
+                idx2 = Int.random(in: 0..<numPlayers)
+            }
+            let match = Match()
+            match.player1 = groupPlayers[idx1]
+            match.player2 = groupPlayers[idx2]
+            // Pre jednoduchosť priraďujeme fixturesRound ako číslo skupiny
+            match.fixturesRound = groupIndex + 1
+            match.tournament = tournament
+            groupMatches.append(match)
+            
+            // Uloženie zápasu do Realm (ak je to potrebné)
+            if let realm = RealmManager.shared.realm {
+                try? realm.write {
+                    realm.add(match)
+                }
+            }
+        }
+    }
+    
+    // 3. Vygenerovanie skupinových tabuliek
+    var groupTables: [TournamentTable] = []
+    for group in groups {
+        let tables = group.map { TournamentTable(player: $0, tournament: tournament) }
+        groupTables.append(contentsOf: tables)
+    }
+    
+    // Uloženie skupinových zápasov a tabuliek do turnaja
+    if let realm = RealmManager.shared.realm {
+        try? realm.write {
+            tournament.matches.append(objectsIn: groupMatches)
+            tournament.table.append(objectsIn: groupTables)
+            realm.add(tournament, update: .modified)
+        }
+    }
+    return matches
+}
+

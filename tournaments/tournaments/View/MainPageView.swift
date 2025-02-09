@@ -74,6 +74,8 @@ struct MainPageView: View {
             RoundRobinView(viewModel: TournamentGenerateModel(tournament: tournament))
         } else if tournament.type == "Single Elimination" {
             SingleEliminationView(viewModel: TournamentGenerateModel(tournament: tournament))
+        } else if tournament.type == "Group Stage and KO" {
+            GSKOView(viewModel: TournamentGenerateModel(tournament: tournament), numberOfGroups: 4)
         } else {
             Text("Unsupported tournament type")
         }
