@@ -54,7 +54,7 @@ struct MatchesView: View {
             .padding(.horizontal)
         }
         .onAppear {
-            print("Match")
+            print("Match View for Group")
         }
     }
 }

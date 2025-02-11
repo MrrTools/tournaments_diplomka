@@ -32,6 +32,7 @@
 		469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */; };
 		469CDB212C677BEA00B1143F /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB202C677BEA00B1143F /* SettingsViewModel.swift */; };
 		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
+		46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -74,6 +75,7 @@
 		469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentSettings.swift; sourceTree = "<group>"; };
 		469CDB202C677BEA00B1143F /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSKOView.swift; sourceTree = "<group>"; };
+		46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +131,7 @@
 		464657A12BE6805500A963C2 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */,
 				466B70BC2C3AA8FE00BF7426 /* MainPageView.swift */,
 				466B70BE2C3AAACA00BF7426 /* NewTournamentView.swift */,
 				466B70E12C45AF1900BF7426 /* SingleEliminationView.swift */,
@@ -277,6 +280,7 @@
 				466B70BF2C3AAACA00BF7426 /* NewTournamentView.swift in Sources */,
 				467E9A022C46FDDC00F9774E /* TournamentTable.swift in Sources */,
 				466B70BD2C3AA8FE00BF7426 /* MainPageView.swift in Sources */,
+				46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */,
 				462FA4BB2BD2E45700175699 /* tournamentsApp.swift in Sources */,
 				466B70C32C3AB51200BF7426 /* NewTournamentViewModel.swift in Sources */,
 				465554212C714A3500C1CB7C /* Player.swift in Sources */,

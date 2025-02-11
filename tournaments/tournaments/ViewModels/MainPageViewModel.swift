@@ -23,7 +23,6 @@ class MainPageViewModel: ObservableObject {
         let tournamentsResults = realm.objects(Tournament.self)
         self.tournaments = Array(tournamentsResults)
     }
-    
     func deleteTournament(tournament: Tournament) {
         guard let realm = realm else { return }
         try? realm.write {

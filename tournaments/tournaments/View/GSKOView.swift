@@ -1,127 +1,130 @@
-//
-//  GSKOView.swift
-//  tournaments
-//
-//  Created by Lukas Sarocky on 09.02.2025.
-//
-
 import SwiftUI
 import RealmSwift
 
 struct GSKOView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
-    /// Počet skupín, ktorý musíte poznať (napr. z nastavení turnaja)
     let numberOfGroups: Int
     
+    // Vyberaná skupina (0-based: Group A=0, B=1, ...)
     @State private var selectedGroupIndex = 0
     
+    // Vyberaná „karta“ (0 = Table, 1 = Matches)
+    @State private var selectedTabIndex = 0
+    
+    // Premenné pre úpravu skóre
+    @State private var showScoreDialog = false
+    @State private var selectedMatch: Match?
+    @State private var showSettings = false
+    
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             // Názov turnaja
             Text(viewModel.tournament.name)
                 .font(.largeTitle)
                 .bold()
                 .padding(.top)
             
-            // Segmented picker pre prepínanie medzi skupinami
+            HStack {
+                Spacer()
+                
+                Button(action: {
+                    showSettings.toggle()
+                }) {
+                    Image(systemName: "gearshape.fill")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .padding()
+                    
+                }
+            }
+            .padding(.trailing)
+            
+            // 1) Picker pre výber skupiny
             Picker("Skupina", selection: $selectedGroupIndex) {
                 ForEach(0..<numberOfGroups, id: \.self) { index in
                     Text("Group \(Character(UnicodeScalar(65 + index)!))")
                         .tag(index)
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
+            .pickerStyle(.segmented)
             .padding(.horizontal)
-            .padding(.vertical, 8)
+            .padding(.top, 8)
             
-            // Obsah vybratej skupiny
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Tabuľka pre vybranú skupinu
-                    GroupTableView(tableEntries: groupTableEntries)
-                    
-                    Divider()
-                        .padding(.vertical)
-                    
-                    // Zoznam zápasov pre vybranú skupinu
-                    GroupMatchesView(matches: groupMatches)
-                }
-                .padding()
+            
+            // 2) Picker pre voľbu Table / Matches
+            Picker("", selection: $selectedTabIndex) {
+                Text("Table").tag(0)
+                Text("Matches").tag(1)
             }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            
+            // 3) Základné „prepínanie“ tabov v pozadí
+            //    miesto .tabItem() použijeme selection + .tag()
+            //    a .page(...) pre skrytie indikátora
+            TabView(selection: $selectedTabIndex) {
+                // TABLE
+                LeaderBoardView(
+                    table: groupTableEntries,
+                    viewModel: viewModel
+                )
+                .tag(0)
+                
+                // MATCHES
+                MatchesView(
+                    viewModel: viewModel,
+                    showScoreDialog: $showScoreDialog,
+                    selectedMatch: $selectedMatch
+                )
+                .tag(1)
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(height: 500)
             
             Spacer()
         }
+        .padding(.bottom)
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
         .navigationTitle("Skupinová fáza")
         .onAppear {
-            // Pri načítaní view načítame aktuálne tabuľkové údaje a zápasy
+            // Načítanie z DB
             viewModel.loadTable()
             viewModel.loadMatches()
+            // Môžete napr. resetnúť kolo
+            viewModel.selectedRound = 1
+        }
+        .sheet(isPresented: $showSettings) {
+            if let settings = viewModel.tournament.settings.first {
+                SettingsView(settings: settings)
+                    .background(Color.clear)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .sheet(isPresented: Binding(            get: { showScoreDialog },
+                                                set: { showScoreDialog = $0 }
+                                   ))
+        {
+            if let match = selectedMatch {
+                EditModalDialogView(match: match, isPresented: $showScoreDialog, onSave: viewModel.updateMatchScore)
+                    .background(Color.clear)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+            }
+            
         }
     }
     
-    /// Predpokladáme, že hráči sú rovnomerne rozdelení do skupín.
-    /// Ak je celkový počet hráčov turnaja deliteľný počtom skupín, každý tím má rovnaký počet tabuľkových záznamov.
+    // MARK: - Tabuľkové záznamy len pre vybranú skupinu
     var groupTableEntries: [TournamentTable] {
         let totalPlayers = viewModel.tournament.players.count
         let playersPerGroup = totalPlayers / numberOfGroups
         let start = selectedGroupIndex * playersPerGroup
         let end = start + playersPerGroup
-        if viewModel.table.count >= end {
-            return Array(viewModel.table[start..<end])
-        } else {
+        
+        guard viewModel.table.count >= end else {
             return []
         }
-    }
-    
-    /// Skupinové zápasy – predpokladáme, že v skupinovej fáze majú zápasy `fixturesRound` od 1 do numberOfGroups.
-    var groupMatches: [Match] {
-        viewModel.matches.filter { $0.fixturesRound == selectedGroupIndex + 1 }
-    }
-}
-
-struct GroupTableView: View {
-    let tableEntries: [TournamentTable]
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Tabuľka")
-                .font(.headline)
-            ForEach(tableEntries, id: \.id) { entry in
-                HStack {
-                    Text(entry.player?.name ?? "TBD")
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text("Points: \(entry.points)")
-                }
-                .padding(.vertical, 4)
-            }
-        }
-    }
-}
-
-struct GroupMatchesView: View {
-    let matches: [Match]
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Zápasy")
-                .font(.headline)
-            ForEach(matches, id: \.id) { match in
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text(match.player1?.name ?? "Team 1")
-                        Text("vs")
-                        Text(match.player2?.name ?? "Team 2")
-                    }
-                    .font(.subheadline)
-                    Text("Kolo: \(match.fixturesRound)")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                .padding(.vertical, 4)
-            }
-        }
+        return Array(viewModel.table[start..<end])
     }
 }

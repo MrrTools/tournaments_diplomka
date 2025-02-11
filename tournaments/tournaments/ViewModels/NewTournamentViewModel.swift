@@ -95,7 +95,7 @@ class NewTournamentViewModel: ObservableObject {
             matches = generateElimination(players: players, tournament: tournament)
         }
         else if self.selectedType == "Group Stage and KO"{
-            matches = generateGSKO(players: players, numberOfGroups: 4, advancingPerGroup: 2, groupMatchesCount: 1, tournament: tournament)
+            matches = generateGSKO(players: players, numberOfGroups: 4, advancingPerGroup: 2, tournament: tournament, groupMatchesCount: 1)
         }
         //let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
         let settings = TournamentSettings(tournament: tournament)

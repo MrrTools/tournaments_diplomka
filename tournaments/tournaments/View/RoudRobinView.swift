@@ -39,7 +39,7 @@ struct RoundRobinView: View {
             }
             .padding(.top)
             TabView {
-                LeaderboardView(table: viewModel.table, viewModel: viewModel)
+                LeaderBoardView(table: viewModel.table, viewModel: viewModel)
                     .tabItem {
                         Image(systemName: "list.number")
                         Text("Table")
@@ -74,56 +74,6 @@ struct RoundRobinView: View {
                 
             }
             
-        }
-    }
-}
-
-struct LeaderboardView: View {
-    var table: [TournamentTable]
-    @ObservedObject var viewModel: TournamentGenerateModel
-    
-    var sortedTable: [TournamentTable] {
-        return table.sorted {
-            if $0.points != $1.points {
-                return $0.points > $1.points
-            } else if $0.scoreDifference != $1.scoreDifference {
-                return $0.scoreDifference > $1.scoreDifference
-            } else if $0.goalsScored != $1.goalsScored {
-                return $0.goalsScored > $1.goalsScored
-            } else {
-                return $0.goalsConceded < $1.goalsConceded
-            }
-        }
-    }
-    var body: some View {
-        Table(sortedTable) {
-            TableColumn("Position") { table in
-                if let index = sortedTable.firstIndex(where: { $0._id == table._id }) {
-                    Text("\(index + 1)")
-                }
-            }
-            
-            TableColumn("Player Name"){ table in
-                Text(table.player?.name ?? "TBD")
-            }
-            TableColumn("Points") { table in
-                Text("\(table.points)")
-            }
-            TableColumn("Score") { table in
-                Text("\(table.goalsScored):\(table.goalsConceded)")
-            }
-            TableColumn("Wins") { table in
-                Text("\(table.wins)")
-            }
-            TableColumn("Draws") { table in
-                Text("\(table.draws)")
-            }
-            TableColumn("Losses") { table in
-                Text("\(table.losses)")
-            }
-        }
-        .refreshable {
-            viewModel.loadTable()
         }
     }
 }

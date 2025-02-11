@@ -32,7 +32,7 @@ class TournamentGenerateModel: ObservableObject {
         var rounds: [[Match]] = []
         print("Number of Rounds: \(numberOfRounds)")
         for round in 1...numberOfRounds {
-            let matchesInRound = matches.filter { $0.fixturesRound == round }
+            let matchesInRound = matches.filter { $0.fixturesRound == round}
             rounds.append(matchesInRound)
         }
         return rounds
@@ -273,54 +273,71 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
     return matches
 }
 
-func generateGSKO(players: [Player], numberOfGroups: Int, advancingPerGroup: Int, groupMatchesCount: Int, tournament: Tournament) -> [Match]  {
-    let matches: [Match] = []
+func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,tournament: Tournament, groupMatchesCount: Int) -> [Match] {
+    // Ak hráčov náhodne premiešame, každá skupina bude inak poskladaná
+    let allPlayers = players.shuffled()
     
     // 1. Rozdelenie hráčov do skupín
-    let allPlayers = players.shuffled()
     var groups: [[Player]] = Array(repeating: [], count: numberOfGroups)
     for (i, player) in allPlayers.enumerated() {
         groups[i % numberOfGroups].append(player)
     }
     
-    // 2. Vygenerovanie skupinových zápasov
+    // 2. Vygenerovanie Round Robin zápasov pre každú skupinu
     var groupMatches: [Match] = []
-    for (groupIndex, groupPlayers) in groups.enumerated() {
-        let numPlayers = groupPlayers.count
-        // Preskočíme skupiny, ktoré majú menej ako 2 hráčov
-        guard numPlayers >= 2 else { continue }
-        for _ in 0..<groupMatchesCount {
-            // Náhodný výber dvoch rôznych hráčov zo skupiny
-            let idx1 = Int.random(in: 0..<numPlayers)
-            var idx2 = Int.random(in: 0..<numPlayers)
-            while idx2 == idx1 {
-                idx2 = Int.random(in: 0..<numPlayers)
-            }
-            let match = Match()
-            match.player1 = groupPlayers[idx1]
-            match.player2 = groupPlayers[idx2]
-            // Pre jednoduchosť priraďujeme fixturesRound ako číslo skupiny
-            match.fixturesRound = groupIndex + 1
-            match.tournament = tournament
-            groupMatches.append(match)
-            
-            // Uloženie zápasu do Realm (ak je to potrebné)
-            if let realm = RealmManager.shared.realm {
-                try? realm.write {
-                    realm.add(match)
+    for (groupIndex, originalGroupPlayers) in groups.enumerated() {
+        // Skopírujeme hráčov danej skupiny, prípadne pridáme "BYE" pri nepárnom počte
+        var groupPlayers = originalGroupPlayers
+        if groupPlayers.count % 2 != 0 {
+            groupPlayers.append(Player(name: "BYE", team: ""))
+        }
+        let groupCount = groupPlayers.count
+        
+        // Round Robin logika: i od 1 do groupCount-1
+        // (ak je BYE, tak bude aj tak jeden hráč vždy stáť)
+        for round in 1..<(groupCount) {
+            for j in 0..<(groupCount / 2) {
+                let homeIndex = j
+                let awayIndex = groupCount - 1 - j
+                let homeTeam = groupPlayers[homeIndex]
+                let awayTeam = groupPlayers[awayIndex]         
+                
+                let match = Match()
+                match.player1 = homeTeam
+                match.player2 = awayTeam
+                
+                // matchIndex = číslo skupiny (1-based)
+                match.matchIndex = groupIndex + 1
+                // fixturesRound = kolo v rámci tejto skupiny
+                match.fixturesRound = round
+                match.tournament = tournament
+                
+                groupMatches.append(match)
+                
+                // Uloženie zápasu do Realm
+                if let realm = RealmManager.shared.realm {
+                    try? realm.write {
+                        realm.add(match)
+                    }
                 }
             }
+            // Implementujeme tzv. "circle shift" - posunieme posledného hráča dopredu
+            // aby sme zachovali Round Robin
+            let last = groupPlayers.removeLast()
+            groupPlayers.insert(last, at: 1)
         }
     }
     
     // 3. Vygenerovanie skupinových tabuliek
     var groupTables: [TournamentTable] = []
     for group in groups {
-        let tables = group.map { TournamentTable(player: $0, tournament: tournament) }
+        // Skupina mohla mať BYE, do tabulky to nepridávame
+        let tables = group.filter { $0.name != "BYE" }
+            .map { TournamentTable(player: $0, tournament: tournament) }
         groupTables.append(contentsOf: tables)
     }
     
-    // Uloženie skupinových zápasov a tabuliek do turnaja
+    // 4. Uloženie skupinových zápasov a tabuliek do turnaja
     if let realm = RealmManager.shared.realm {
         try? realm.write {
             tournament.matches.append(objectsIn: groupMatches)
@@ -328,6 +345,11 @@ func generateGSKO(players: [Player], numberOfGroups: Int, advancingPerGroup: Int
             realm.add(tournament, update: .modified)
         }
     }
-    return matches
+    
+    // V tomto príklade "advancingPerGroup" zatiaľ nijako nepoužívame
+    // (logika postupujúcich zo skupiny môže nasledovať neskôr)
+    
+    return groupMatches
 }
+
 
