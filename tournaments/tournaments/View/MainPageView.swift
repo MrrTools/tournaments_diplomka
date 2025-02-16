@@ -70,16 +70,23 @@ struct MainPageView: View {
     
     @ViewBuilder
     private func destinationView(for tournament: Tournament) -> some View {
-        if tournament.type == "Round Robin" {
+        switch tournament.type {
+        case "Round Robin":
             RoundRobinView(viewModel: TournamentGenerateModel(tournament: tournament))
-        } else if tournament.type == "Single Elimination" {
+            
+        case "Single Elimination", "Double Elimination", "Playoff":
             SingleEliminationView(viewModel: TournamentGenerateModel(tournament: tournament))
-        } else if tournament.type == "Group Stage and KO" {
-            GSKOView(viewModel: TournamentGenerateModel(tournament: tournament), numberOfGroups: 4)
-        } else {
+            
+        case "Group Stage and KO":
+            GSKOView(viewModel: TournamentGenerateModel(tournament: tournament),
+                     gskoVM: GSKOViewModel(viewModel: TournamentGenerateModel(tournament: tournament)),
+                     numberOfGroups: 4)
+            
+        default:
             Text("Unsupported tournament type")
         }
     }
+    
 }
 
 

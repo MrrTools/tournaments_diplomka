@@ -12,6 +12,7 @@ class TournamentGenerateModel: ObservableObject {
     @Published var tournament: Tournament
     @Published var table: [TournamentTable] = []
     @Published var matches: [Match] = []
+    @Published var selectedGroupIndex: Int = 0
     @Published var selectedRound: Int = 1 {
         didSet {
             loadMatches()
@@ -28,15 +29,28 @@ class TournamentGenerateModel: ObservableObject {
         loadTable()
     }
     
+    var isGroupStageAndKO: Bool {
+        tournament.type == "Group Stage and KO"
+    }
+    
     var rounds: [[Match]] {
         var rounds: [[Match]] = []
         print("Number of Rounds: \(numberOfRounds)")
         for round in 1...numberOfRounds {
-            let matchesInRound = matches.filter { $0.fixturesRound == round}
-            rounds.append(matchesInRound)
+            if isGroupStageAndKO {
+                let matchesInRound = matches.filter { $0.fixturesRound == round &&
+                    $0.matchIndex == (selectedGroupIndex + 1)
+                }
+                rounds.append(matchesInRound)
+            }
+            else {
+                let matchesInRound = matches.filter { $0.fixturesRound == round}
+                rounds.append(matchesInRound)
+            }
         }
         return rounds
     }
+    
     
     var matchesForSelectedRound: [Match] {
         rounds[selectedRound - 1]
@@ -78,11 +92,19 @@ class TournamentGenerateModel: ObservableObject {
         objectWillChange.send()
     }
     
-    func updateMatchScore(match: Match, player1Score: Int, player2Score: Int) {
+    func updateMatchScore(match: Match, player1Score: Int, player2Score: Int, setsString: String, rematchFlag: Int) {
         if let realm = RealmManager.shared.realm {
             try? realm.write {
-                match.player1Score = player1Score
-                match.player2Score = player2Score
+                if rematchFlag == 1 {
+                    match.player1ScoreRematch = player1Score
+                    match.player2ScoreRematch = player2Score
+                } else {
+                    match.player1Score = player1Score
+                    match.player2Score = player2Score
+                }
+                
+                
+                match.setsString   = setsString
                 
                 realm.add(match, update: .modified)
             }
@@ -104,6 +126,21 @@ class TournamentGenerateModel: ObservableObject {
                 guard let actualWinner = winner else { return }
                 
                 addWinnerToNextRound(winner: actualWinner, match: match)
+            } else if tournament.type == "Double Elimination" {
+                
+                let firstMatchCompleted = match.player1Score != 0 || match.player2Score != 0
+                let rematchCompleted = match.player1ScoreRematch != 0 || match.player2ScoreRematch != 0
+                if firstMatchCompleted && rematchCompleted {
+                    var winner: Player?
+                    if match.player1Score + match.player1ScoreRematch  > match.player2Score + match.player2ScoreRematch {
+                        winner = match.player1
+                    } else if match.player2Score + match.player2ScoreRematch > match.player1Score + match.player1ScoreRematch {
+                        winner = match.player2
+                    }
+                    guard let actualWinner = winner else { return }
+                    addWinnerToNextRound(winner: actualWinner, match: match)
+                }
+                
             }
         }
     }
@@ -260,6 +297,16 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
         match.tournament = tournament
         match.matchIndex = i + 1
         
+        switch tournament.type {
+        case "Double Elimination":
+            match.rematchFlag = 1
+        case "Playoff":
+            match.plafOFFMatchCount = 1
+        default:
+            break  // Žiadna špeciálna akcia pre iné typy turnajov
+        }
+        
+        
         // Použití RealmManager pro uložení turnaje
         if let realm = RealmManager.shared.realm {
             try? realm.write {
@@ -300,7 +347,7 @@ func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,
                 let homeIndex = j
                 let awayIndex = groupCount - 1 - j
                 let homeTeam = groupPlayers[homeIndex]
-                let awayTeam = groupPlayers[awayIndex]         
+                let awayTeam = groupPlayers[awayIndex]
                 
                 let match = Match()
                 match.player1 = homeTeam
@@ -346,8 +393,6 @@ func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,
         }
     }
     
-    // V tomto príklade "advancingPerGroup" zatiaľ nijako nepoužívame
-    // (logika postupujúcich zo skupiny môže nasledovať neskôr)
     
     return groupMatches
 }

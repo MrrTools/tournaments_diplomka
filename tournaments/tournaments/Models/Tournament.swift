@@ -14,18 +14,24 @@ class Tournament: Object, ObjectKeyIdentifiable {
     @Persisted var owner: String = ""
     @Persisted var sport: String = ""
     @Persisted var type: String = ""
+    @Persisted var groupNumber: Int?
+    @Persisted var playOFFMatches: Int?
+    @Persisted var qualifiedToNextRound: Int?
     @Persisted var players: List<Player>
     @Persisted var matches: List<Match>
     @Persisted var table: List<TournamentTable>
     @Persisted var settings: List<TournamentSettings>
     
     
-    convenience init(name: String, owner: String, sport: String, type: String, players: [Player], matches: [Match], table: [TournamentTable], settings: [TournamentSettings]) {
+    convenience init(name: String, owner: String, sport: String, type: String, groupNumber: Int?, playOFFMatches: Int?, qualifiedToNextRound: Int?, players: [Player], matches: [Match], table: [TournamentTable], settings: [TournamentSettings]) {
         self.init()
         self.name = name
         self.owner = owner
         self.sport = sport
         self.type = type
+        self.groupNumber = groupNumber
+        self.playOFFMatches = playOFFMatches
+        self.qualifiedToNextRound = qualifiedToNextRound
         self.players.append(objectsIn: players)
         self.matches.append(objectsIn: matches)
         self.table.append(objectsIn: table)

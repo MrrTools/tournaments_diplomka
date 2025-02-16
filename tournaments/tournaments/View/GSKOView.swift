@@ -3,30 +3,27 @@ import RealmSwift
 
 struct GSKOView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
+    @ObservedObject var gskoVM: GSKOViewModel
     let numberOfGroups: Int
     
-    // Vyberaná skupina (0-based: Group A=0, B=1, ...)
     @State private var selectedGroupIndex = 0
-    
-    // Vyberaná „karta“ (0 = Table, 1 = Matches)
     @State private var selectedTabIndex = 0
-    
-    // Premenné pre úpravu skóre
     @State private var showScoreDialog = false
     @State private var selectedMatch: Match?
     @State private var showSettings = false
+    @State private var rematchFlag = 0
     
     var body: some View {
         VStack(spacing: 16) {
-            // Názov turnaja
+            // Horný nadpis
             Text(viewModel.tournament.name)
                 .font(.largeTitle)
                 .bold()
                 .padding(.top)
             
+            // Prvky vpravo hore (nastavenia)
             HStack {
                 Spacer()
-                
                 Button(action: {
                     showSettings.toggle()
                 }) {
@@ -34,12 +31,11 @@ struct GSKOView: View {
                         .resizable()
                         .frame(width: 24, height: 24)
                         .padding()
-                    
                 }
             }
             .padding(.trailing)
             
-            // 1) Picker pre výber skupiny
+            // Picker pre výber skupiny
             Picker("Skupina", selection: $selectedGroupIndex) {
                 ForEach(0..<numberOfGroups, id: \.self) { index in
                     Text("Group \(Character(UnicodeScalar(65 + index)!))")
@@ -49,9 +45,12 @@ struct GSKOView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
             .padding(.top, 8)
+            // iOS 17 - onChange s dvoma parametrami
+            .onChange(of: selectedGroupIndex) { newValue, transaction in
+                viewModel.selectedGroupIndex = newValue
+            }
             
-            
-            // 2) Picker pre voľbu Table / Matches
+            // Picker pre prepínanie Table / Matches
             Picker("", selection: $selectedTabIndex) {
                 Text("Table").tag(0)
                 Text("Matches").tag(1)
@@ -59,15 +58,32 @@ struct GSKOView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
             
-            // 3) Základné „prepínanie“ tabov v pozadí
-            //    miesto .tabItem() použijeme selection + .tag()
-            //    a .page(...) pre skrytie indikátora
+            // TabView
             TabView(selection: $selectedTabIndex) {
                 // TABLE
-                LeaderBoardView(
-                    table: groupTableEntries,
-                    viewModel: viewModel
-                )
+                VStack(spacing: 0) {
+                    LeaderBoardView(
+                        table: groupTableEntries,
+                        viewModel: viewModel
+                    )
+                    .frame(minHeight: 300)
+                    
+                    // Tlačidlo "Proceed" - pod tabuľkou
+                    Button(action: {
+                        gskoVM.proceedAfterAllResults()
+                    }) {
+                        Text("Knock Out Stage")
+                            .font(.headline)
+                            .padding()
+                            .frame(maxWidth: 200)
+                            .background(Color.purple)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.vertical, 16)
+                    .disabled(!gskoVM.allResultsFilled)
+                    .opacity(gskoVM.allResultsFilled ? 1.0 : 0.5)
+                }
                 .tag(0)
                 
                 // MATCHES
@@ -86,14 +102,13 @@ struct GSKOView: View {
         .padding(.bottom)
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .foregroundColor(.white)
-        .navigationTitle("Skupinová fáza")
+        .navigationTitle("Group Stage")
         .onAppear {
-            // Načítanie z DB
             viewModel.loadTable()
             viewModel.loadMatches()
-            // Môžete napr. resetnúť kolo
             viewModel.selectedRound = 1
         }
+        // Nastavenia
         .sheet(isPresented: $showSettings) {
             if let settings = viewModel.tournament.settings.first {
                 SettingsView(settings: settings)
@@ -101,17 +116,17 @@ struct GSKOView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .sheet(isPresented: Binding(            get: { showScoreDialog },
-                                                set: { showScoreDialog = $0 }
-                                   ))
-        {
+        // Dialóg pre skóre zápasu
+        .sheet(isPresented: Binding(get: { showScoreDialog },
+                                   set: { showScoreDialog = $0 })) {
             if let match = selectedMatch {
-                EditModalDialogView(match: match, isPresented: $showScoreDialog, onSave: viewModel.updateMatchScore)
-                    .background(Color.clear)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
+                EditModalDialogView(match: match,
+                                    isPresented: $showScoreDialog, rematchFlag: rematchFlag,
+                                    
+                                    onSave: viewModel.updateMatchScore)
+                .background(Color.clear)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            
         }
     }
     

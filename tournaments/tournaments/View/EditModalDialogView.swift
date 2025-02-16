@@ -16,7 +16,9 @@ struct EditModalDialogView: View {
     @Binding var isPresented: Bool
     @State private var player1Score: String = ""
     @State private var player2Score: String = ""
-    var onSave: (Match, Int, Int) -> Void
+    @State private var setsString: String = ""
+    var rematchFlag: Int 
+    var onSave: (Match, Int, Int, String, Int) -> Void
     
     var body: some View {
         ZStack {
@@ -100,13 +102,27 @@ struct EditModalDialogView: View {
                 }
                 .padding()
                 
+                if let tournament = match.tournament, tournament.sport == "Tennis" {
+                    Text("Sets (napr. 6:4;6:3)")
+                        .foregroundColor(.white)
+                    TextField("Sets", text: $setsString)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .foregroundColor(.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.white, lineWidth: 2)
+                        )
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                }
+                
                 DatePicker("Date", selection: .constant(Date()), displayedComponents: .date)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
                 Button(action: {
                     if let p1Score = Int(player1Score), let p2Score = Int(player2Score) {
-                        onSave(match, p1Score, p2Score)
+                        onSave(match, p1Score, p2Score, setsString, rematchFlag)
                         isPresented = false
                     }
                 }) {

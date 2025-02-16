@@ -16,6 +16,8 @@ class NewTournamentViewModel: ObservableObject {
     @Published var owner: String = ""
     @Published var selectedSport: String? = nil
     @Published var selectedType: String? = nil
+    @Published var groupNumber: Int? = nil
+    @Published var qualifiedToNextRound: Int? = nil
     @Published var numberOfPlayers: Double = 2 {
         didSet {
             updatePlayersArray()
@@ -27,6 +29,7 @@ class NewTournamentViewModel: ObservableObject {
     @Published var isEditing: Bool = false
     @Published var playerPhotos: [Int: UIImage] = [:]
     @Published var f1Teams: [String] = Array(repeating: "", count: 2)
+    @Published var playOFFMatches: Int? = nil
     
     let sportTypes: [String: [String]] = [
         "Football": ["Single Elimination", "Double Elimination", "Round Robin", "Group Stage and KO"],
@@ -71,6 +74,9 @@ class NewTournamentViewModel: ObservableObject {
             owner: self.owner,
             sport: self.selectedSport ?? "",
             type: self.selectedType ?? "",
+            groupNumber: self.groupNumber,
+            playOFFMatches: self.playOFFMatches,
+            qualifiedToNextRound: self.qualifiedToNextRound,
             players: players,
             matches: [],
             table: [],
@@ -80,8 +86,6 @@ class NewTournamentViewModel: ObservableObject {
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 realm.add(tournament)
-               // let settings = TournamentSettings(tournament: tournament)
-               // realm.add(settings)
             }
             
             onSave()
@@ -91,7 +95,7 @@ class NewTournamentViewModel: ObservableObject {
         
         if self.selectedType == "Round Robin" {
             matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches)
-        } else if self.selectedType == "Single Elimination" || self.selectedType == "Double Elimination" {
+        } else if self.selectedType == "Single Elimination" || self.selectedType == "Double Elimination" ||  self.selectedType == "Playoff" {
             matches = generateElimination(players: players, tournament: tournament)
         }
         else if self.selectedType == "Group Stage and KO"{

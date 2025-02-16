@@ -46,8 +46,8 @@
             filePath = "tournaments/View/MainPageView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
             landmarkName = "MainPageView"
             landmarkType = "14">
          </BreakpointContent>

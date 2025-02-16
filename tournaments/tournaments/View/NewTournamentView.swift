@@ -10,6 +10,7 @@ struct NewTournamentView: View {
     
     let eliminationPlayerCounts = [2, 4, 8, 16, 32, 64]
     let groupStageKO = [ 4, 8, 16, 32, 64]
+    let playOffNHL = [2, 4, 8, 16]
     
     // Chybové zprávy
     @State private var nameError: String?
@@ -90,14 +91,14 @@ struct NewTournamentView: View {
                 }
                 
                 // Možnost zapnout ripose zápasy, pokud je vybrán Round Robin
-                if viewModel.selectedType == "Round Robin" {
+                if viewModel.selectedType == "Round Robin" || viewModel.selectedType ==  "Group Stage and KO"{
                     Toggle(isOn: $viewModel.riposeMateches) {
                         Text("Zahrnout ripose zápasy")
                     }
                 }
                 else if viewModel.selectedType == "Championship" {
                     Section(header: Text("Počet pretekov")) {
-                    VStack {
+                        VStack {
                             Slider(
                                 value: $viewModel.numberOfRaces,
                                 in: 3...30,
@@ -110,44 +111,59 @@ struct NewTournamentView: View {
                                 .foregroundColor(viewModel.isEditing ? .red : .purple)
                         }
                     }
+                } else if  viewModel.selectedType == "Playoff"{
+                    Section(header: Text("Počet víťazných zápasov")) {
+                        Picker("Počet víťazných zápasov", selection: $viewModel.playOFFMatches) {
+                            ForEach([3, 5, 7], id: \.self) { value in
+                                Text("\(value)").tag(value)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle()) // Zobrazenie ako tlačidlá
+                    }
+
                 }
-                
-    
                 
                 // Počet hráčů
                 Section(header: Text("Počet hráčů")) {
                     VStack {
-                        if viewModel.selectedType == "Single Elimination" || viewModel.selectedType == "Double Elimination" {
-                            Slider(
-                                value: Binding(
-                                    get: {
-                                        Double(eliminationPlayerCounts.first(where: { $0 >= Int(viewModel.numberOfPlayers) }) ?? 2)
-                                    },
-                                    set: { newValue in
-                                        viewModel.numberOfPlayers = Double(
-                                            eliminationPlayerCounts.min(by: {
-                                                abs($0 - Int(newValue)) < abs($1 - Int(newValue))
-                                            }) ?? 2
-                                        )
-                                    }
-                                ),
-                                in: 2...64,
-                                step: 1
-                            )
-                            Text("Počet hráčů: \(Int(viewModel.numberOfPlayers))")
-                                .foregroundColor(viewModel.isEditing ? .red : .purple)
-                        } else {
-                            Slider(
-                                value: $viewModel.numberOfPlayers,
-                                in: 2...64,
-                                step: 1,
-                                onEditingChanged: { editing in
-                                    viewModel.isEditing = editing
+                        // Výber dostupných možností podľa typu turnaja
+                        let availableCounts: [Int] = {
+                            switch viewModel.selectedType {
+                            case "Group Stage and KO":
+                                return groupStageKO
+                            case "Playoff":
+                                return playOffNHL
+                            case "Single Elimination", "Double Elimination":
+                                return eliminationPlayerCounts
+                            default:
+                                return Array(2...64) // Pre ostatné turnaje voľný výber
+                            }
+                        }()
+                        
+                        // Výpočet najbližšej platnej hodnoty (odstránenie zložitého `min(by:)`)
+                        let nearestValidPlayers: Int = availableCounts.first(where: { $0 >= Int(viewModel.numberOfPlayers) }) ?? availableCounts.first ?? 2
+                        
+                        // Aktualizovaný `Binding` pre `Slider`
+                        let playerBinding = Binding<Double>(
+                            get: { Double(viewModel.numberOfPlayers) },
+                            set: { newValue in
+                                let newIntValue = Int(newValue)
+                                if availableCounts.contains(newIntValue) {
+                                    viewModel.numberOfPlayers = Double(newIntValue)
+                                } else if let closest = availableCounts.min(by: { abs($0 - newIntValue) < abs($1 - newIntValue) }) {
+                                    viewModel.numberOfPlayers = Double(closest)
                                 }
-                            )
-                            Text("Počet hráčů: \(Int(viewModel.numberOfPlayers))")
-                                .foregroundColor(viewModel.isEditing ? .red : .purple)
-                        }
+                            }
+                        )
+                        
+                        Slider(
+                            value: playerBinding,
+                            in: Double(availableCounts.first ?? 2)...Double(availableCounts.last ?? 64),
+                            step: 1
+                        )
+                        
+                        Text("Počet hráčů: \(Int(viewModel.numberOfPlayers))")
+                            .foregroundColor(viewModel.isEditing ? .red : .purple)
                     }
                 }
                 
@@ -304,26 +320,26 @@ struct NewTournamentView: View {
         }
         
         // 6) F1 validacie
-            var teamFrequencies: [String: Int] = [:]
-            for team in viewModel.f1Teams {
-                let trimmedTeam = team.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmedTeam.isEmpty {
-                    teamFrequencies[trimmedTeam, default: 0] += 1
-                }
+        var teamFrequencies: [String: Int] = [:]
+        for team in viewModel.f1Teams {
+            let trimmedTeam = team.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmedTeam.isEmpty {
+                teamFrequencies[trimmedTeam, default: 0] += 1
             }
-            
-            // Nyní ověříme každý textfield
-      /*      for (index, team) in viewModel.f1Teams.enumerated() {
-                let trimmedTeam = team.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmedTeam.isEmpty {
-                    f1TeamsError[index] = "Jméno teamu je povinné."
-                    isValid = false
-                } else if let count = teamFrequencies[trimmedTeam], count >= 3 {
-                    f1TeamsError[index] = "Maximálně 2 hráči mohou mít stejný tým."
-                    isValid = false
-                }
-            }*/
-
+        }
+        
+        // Nyní ověříme každý textfield
+        /*      for (index, team) in viewModel.f1Teams.enumerated() {
+         let trimmedTeam = team.trimmingCharacters(in: .whitespacesAndNewlines)
+         if trimmedTeam.isEmpty {
+         f1TeamsError[index] = "Jméno teamu je povinné."
+         isValid = false
+         } else if let count = teamFrequencies[trimmedTeam], count >= 3 {
+         f1TeamsError[index] = "Maximálně 2 hráči mohou mít stejný tým."
+         isValid = false
+         }
+         }*/
+        
         
         // Pokud je formulář validní, teprve potom uložíme a zavřeme obrazovku
         if isValid {

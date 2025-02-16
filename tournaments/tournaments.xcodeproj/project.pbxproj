@@ -33,6 +33,7 @@
 		469CDB212C677BEA00B1143F /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB202C677BEA00B1143F /* SettingsViewModel.swift */; };
 		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
 		46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */; };
+		46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB382D5BF97100FDBBA7 /* GSKOViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -76,6 +77,7 @@
 		469CDB202C677BEA00B1143F /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSKOView.swift; sourceTree = "<group>"; };
 		46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardView.swift; sourceTree = "<group>"; };
+		46B3CB382D5BF97100FDBBA7 /* GSKOViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSKOViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 				466B70C22C3AB51200BF7426 /* NewTournamentViewModel.swift */,
 				466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */,
 				469CDB202C677BEA00B1143F /* SettingsViewModel.swift */,
+				46B3CB382D5BF97100FDBBA7 /* GSKOViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -268,6 +271,7 @@
 				466B70D12C3B0D7A00BF7426 /* Tournament.swift in Sources */,
 				466B70E82C45C73100BF7426 /* TournamentGenerateModel.swift in Sources */,
 				466B70E22C45AF1900BF7426 /* SingleEliminationView.swift in Sources */,
+				46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */,
 				462102CF2C5956D700924E6E /* MatchView.swift in Sources */,
 				469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */,
 				466B70C52C3AFCD400BF7426 /* ImagePicker.swift in Sources */,
