@@ -10,7 +10,7 @@ import RealmSwift
 struct SingleEliminationView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
     @State private var showScoreDialog = false
-    @State private var selectedMatch: Match?
+    @State private var selectedMatch: TournamentMatch?
     @State private var rematchFlag = 0  // Defaultná hodnota
 
     var body: some View {
@@ -80,9 +80,9 @@ struct SingleEliminationView: View {
 }
 
 struct MatchViewv: View {
-    var match: Match?
+    var match: TournamentMatch?
     @Binding var showScoreDialog: Bool
-    @Binding var selectedMatch: Match?
+    @Binding var selectedMatch: TournamentMatch?
     @Binding var rematchFlag: Int  // Posielame flag do hlavného view
 
     var body: some View {

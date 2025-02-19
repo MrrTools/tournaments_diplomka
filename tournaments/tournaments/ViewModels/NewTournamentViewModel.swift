@@ -91,7 +91,7 @@ class NewTournamentViewModel: ObservableObject {
             onSave()
         }
         
-        var matches: [Match] = []
+        var matches: [TournamentMatch] = []
         
         if self.selectedType == "Round Robin" {
             matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches)
@@ -101,14 +101,14 @@ class NewTournamentViewModel: ObservableObject {
         else if self.selectedType == "Group Stage and KO"{
             matches = generateGSKO(players: players, numberOfGroups: 4, advancingPerGroup: 2, tournament: tournament, groupMatchesCount: 1)
         }
-        //let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
+        let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
         let settings = TournamentSettings(tournament: tournament)
         
         //if let optional konstrukcia swift kde sa telo vykona ak nie je nill
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.matches.append(objectsIn: matches)
-               // tournament.table.append(objectsIn: table)
+                tournament.table.append(objectsIn: table)
                 tournament.settings.append(settings)
                 realm.add(tournament, update: .modified)
             }

@@ -140,9 +140,7 @@ struct NewTournamentView: View {
                             }
                         }()
                         
-                        // Výpočet najbližšej platnej hodnoty (odstránenie zložitého `min(by:)`)
-                        let nearestValidPlayers: Int = availableCounts.first(where: { $0 >= Int(viewModel.numberOfPlayers) }) ?? availableCounts.first ?? 2
-                        
+
                         // Aktualizovaný `Binding` pre `Slider`
                         let playerBinding = Binding<Double>(
                             get: { Double(viewModel.numberOfPlayers) },

@@ -43,7 +43,7 @@ class RealmManager: ObservableObject {
                 subs.append(QuerySubscription<Player>(name: "all-players"))
             }
             if subs.first(named: "all-matches") == nil {
-                subs.append(QuerySubscription<Match>(name: "all-matches"))
+                subs.append(QuerySubscription<TournamentMatch>(name: "all-matches"))
             }
             if subs.first(named: "all-settings") == nil {
                 subs.append(QuerySubscription<TournamentSettings>(name: "all-settings"))

@@ -11,7 +11,7 @@ import RealmSwift
 struct RoundRobinView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
     @State var showScoreDialog = false
-    @State private var selectedMatch: Match?
+    @State private var selectedMatch: TournamentMatch?
     @State private var showSettings = false
     @State private var rematchFlag = 0
     

@@ -29,17 +29,13 @@ class GSKOViewModel: ObservableObject {
     }
     
     func createKnockoutStage() {
-            guard let tournament = viewModel.tournament.settings.first else {
-                print("Tournament settings not found")
-                return
-            }
 
             let advancingPerGroup = 2//tournament.advancingPerGroup  // Počet postupujúcich zo skupiny
             let groupsCount = 4 //viewModel.tournament.groupsCount    // Počet skupín
             var advancingPlayers: [Player] = []
             
         for groupIndex in 1...groupsCount {
-                    let groupMatches = viewModel.matches.filter { $0.matchIndex == groupIndex } // Filtrujeme zápasy pre danú skupinu
+            let groupMatches = viewModel.matches.filter { $0.groupIndex == groupIndex } // Filtrujeme zápasy pre danú skupinu
                     var playerStats: [Player: TournamentTable] = [:]
                     
                     // 2. Naplníme tabuľku bodov pre hráčov v danej skupine
@@ -66,10 +62,10 @@ class GSKOViewModel: ObservableObject {
             advancingPlayers.shuffle()
             
             // 3. Vytvoríme Knockout Stage zápasy
-            var knockoutMatches: [Match] = []
+            var knockoutMatches: [TournamentMatch] = []
             for i in stride(from: 0, to: advancingPlayers.count, by: 2) {
                 if i + 1 < advancingPlayers.count {
-                    let match = Match()
+                    let match = TournamentMatch()
                     match.player1 = advancingPlayers[i]
                     match.player2 = advancingPlayers[i + 1]
                     match.fixturesRound = 1  // Prvé kolo KO fázy

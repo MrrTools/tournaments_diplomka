@@ -11,7 +11,7 @@ import RealmSwift
 class TournamentGenerateModel: ObservableObject {
     @Published var tournament: Tournament
     @Published var table: [TournamentTable] = []
-    @Published var matches: [Match] = []
+    @Published var matches: [TournamentMatch] = []
     @Published var selectedGroupIndex: Int = 0
     @Published var selectedRound: Int = 1 {
         didSet {
@@ -33,8 +33,8 @@ class TournamentGenerateModel: ObservableObject {
         tournament.type == "Group Stage and KO"
     }
     
-    var rounds: [[Match]] {
-        var rounds: [[Match]] = []
+    var rounds: [[TournamentMatch]] {
+        var rounds: [[TournamentMatch]] = []
         print("Number of Rounds: \(numberOfRounds)")
         for round in 1...numberOfRounds {
             if isGroupStageAndKO {
@@ -52,7 +52,7 @@ class TournamentGenerateModel: ObservableObject {
     }
     
     
-    var matchesForSelectedRound: [Match] {
+    var matchesForSelectedRound: [TournamentMatch] {
         rounds[selectedRound - 1]
     }
     
@@ -81,7 +81,7 @@ class TournamentGenerateModel: ObservableObject {
     }
     
     func loadMatches() {
-        let matches = realm.objects(Match.self).filter("tournament == %@", tournament)
+        let matches = realm.objects(TournamentMatch.self).filter("tournament == %@", tournament)
         self.matches = Array(matches)
         objectWillChange.send()
     }
@@ -92,9 +92,18 @@ class TournamentGenerateModel: ObservableObject {
         objectWillChange.send()
     }
     
-    func updateMatchScore(match: Match, player1Score: Int, player2Score: Int, setsString: String, rematchFlag: Int) {
+    func updateMatchScore(match: TournamentMatch, player1Score: Int, player2Score: Int, setsString: String, rematchFlag: Int) {
         if let realm = RealmManager.shared.realm {
+            
+            if match.player1Score != 0 || match.player2Score != 0 {
+                updateTable(for: match, player1Score: match.player1Score, player2Score: match.player2Score, remove: true)
+            }
+            if match.player1ScoreRematch != 0 || match.player2ScoreRematch != 0 {
+                updateTable(for: match, player1Score: match.player1ScoreRematch, player2Score: match.player2ScoreRematch, remove: true)
+            }
+            
             try? realm.write {
+                                
                 if rematchFlag == 1 {
                     match.player1ScoreRematch = player1Score
                     match.player2ScoreRematch = player2Score
@@ -108,7 +117,7 @@ class TournamentGenerateModel: ObservableObject {
                 
                 realm.add(match, update: .modified)
             }
-            updateTable(for: match, player1Score: player1Score, player2Score: player2Score)
+            updateTable(for: match, player1Score: player1Score, player2Score: player2Score, remove: false)
             loadMatches()
             loadTable()
             objectWillChange.send()
@@ -145,25 +154,33 @@ class TournamentGenerateModel: ObservableObject {
         }
     }
     
-    func addWinnerToNextRound(winner: Player, match: Match) {
+    func addWinnerToNextRound(winner: Player, match: TournamentMatch) {
         let nextRound = match.fixturesRound + 1
         let nextMatchIndex = Int(floor(Double(match.matchIndex + 1) / 2)) + numberOfFixtures
         print("Found existing match with index \(nextMatchIndex) in round \(nextRound)")
         
         guard let realm = RealmManager.shared.realm else { return }
         
-        if let nextMatch = realm.objects(Match.self).filter("matchIndex == %@ AND fixturesRound == %@ AND tournament == %@", nextMatchIndex, nextRound, match.tournament!).first {
+        if let nextMatch = realm.objects(TournamentMatch.self).filter("matchIndex == %@ AND fixturesRound == %@ AND tournament == %@", nextMatchIndex, nextRound, match.tournament!).first {
             print("Found existing match with matchIndex \(nextMatchIndex) in round \(nextRound)")
             try? realm.write {
-                if nextMatch.player1 == nil {
+                // Kontrola, či sa víťaz zmenil a potrebujeme ho aktualizovať
+                if nextMatch.player1 == match.player1 || nextMatch.player1 == match.player2 {
                     nextMatch.player1 = winner
-                } else if nextMatch.player2 == nil {
+                } else if nextMatch.player2 == match.player1 || nextMatch.player2 == match.player2 {
                     nextMatch.player2 = winner
+                } else {
+                    // Ak ešte nie je pridelený druhý hráč, pridáme ho na správne miesto
+                    if nextMatch.player1 == nil {
+                        nextMatch.player1 = winner
+                    } else if nextMatch.player2 == nil {
+                        nextMatch.player2 = winner
+                    }
                 }
                 realm.add(nextMatch, update: .modified)
             }
         } else {
-            let newMatch = Match()
+            let newMatch = TournamentMatch()
             newMatch.fixturesRound = nextRound
             newMatch.matchIndex = nextMatchIndex
             newMatch.tournament = match.tournament
@@ -172,13 +189,15 @@ class TournamentGenerateModel: ObservableObject {
                 newMatch.player1 = winner
                 realm.add(newMatch)
             }
+            loadMatches()
+            objectWillChange.send()
         }
     }
     
     
     
     
-    func updateTable(for match: Match, player1Score: Int, player2Score: Int) {
+    func updateTable(for match: TournamentMatch, player1Score: Int, player2Score: Int, remove: Bool) {
         guard let settings = tournament.settings.first else {
             print("Tournament settings not found")
             return
@@ -191,27 +210,31 @@ class TournamentGenerateModel: ObservableObject {
             if let player2Table = tournament.table.first(where: { $0.player == player2 }) {
                 if let realm = RealmManager.shared.realm {
                     try? realm.write {
-                        if player1Score > player2Score {
-                            player1Table.wins += 1
-                            player1Table.points += settings.winPoints
-                            player2Table.points += settings.losePoints
-                            player2Table.losses += 1
-                        } else if player1Score < player2Score {
-                            player2Table.wins += 1
-                            player2Table.points += settings.winPoints
-                            player1Table.points += settings.losePoints
-                            player1Table.losses += 1
-                        } else {
-                            player1Table.draws += 1
-                            player2Table.draws += 1
-                            player1Table.points += settings.drawPoints
-                            player2Table.points += settings.drawPoints
-                        }
-                        player1Table.goalsScored += player1Score
-                        player1Table.goalsConceded += player2Score
-                        player2Table.goalsScored += player2Score
-                        player2Table.goalsConceded += player1Score
+                        let refreshScore = remove ? -1 : 1
                         
+                        if player1Score > player2Score {
+                            player1Table.wins += 1 * refreshScore
+                            player1Table.points += settings.winPoints * refreshScore
+                            player2Table.points += settings.losePoints * refreshScore
+                            player2Table.losses += 1 * refreshScore
+                        } else if player1Score < player2Score {
+                            player2Table.wins += 1 * refreshScore
+                            player2Table.points += settings.winPoints * refreshScore
+                            player1Table.points += settings.losePoints * refreshScore
+                            player1Table.losses += 1 * refreshScore
+                        } else {
+                            player1Table.draws += 1 * refreshScore
+                            player2Table.draws += 1 * refreshScore
+                            player1Table.points += settings.drawPoints * refreshScore
+                            player2Table.points += settings.drawPoints * refreshScore
+                        }
+                        player1Table.goalsScored += player1Score * refreshScore
+                        player1Table.goalsConceded += player2Score * refreshScore
+                        player2Table.goalsScored += player2Score * refreshScore
+                        player2Table.goalsConceded += player1Score * refreshScore
+                        
+                        print("Found existing match with index \(player1Table.goalsScored) in round \(player1Table.goalsConceded )")
+                        print("Found existing match with index \(player2Table.goalsScored) in round \(player2Table.goalsConceded )")
                         realm.add(player1Table, update: .modified)
                         realm.add(player2Table, update: .modified)
                     }
@@ -222,8 +245,8 @@ class TournamentGenerateModel: ObservableObject {
 }
 
 // Generování Round Robin zápasů a jejich ukládání do MongoDB Realm
-func generateRoundRobinMatches(players: [Player], tournament: Tournament, riposeMateches: Bool) -> [Match] {
-    let matches: [Match] = []
+func generateRoundRobinMatches(players: [Player], tournament: Tournament, riposeMateches: Bool) -> [TournamentMatch] {
+    let matches: [TournamentMatch] = []
     var players = players
     
     // Pokud je počet týmů lichý, přidejte "BYE"
@@ -239,7 +262,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
             if homeTeam.name == "BYE" || awayTeam.name == "BYE" {
                 continue
             }
-            let match = Match()
+            let match = TournamentMatch()
             match.player1 = homeTeam
             match.player2 = awayTeam
             match.fixturesRound = i
@@ -256,7 +279,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
             
             // odvety
             if riposeMateches {
-                let riposeMatch = Match()
+                let riposeMatch = TournamentMatch()
                 riposeMatch.player1 = awayTeam
                 riposeMatch.player2 = homeTeam
                 riposeMatch.fixturesRound = players.count - 1 + i
@@ -280,8 +303,8 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
 }
 
 
-func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
-    var matches: [Match] = []
+func generateElimination(players: [Player], tournament: Tournament) -> [TournamentMatch] {
+    var matches: [TournamentMatch] = []
     let shuffledPlayers = players.shuffled()
     let numberOfMatches = shuffledPlayers.count / 2
     
@@ -290,7 +313,7 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
         let player2 = shuffledPlayers[i * 2 + 1]
         
         // Vytvoření zápasu
-        let match = Match()
+        let match = TournamentMatch()
         match.player1 = player1
         match.player2 = player2
         match.fixturesRound = 1
@@ -320,7 +343,7 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Match] {
     return matches
 }
 
-func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,tournament: Tournament, groupMatchesCount: Int) -> [Match] {
+func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,tournament: Tournament, groupMatchesCount: Int) -> [TournamentMatch] {
     // Ak hráčov náhodne premiešame, každá skupina bude inak poskladaná
     let allPlayers = players.shuffled()
     
@@ -331,7 +354,7 @@ func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,
     }
     
     // 2. Vygenerovanie Round Robin zápasov pre každú skupinu
-    var groupMatches: [Match] = []
+    var groupMatches: [TournamentMatch] = []
     for (groupIndex, originalGroupPlayers) in groups.enumerated() {
         // Skopírujeme hráčov danej skupiny, prípadne pridáme "BYE" pri nepárnom počte
         var groupPlayers = originalGroupPlayers
@@ -349,12 +372,12 @@ func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,
                 let homeTeam = groupPlayers[homeIndex]
                 let awayTeam = groupPlayers[awayIndex]
                 
-                let match = Match()
+                let match = TournamentMatch()
                 match.player1 = homeTeam
                 match.player2 = awayTeam
                 
                 // matchIndex = číslo skupiny (1-based)
-                match.matchIndex = groupIndex + 1
+                match.groupIndex = groupIndex + 1
                 // fixturesRound = kolo v rámci tejto skupiny
                 match.fixturesRound = round
                 match.tournament = tournament

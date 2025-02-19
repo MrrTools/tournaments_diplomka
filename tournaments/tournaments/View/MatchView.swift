@@ -9,7 +9,7 @@ import SwiftUI
 struct MatchesView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
     @Binding var showScoreDialog: Bool
-    @Binding var selectedMatch: Match?
+    @Binding var selectedMatch: TournamentMatch?
     
     var body: some View {
         VStack {

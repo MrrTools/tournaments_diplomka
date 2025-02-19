@@ -12,13 +12,13 @@
 import SwiftUI
 
 struct EditModalDialogView: View {
-    var match: Match
+    var match: TournamentMatch
     @Binding var isPresented: Bool
     @State private var player1Score: String = ""
     @State private var player2Score: String = ""
     @State private var setsString: String = ""
     var rematchFlag: Int 
-    var onSave: (Match, Int, Int, String, Int) -> Void
+    var onSave: (TournamentMatch, Int, Int, String, Int) -> Void
     
     var body: some View {
         ZStack {

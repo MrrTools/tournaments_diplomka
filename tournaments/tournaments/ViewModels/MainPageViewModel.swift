@@ -26,8 +26,8 @@ class MainPageViewModel: ObservableObject {
     func deleteTournament(tournament: Tournament) {
         guard let realm = realm else { return }
         try? realm.write {
-            realm.delete(tournament.matches)
             realm.delete(tournament.table)
+            realm.delete(tournament.matches)
             realm.delete(tournament.players)
             realm.delete(tournament.settings)
             realm.delete(tournament)
