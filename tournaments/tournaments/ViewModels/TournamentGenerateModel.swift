@@ -39,7 +39,7 @@ class TournamentGenerateModel: ObservableObject {
         for round in 1...numberOfRounds {
             if isGroupStageAndKO {
                 let matchesInRound = matches.filter { $0.fixturesRound == round &&
-                    $0.matchIndex == (selectedGroupIndex + 1)
+                    $0.groupIndex == (selectedGroupIndex + 1)
                 }
                 rounds.append(matchesInRound)
             }

@@ -30,6 +30,9 @@ class MainPageViewModel: ObservableObject {
             realm.delete(tournament.matches)
             realm.delete(tournament.players)
             realm.delete(tournament.settings)
+            realm.delete(tournament.f1Race)
+            realm.delete(tournament.f1TeamTable)
+            realm.delete(tournament.f1PlayerTable)
             realm.delete(tournament)
         }
         loadTournaments()

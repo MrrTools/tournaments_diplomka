@@ -51,6 +51,15 @@ class RealmManager: ObservableObject {
             if subs.first(named: "all-table") == nil {
                 subs.append(QuerySubscription<TournamentTable>(name: "all-table"))
             }
+            if subs.first(named: "all-f1Teamtable") == nil {
+                subs.append(QuerySubscription<F1TeamTable>(name: "all-f1Teamtable"))
+            }
+            if subs.first(named: "all-f1Playertable") == nil {
+                subs.append(QuerySubscription<F1PlayerTable>(name: "all-f1Playertable"))
+            }
+            if subs.first(named: "all-F1Race") == nil {
+                subs.append(QuerySubscription<F1Race>(name: "all-F1Race"))
+            }
             
         }, rerunOnOpen: true)
         

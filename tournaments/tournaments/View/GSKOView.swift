@@ -13,15 +13,11 @@ struct GSKOView: View {
     @State private var showSettings = false
     @State private var rematchFlag = 0
     
-    @State private var showKnockoutPicker = false  // 🔹 Skryje Picker, pokiaľ sa neklikne na "Knockout Stage"
-    @State private var showKnockoutStage = false   // 🔹 Prepína medzi Group Stage a Knockout Stage
-    
     var body: some View {
         VStack(spacing: 16) {
-            
-            // 🔥 Picker sa zobrazí iba, ak bol aktivovaný Knockout Stage
-            if showKnockoutPicker {
-                Picker("Stage", selection: $showKnockoutStage) {
+            // 🔥 Picker sa zobrazí vždy, ak bola aktivovaná Knockout Stage
+            if gskoVM.showKnockoutStage {
+                Picker("Stage", selection: $gskoVM.showKnockoutStage) {
                     Text("Group Stage").tag(false)
                     Text("Knockout Stage").tag(true)
                 }
@@ -30,12 +26,10 @@ struct GSKOView: View {
                 .transition(.opacity) // Plynulý prechod pri zobrazení
             }
             
-            if showKnockoutStage {
-                // 🔥 Knockout fáza (Single Elimination View)
+            if gskoVM.showKnockoutStage {
                 SingleEliminationView(viewModel: viewModel)
                     .transition(.opacity)
             } else {
-                // 🔥 Skupinová fáza (Pôvodný obsah)
                 VStack(spacing: 16) {
                     Text(viewModel.tournament.name)
                         .font(.largeTitle)
@@ -74,7 +68,6 @@ struct GSKOView: View {
                     .padding(.horizontal)
                     
                     TabView(selection: $selectedTabIndex) {
-                        // TABLE
                         VStack(spacing: 0) {
                             LeaderBoardView(
                                 table: groupTableEntries,
@@ -82,27 +75,26 @@ struct GSKOView: View {
                             )
                             .frame(minHeight: 300)
                             
-                            // 🔥 Po kliknutí na "Knockout Stage" sa aktivuje Picker a zobrazí sa Knockout fáza
-                            Button(action: {
-                                gskoVM.proceedAfterAllResults()
-                                showKnockoutPicker = true
-                                showKnockoutStage = true
-                            }) {
-                                Text("Knockout Stage")
-                                    .font(.headline)
-                                    .padding()
-                                    .frame(maxWidth: 200)
-                                    .background(Color.purple)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
+                            // 🔥 Tlačidlo zmizne po aktivovaní KO fázy
+                            if !gskoVM.showKnockoutStage {
+                                Button(action: {
+                                    gskoVM.proceedAfterAllResults()
+                                }) {
+                                    Text("Knockout Stage")
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: 200)
+                                        .background(Color.purple)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                }
+                                .padding(.vertical, 16)
+                                .disabled(!gskoVM.allResultsFilled)
+                                .opacity(gskoVM.allResultsFilled ? 1.0 : 0.5)
                             }
-                            .padding(.vertical, 16)
-                            .disabled(!gskoVM.allResultsFilled)
-                            .opacity(gskoVM.allResultsFilled ? 1.0 : 0.5)
                         }
                         .tag(0)
                         
-                        // MATCHES
                         MatchesView(
                             viewModel: viewModel,
                             showScoreDialog: $showScoreDialog,
@@ -125,8 +117,8 @@ struct GSKOView: View {
             viewModel.loadTable()
             viewModel.loadMatches()
             viewModel.selectedRound = 1
+            gskoVM.checkIfKnockoutStageExists() // ✅ Pri návrate do turnaja ostane KO fáza
         }
-        // Nastavenia
         .sheet(isPresented: $showSettings) {
             if let settings = viewModel.tournament.settings.first {
                 SettingsView(settings: settings)
@@ -134,9 +126,8 @@ struct GSKOView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        // Dialóg pre skóre zápasu
         .sheet(isPresented: Binding(get: { showScoreDialog },
-                                   set: { showScoreDialog = $0 })) {
+                                    set: { showScoreDialog = $0 })) {
             if let match = selectedMatch {
                 EditModalDialogView(match: match,
                                     isPresented: $showScoreDialog, rematchFlag: rematchFlag,
@@ -147,7 +138,6 @@ struct GSKOView: View {
         }
     }
     
-    // MARK: - Tabuľkové záznamy len pre vybranú skupinu
     var groupTableEntries: [TournamentTable] {
         let totalPlayers = viewModel.tournament.players.count
         let playersPerGroup = totalPlayers / numberOfGroups

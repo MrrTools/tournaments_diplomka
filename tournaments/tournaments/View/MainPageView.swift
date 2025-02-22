@@ -81,6 +81,8 @@ struct MainPageView: View {
             GSKOView(viewModel: TournamentGenerateModel(tournament: tournament),
                      gskoVM: GSKOViewModel(viewModel: TournamentGenerateModel(tournament: tournament)),
                      numberOfGroups: 4)
+        case "Championship":
+            F1View(viewModel: F1ViewModel(tournament: tournament))
             
         default:
             Text("Unsupported tournament type")

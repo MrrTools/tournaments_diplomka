@@ -28,6 +28,13 @@
 		466B70E62C45C56B00BF7426 /* TournamentMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70E52C45C56B00BF7426 /* TournamentMatch.swift */; };
 		466B70E82C45C73100BF7426 /* TournamentGenerateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */; };
 		467E9A022C46FDDC00F9774E /* TournamentTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467E9A012C46FDDC00F9774E /* TournamentTable.swift */; };
+		468355982D67ECAC005EE2D0 /* F1Race.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355972D67ECA5005EE2D0 /* F1Race.swift */; };
+		4683559A2D67ED3D005EE2D0 /* F1PlayerTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355992D67ED2F005EE2D0 /* F1PlayerTable.swift */; };
+		4683559C2D67EE2C005EE2D0 /* F1TeamTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4683559B2D67EE24005EE2D0 /* F1TeamTable.swift */; };
+		4683559E2D67F0CF005EE2D0 /* F1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4683559D2D67F0C8005EE2D0 /* F1View.swift */; };
+		468355A02D67F100005EE2D0 /* F1ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4683559F2D67F0F9005EE2D0 /* F1ViewModel.swift */; };
+		468355A22D6A2AFA005EE2D0 /* F1RaceDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355A12D6A2AEF005EE2D0 /* F1RaceDialogView.swift */; };
+		468355A42D6A3A56005EE2D0 /* RaceResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355A32D6A3A4F005EE2D0 /* RaceResultsView.swift */; };
 		469CDB1D2C66C9EC00B1143F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1C2C66C9EC00B1143F /* SettingsView.swift */; };
 		469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */; };
 		469CDB212C677BEA00B1143F /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB202C677BEA00B1143F /* SettingsViewModel.swift */; };
@@ -72,6 +79,13 @@
 		466B70E52C45C56B00BF7426 /* TournamentMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentMatch.swift; sourceTree = "<group>"; };
 		466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentGenerateModel.swift; sourceTree = "<group>"; };
 		467E9A012C46FDDC00F9774E /* TournamentTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentTable.swift; sourceTree = "<group>"; };
+		468355972D67ECA5005EE2D0 /* F1Race.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1Race.swift; sourceTree = "<group>"; };
+		468355992D67ED2F005EE2D0 /* F1PlayerTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1PlayerTable.swift; sourceTree = "<group>"; };
+		4683559B2D67EE24005EE2D0 /* F1TeamTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1TeamTable.swift; sourceTree = "<group>"; };
+		4683559D2D67F0C8005EE2D0 /* F1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1View.swift; sourceTree = "<group>"; };
+		4683559F2D67F0F9005EE2D0 /* F1ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1ViewModel.swift; sourceTree = "<group>"; };
+		468355A12D6A2AEF005EE2D0 /* F1RaceDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1RaceDialogView.swift; sourceTree = "<group>"; };
+		468355A32D6A3A4F005EE2D0 /* RaceResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceResultsView.swift; sourceTree = "<group>"; };
 		469CDB1C2C66C9EC00B1143F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentSettings.swift; sourceTree = "<group>"; };
 		469CDB202C677BEA00B1143F /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
@@ -133,6 +147,9 @@
 		464657A12BE6805500A963C2 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				468355A32D6A3A4F005EE2D0 /* RaceResultsView.swift */,
+				468355A12D6A2AEF005EE2D0 /* F1RaceDialogView.swift */,
+				4683559D2D67F0C8005EE2D0 /* F1View.swift */,
 				46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */,
 				466B70BC2C3AA8FE00BF7426 /* MainPageView.swift */,
 				466B70BE2C3AAACA00BF7426 /* NewTournamentView.swift */,
@@ -149,6 +166,7 @@
 		464657A22BE6808300A963C2 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				4683559F2D67F0F9005EE2D0 /* F1ViewModel.swift */,
 				466B70C02C3AAEE700BF7426 /* MainPageViewModel.swift */,
 				466B70C22C3AB51200BF7426 /* NewTournamentViewModel.swift */,
 				466B70E72C45C73100BF7426 /* TournamentGenerateModel.swift */,
@@ -161,6 +179,9 @@
 		464657A32BE680C400A963C2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				4683559B2D67EE24005EE2D0 /* F1TeamTable.swift */,
+				468355992D67ED2F005EE2D0 /* F1PlayerTable.swift */,
+				468355972D67ECA5005EE2D0 /* F1Race.swift */,
 				466B70D02C3B0D7A00BF7426 /* Tournament.swift */,
 				466B70E52C45C56B00BF7426 /* TournamentMatch.swift */,
 				467E9A012C46FDDC00F9774E /* TournamentTable.swift */,
@@ -269,18 +290,25 @@
 			files = (
 				465554232C714A8D00C1CB7C /* EditModalDialogView.swift in Sources */,
 				466B70D12C3B0D7A00BF7426 /* Tournament.swift in Sources */,
+				4683559A2D67ED3D005EE2D0 /* F1PlayerTable.swift in Sources */,
 				466B70E82C45C73100BF7426 /* TournamentGenerateModel.swift in Sources */,
 				466B70E22C45AF1900BF7426 /* SingleEliminationView.swift in Sources */,
 				46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */,
+				468355982D67ECAC005EE2D0 /* F1Race.swift in Sources */,
 				462102CF2C5956D700924E6E /* MatchView.swift in Sources */,
 				469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */,
 				466B70C52C3AFCD400BF7426 /* ImagePicker.swift in Sources */,
+				468355A42D6A3A56005EE2D0 /* RaceResultsView.swift in Sources */,
+				468355A02D67F100005EE2D0 /* F1ViewModel.swift in Sources */,
+				4683559C2D67EE2C005EE2D0 /* F1TeamTable.swift in Sources */,
 				462102CB2C5818D200924E6E /* RoudRobinView.swift in Sources */,
 				466B70C12C3AAEE700BF7426 /* MainPageViewModel.swift in Sources */,
+				4683559E2D67F0CF005EE2D0 /* F1View.swift in Sources */,
 				466B70E62C45C56B00BF7426 /* TournamentMatch.swift in Sources */,
 				469CDB1D2C66C9EC00B1143F /* SettingsView.swift in Sources */,
 				466B70CF2C3B0D3800BF7426 /* RealmManager.swift in Sources */,
 				46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */,
+				468355A22D6A2AFA005EE2D0 /* F1RaceDialogView.swift in Sources */,
 				466B70BF2C3AAACA00BF7426 /* NewTournamentView.swift in Sources */,
 				467E9A022C46FDDC00F9774E /* TournamentTable.swift in Sources */,
 				466B70BD2C3AA8FE00BF7426 /* MainPageView.swift in Sources */,

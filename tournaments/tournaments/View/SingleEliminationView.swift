@@ -12,15 +12,19 @@ struct SingleEliminationView: View {
     @State private var showScoreDialog = false
     @State private var selectedMatch: TournamentMatch?
     @State private var rematchFlag = 0  // Defaultná hodnota
-
+    
     var body: some View {
         ScrollView([.horizontal, .vertical], showsIndicators: false) {
             HStack(spacing: 100) {
                 ForEach(0..<viewModel.EliminationRounds, id: \.self) { roundIndex in
                     VStack(spacing: 40) {
-                        let matchesForRound = viewModel.matches.filter { $0.fixturesRound == roundIndex + 1 }
+                        let matchesForRound = viewModel.matches
+                            .filter {
+                                $0.fixturesRound == roundIndex + 1 &&
+                                (viewModel.tournament.type == "Group Stage and KO" ? $0.matchIndex != 0 : true)
+                            }
                             .sorted { $0.matchIndex < $1.matchIndex }
-
+                        
                         ForEach(0..<viewModel.matchesInSection[roundIndex], id: \.self) { matchIndex in
                             ZStack {
                                 if matchIndex < matchesForRound.count {
@@ -38,7 +42,7 @@ struct SingleEliminationView: View {
                                         rematchFlag: $rematchFlag
                                     )
                                 }
-
+                                
                                 if roundIndex < viewModel.EliminationRounds - 1 {
                                     drawLine(matchIndex: matchIndex)
                                 }
@@ -66,7 +70,7 @@ struct SingleEliminationView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     func drawLine(matchIndex: Int) -> some View {
         Path { path in
@@ -84,13 +88,13 @@ struct MatchViewv: View {
     @Binding var showScoreDialog: Bool
     @Binding var selectedMatch: TournamentMatch?
     @Binding var rematchFlag: Int  // Posielame flag do hlavného view
-
+    
     var body: some View {
         VStack(spacing: 8) {
             Text(match?.player1?.name ?? "TBD")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
+            
             Button(action: {
                 if let match = match {
                     selectedMatch = match
@@ -106,7 +110,7 @@ struct MatchViewv: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
-
+            
             if match?.rematchFlag == 1 {
                 Button(action: {
                     if let match = match {
@@ -124,18 +128,18 @@ struct MatchViewv: View {
                         .cornerRadius(8)
                 }
             }
-
+            
             Text(match?.player2?.name ?? "TBD")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .trailing)
-
+            
             if let setsString = match?.setsString,
                !setsString.isEmpty,
                let t = match?.tournament,
                t.sport == "Tennis" {
-
+                
                 let sets = setsString.split(separator: ";").map { String($0) }
-
+                
                 HStack {
                     ForEach(sets, id: \.self) { setScore in
                         Text(setScore)

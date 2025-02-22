@@ -62,13 +62,8 @@ class NewTournamentViewModel: ObservableObject {
             return Player(name: name, team: team, photoData: photoData)
         }
         
-        func generateStandings(players: [Player], tournament: Tournament) -> [TournamentTable] {
-            return players.map { TournamentTable(player: $0, tournament: tournament) }
-        }
-        
-        
-        
-        
+        let isF1 = selectedSport == "F1"
+
         let tournament = Tournament(
             name: self.tournamentName,
             owner: self.owner,
@@ -77,10 +72,14 @@ class NewTournamentViewModel: ObservableObject {
             groupNumber: self.groupNumber,
             playOFFMatches: self.playOFFMatches,
             qualifiedToNextRound: self.qualifiedToNextRound,
+            numberOfRaces: isF1 ? Int(numberOfRaces) : nil,  // 🔥 Uloženie počtu pretekov pre F1
             players: players,
             matches: [],
             table: [],
-            settings: []
+            settings: [],
+            f1Race: [],
+            f1TeamTable: [],
+            f1PlayerTable: []
         )
         
         if let realm = RealmManager.shared.realm {
@@ -91,20 +90,50 @@ class NewTournamentViewModel: ObservableObject {
             onSave()
         }
         
+        if isF1 {
+            generateF1Standings(tournament: tournament, players: players)
+        } else {
+            generateStandardTournament(tournament: tournament, players: players)
+        }
+        
+        onSave()
+    }
+    
+    // ✅ GENEROVANIE F1 STANDINGS (BEZ PRETEKOV)
+    private func generateF1Standings(tournament: Tournament, players: [Player]) {
+        let driverStandings = players.map { F1PlayerTable(player: $0, tournament: tournament) }
+        
+        let teamStandings = Dictionary(grouping: players, by: { $0.team! }).map { (team, drivers) in
+            F1TeamTable(teamName: team, tournament: tournament)
+        }
+        
+        if let realm = RealmManager.shared.realm {
+            try? realm.write {
+                tournament.f1PlayerTable.append(objectsIn: driverStandings)
+                tournament.f1TeamTable.append(objectsIn: teamStandings)
+                realm.add(tournament, update: .modified)
+            }
+        }
+    }
+    
+    // ✅ GENEROVANIE ŠTANDARDNÝCH TURNOS (PRE OSTATNÉ ŠPORTY)
+    private func generateStandardTournament(tournament: Tournament, players: [Player]) {
         var matches: [TournamentMatch] = []
         
-        if self.selectedType == "Round Robin" {
+        switch selectedType {
+        case "Round Robin":
             matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches)
-        } else if self.selectedType == "Single Elimination" || self.selectedType == "Double Elimination" ||  self.selectedType == "Playoff" {
+        case "Single Elimination", "Double Elimination", "Playoff":
             matches = generateElimination(players: players, tournament: tournament)
-        }
-        else if self.selectedType == "Group Stage and KO"{
+        case "Group Stage and KO":
             matches = generateGSKO(players: players, numberOfGroups: 4, advancingPerGroup: 2, tournament: tournament, groupMatchesCount: 1)
+        default:
+            break
         }
-        let table: [TournamentTable] = generateStandings(players: players, tournament: tournament)
-        let settings = TournamentSettings(tournament: tournament)
         
-        //if let optional konstrukcia swift kde sa telo vykona ak nie je nill
+        let table: [TournamentTable] = players.map { TournamentTable(player: $0, tournament: tournament) }
+        let settings = TournamentSettings(tournament: tournament)
+
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.matches.append(objectsIn: matches)
@@ -113,7 +142,5 @@ class NewTournamentViewModel: ObservableObject {
                 realm.add(tournament, update: .modified)
             }
         }
-        
-        onSave()
     }
 }

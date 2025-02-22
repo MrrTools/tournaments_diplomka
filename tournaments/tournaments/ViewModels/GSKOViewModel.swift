@@ -12,77 +12,75 @@ import SwiftUI
 
 class GSKOViewModel: ObservableObject {
     @ObservedObject var viewModel: TournamentGenerateModel
+    @Published var showKnockoutStage = false
     
     init(viewModel: TournamentGenerateModel) {
         self.viewModel = viewModel
+        checkIfKnockoutStageExists()
     }
     
+    /// ✅ Automaticky skontroluje, či knockout zápasy už existujú
+    func checkIfKnockoutStageExists() {
+        showKnockoutStage = viewModel.matches.contains(where: { $0.groupIndex == 0 })
+    }
+    
+    /// ✅ Podmienka správne kontroluje stav turnaja
     var allResultsFilled: Bool {
-        !viewModel.matches.contains { match in
-            match.player1Score == 0 && match.player2Score == 0
+        switch (viewModel.matches.contains { $0.groupIndex != 0 && ($0.player1Score == 0 && $0.player2Score == 0) },
+                showKnockoutStage) {
+        case (true, _):
+            return false  // Existujú nevyplnené zápasy v skupinovej fáze → tlačidlo zostane viditeľné
+        case (false, true):
+            return false  // Knockout zápasy už existujú → tlačidlo zmizne
+        case (false, false):
+            return true   // Všetky zápasy základnej časti sú vyplnené, ale knockout ešte neexistuje → tlačidlo sa zobrazí
         }
     }
 
+    /// ✅ Generuje Knockout Stage len raz
     func proceedAfterAllResults() {
+        guard !showKnockoutStage else { return } // 🔥 Zabraňuje opakovanej generácii KO
         print("All results are filled. Proceeding to the next step...")
         createKnockoutStage()
+        checkIfKnockoutStageExists()
     }
     
+    /// ✅ Generovanie KO fázy
     func createKnockoutStage() {
-
-            let advancingPerGroup = 2//tournament.advancingPerGroup  // Počet postupujúcich zo skupiny
-            let groupsCount = 4 //viewModel.tournament.groupsCount    // Počet skupín
-            var advancingPlayers: [Player] = []
-            
+        let advancingPerGroup = 2
+        let groupsCount = 4
+        var advancingPlayers: [Player] = []
+        
         for groupIndex in 1...groupsCount {
-            let groupMatches = viewModel.matches.filter { $0.groupIndex == groupIndex } // Filtrujeme zápasy pre danú skupinu
-                    var playerStats: [Player: TournamentTable] = [:]
-                    
-                    // 2. Naplníme tabuľku bodov pre hráčov v danej skupine
-                    for match in groupMatches {
-                        if let player1 = match.player1, let player2 = match.player2 {
-                            if let table1 = viewModel.table.first(where: { $0.player == player1 }) {
-                                playerStats[player1] = table1
-                            }
-                            if let table2 = viewModel.table.first(where: { $0.player == player2 }) {
-                                playerStats[player2] = table2
-                            }
-                        }
+            let groupMatches = viewModel.matches.filter { $0.groupIndex == groupIndex }
+            var playerStats: [Player: TournamentTable] = [:]
+            
+            for match in groupMatches {
+                if let player1 = match.player1, let player2 = match.player2 {
+                    if let table1 = viewModel.table.first(where: { $0.player == player1 }) {
+                        playerStats[player1] = table1
                     }
-                    
-                    // 3. Zoradíme hráčov podľa bodov
-                    let qualified = playerStats.sorted { $0.value.points > $1.value.points }
-                                              .prefix(advancingPerGroup)
-                                              .map { $0.key } // Extrahujeme iba hráčov
-                    
-                    advancingPlayers.append(contentsOf: qualified)
-                }
-
-            // 2. Zamiešame hráčov, aby boli v pavúkovi náhodne
-            advancingPlayers.shuffle()
-            
-            // 3. Vytvoríme Knockout Stage zápasy
-            var knockoutMatches: [TournamentMatch] = []
-            for i in stride(from: 0, to: advancingPlayers.count, by: 2) {
-                if i + 1 < advancingPlayers.count {
-                    let match = TournamentMatch()
-                    match.player1 = advancingPlayers[i]
-                    match.player2 = advancingPlayers[i + 1]
-                    match.fixturesRound = 1  // Prvé kolo KO fázy
-                    match.tournament = viewModel.tournament
-                    match.matchIndex = (i / 2) + 1
-                    knockoutMatches.append(match)
+                    if let table2 = viewModel.table.first(where: { $0.player == player2 }) {
+                        playerStats[player2] = table2
+                    }
                 }
             }
             
-            // 4. Uložíme zápasy do Realm databázy
-            if let realm = RealmManager.shared.realm {
-                try? realm.write {
-                    realm.add(knockoutMatches)
-                }
-            }
+            let qualified = playerStats.sorted { $0.value.points > $1.value.points }
+                .prefix(advancingPerGroup)
+                .map { $0.key }
             
-            print("Knockout stage generated with \(knockoutMatches.count) matches!")
+            advancingPlayers.append(contentsOf: qualified)
         }
-}
+        
+        let matches = generateElimination(players: advancingPlayers, tournament: viewModel.tournament)
 
+        if let realm = RealmManager.shared.realm {
+            try? realm.write {
+                realm.add(matches)
+            }
+        }
+        
+        checkIfKnockoutStageExists() // ✅ Po generovaní KO okamžite aktualizuje stav
+    }
+}
