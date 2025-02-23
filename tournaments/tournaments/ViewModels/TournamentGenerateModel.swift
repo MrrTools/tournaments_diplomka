@@ -70,7 +70,7 @@ class TournamentGenerateModel: ObservableObject {
     
     //$0 swift uzaver aktualna hodnota v poli
     var numberOfFixtures: Int {
-        return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament }.count
+        return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament && (tournament.type == "Group Stage and KO" ? $0.groupIndex == 0 : true) }.count
     }
     
     //bitovy posun pre pocet kol pole napr 16 teamov [8,4,2,1]
@@ -103,7 +103,7 @@ class TournamentGenerateModel: ObservableObject {
             }
             
             try? realm.write {
-                                
+                
                 if rematchFlag == 1 {
                     match.player1ScoreRematch = player1Score
                     match.player2ScoreRematch = player2Score
@@ -123,8 +123,15 @@ class TournamentGenerateModel: ObservableObject {
             objectWillChange.send()
         }
         
+        var playOffLegDone: Bool {
+            let threshold = ((tournament.playOFFMatches ?? 0) / 2) + 1
+            return threshold == player1Score || threshold == player2Score
+        }
+        
+        
         if let tournament = match.tournament {
-            if tournament.type == "Single Elimination" {
+            if tournament.type == "Single Elimination" || tournament.type ==  "Group Stage and KO"
+                || (tournament.type ==  "Playoff" && playOffLegDone){
                 var winner: Player?
                 if player1Score > player2Score {
                     winner = match.player1
@@ -333,7 +340,7 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Tourname
         // Použití RealmManager pro uložení turnaje
         if let realm = RealmManager.shared.realm {
             try? realm.write {
-                realm.add(match)
+                tournament.matches.append(objectsIn: matches)
             }
         }
         

@@ -4,10 +4,12 @@ import RealmSwift
 struct GSKOView: View {
     @ObservedObject var viewModel: TournamentGenerateModel
     @ObservedObject var gskoVM: GSKOViewModel
+    
     let numberOfGroups: Int
     
     @State private var selectedGroupIndex = 0
     @State private var selectedTabIndex = 0
+    
     @State private var showScoreDialog = false
     @State private var selectedMatch: TournamentMatch?
     @State private var showSettings = false
@@ -15,38 +17,43 @@ struct GSKOView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // 🔥 Picker sa zobrazí vždy, ak bola aktivovaná Knockout Stage
-            if gskoVM.showKnockoutStage {
-                Picker("Stage", selection: $gskoVM.showKnockoutStage) {
-                    Text("Group Stage").tag(false)
-                    Text("Knockout Stage").tag(true)
+            if !gskoVM.showKnockoutStage {
+                Text(viewModel.tournament.name)
+                    .font(.largeTitle)
+                    .bold()
+                    .padding(.top)
+                
+                // Riadok s tlačidlom "Settings" (gear)
+                HStack {
+                    Spacer()
+                    Button(action: { showSettings.toggle() }) {
+                        Image(systemName: "gearshape.fill")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .padding()
+                    }
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .transition(.opacity) // Plynulý prechod pri zobrazení
+                .padding(.trailing)
+            }
+            // Picker na prepínanie STAGE (Group / Knockout)
+            if  gskoVM.showHideComponets { Picker("Stage", selection: $gskoVM.showKnockoutStage) {
+                Text("Group Stage").tag(false)
+                Text("Knockout Stage").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
             }
             
+            // V závislosti od stavu Knockout Stage zobraziť buď SingleEliminationView, alebo Group Stage
             if gskoVM.showKnockoutStage {
+                // KO fáza
                 SingleEliminationView(viewModel: viewModel)
                     .transition(.opacity)
             } else {
+                // GROUP STAGE UI
                 VStack(spacing: 16) {
-                    Text(viewModel.tournament.name)
-                        .font(.largeTitle)
-                        .bold()
-                        .padding(.top)
                     
-                    HStack {
-                        Spacer()
-                        Button(action: { showSettings.toggle() }) {
-                            Image(systemName: "gearshape.fill")
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .padding()
-                        }
-                    }
-                    .padding(.trailing)
-                    
+                    // Picker na výber skupín
                     Picker("Skupina", selection: $selectedGroupIndex) {
                         ForEach(0..<numberOfGroups, id: \.self) { index in
                             Text("Group \(Character(UnicodeScalar(65 + index)!))")
@@ -55,11 +62,11 @@ struct GSKOView: View {
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
-                    .padding(.top, 8)
                     .onChange(of: selectedGroupIndex) { newValue, transaction in
                         viewModel.selectedGroupIndex = newValue
                     }
                     
+                    // Druhý picker (TabView) na zobrazenie "Table" alebo "Matches"
                     Picker("", selection: $selectedTabIndex) {
                         Text("Table").tag(0)
                         Text("Matches").tag(1)
@@ -68,6 +75,8 @@ struct GSKOView: View {
                     .padding(.horizontal)
                     
                     TabView(selection: $selectedTabIndex) {
+                        
+                        // TABLE zobrazenie
                         VStack(spacing: 0) {
                             LeaderBoardView(
                                 table: groupTableEntries,
@@ -75,32 +84,34 @@ struct GSKOView: View {
                             )
                             .frame(minHeight: 300)
                             
-                            // 🔥 Tlačidlo zmizne po aktivovaní KO fázy
-                            if !gskoVM.showKnockoutStage {
+                            if !gskoVM.showHideComponets {
                                 Button(action: {
                                     gskoVM.proceedAfterAllResults()
                                 }) {
-                                    Text("Knockout Stage")
-                                        .font(.headline)
-                                        .padding()
-                                        .frame(maxWidth: 200)
-                                        .background(Color.purple)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(10)
-                                }
+                                Text("Knockout Stage")
+                                    .font(.headline)
+                                    .padding()
+                                    .frame(maxWidth: 200)
+                                    .background(Color.purple)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                            }
                                 .padding(.vertical, 16)
                                 .disabled(!gskoVM.allResultsFilled)
                                 .opacity(gskoVM.allResultsFilled ? 1.0 : 0.5)
-                            }
+                        }
+                            
                         }
                         .tag(0)
                         
+                        // MATCHES zobrazenie
                         MatchesView(
                             viewModel: viewModel,
                             showScoreDialog: $showScoreDialog,
                             selectedMatch: $selectedMatch
                         )
                         .tag(1)
+                        
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                     .frame(height: 500)
@@ -114,11 +125,13 @@ struct GSKOView: View {
         .foregroundColor(.white)
         .navigationTitle("Group Stage")
         .onAppear {
+            // Načítanie potrebných údajov
             viewModel.loadTable()
             viewModel.loadMatches()
             viewModel.selectedRound = 1
-            gskoVM.checkIfKnockoutStageExists() // ✅ Pri návrate do turnaja ostane KO fáza
+            gskoVM.checkIfKnockoutStageExists()
         }
+        // Sheet pre zobrazenie nastavení
         .sheet(isPresented: $showSettings) {
             if let settings = viewModel.tournament.settings.first {
                 SettingsView(settings: settings)
@@ -126,18 +139,23 @@ struct GSKOView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .sheet(isPresented: Binding(get: { showScoreDialog },
+        // Sheet pre zobrazenie editácie skóre zápasu
+        .sheet(isPresented: Binding(get: { showScoreDialog && !gskoVM.showHideComponets },
                                     set: { showScoreDialog = $0 })) {
             if let match = selectedMatch {
-                EditModalDialogView(match: match,
-                                    isPresented: $showScoreDialog, rematchFlag: rematchFlag,
-                                    onSave: viewModel.updateMatchScore)
+                EditModalDialogView(
+                    match: match,
+                    isPresented: $showScoreDialog,
+                    rematchFlag: rematchFlag,
+                    onSave: viewModel.updateMatchScore
+                )
                 .background(Color.clear)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
     
+    // Vyberá iba hráčov (TournamentTable) z danej skupiny
     var groupTableEntries: [TournamentTable] {
         let totalPlayers = viewModel.tournament.players.count
         let playersPerGroup = totalPlayers / numberOfGroups

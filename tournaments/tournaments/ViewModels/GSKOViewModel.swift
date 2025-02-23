@@ -13,39 +13,40 @@ import SwiftUI
 class GSKOViewModel: ObservableObject {
     @ObservedObject var viewModel: TournamentGenerateModel
     @Published var showKnockoutStage = false
+    @Published var showHideComponets = false
     
     init(viewModel: TournamentGenerateModel) {
         self.viewModel = viewModel
         checkIfKnockoutStageExists()
     }
     
-    /// ✅ Automaticky skontroluje, či knockout zápasy už existujú
+    // Automaticky skontroluje, či knockout zápasy už existujú
     func checkIfKnockoutStageExists() {
         showKnockoutStage = viewModel.matches.contains(where: { $0.groupIndex == 0 })
+        showHideComponets = viewModel.matches.contains(where: { $0.groupIndex == 0 })
     }
     
-    /// ✅ Podmienka správne kontroluje stav turnaja
+    //Podmienka správne kontroluje stav turnaja
     var allResultsFilled: Bool {
         switch (viewModel.matches.contains { $0.groupIndex != 0 && ($0.player1Score == 0 && $0.player2Score == 0) },
                 showKnockoutStage) {
         case (true, _):
-            return false  // Existujú nevyplnené zápasy v skupinovej fáze → tlačidlo zostane viditeľné
+            return false
         case (false, true):
-            return false  // Knockout zápasy už existujú → tlačidlo zmizne
+            return false
         case (false, false):
-            return true   // Všetky zápasy základnej časti sú vyplnené, ale knockout ešte neexistuje → tlačidlo sa zobrazí
+            return true
         }
     }
 
-    /// ✅ Generuje Knockout Stage len raz
+    //Generuje Knockout Stage len raz
     func proceedAfterAllResults() {
-        guard !showKnockoutStage else { return } // 🔥 Zabraňuje opakovanej generácii KO
-        print("All results are filled. Proceeding to the next step...")
+        guard !showKnockoutStage else { return }
         createKnockoutStage()
         checkIfKnockoutStageExists()
     }
     
-    /// ✅ Generovanie KO fázy
+    // Generovanie KO fázy
     func createKnockoutStage() {
         let advancingPerGroup = 2
         let groupsCount = 4
@@ -81,6 +82,6 @@ class GSKOViewModel: ObservableObject {
             }
         }
         
-        checkIfKnockoutStageExists() // ✅ Po generovaní KO okamžite aktualizuje stav
+        checkIfKnockoutStageExists()
     }
 }

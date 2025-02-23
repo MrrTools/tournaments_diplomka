@@ -50,7 +50,6 @@ struct F1RaceDialogView: View {
                     }
                     .navigationTitle("Add Race")
                 }
-                // Tlačítko Vytvořit turnaj
                 Button(action: {
                     isPresented = false
                     viewModel.addRace(name: raceName,country: country, laps: laps,

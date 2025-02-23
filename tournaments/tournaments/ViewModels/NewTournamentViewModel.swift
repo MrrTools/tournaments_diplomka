@@ -24,18 +24,29 @@ class NewTournamentViewModel: ObservableObject {
         }
     }
     @Published var riposeMateches: Bool = false
+    @Published var riposeFinal: Bool = false
+    @Published var riposeKnockOut: Bool = false
     @Published var numberOfRaces: Double = 3
     @Published var players: [String] = Array(repeating: "", count: 2)
     @Published var isEditing: Bool = false
     @Published var playerPhotos: [Int: UIImage] = [:]
     @Published var f1Teams: [String] = Array(repeating: "", count: 2)
     @Published var playOFFMatches: Int? = nil
+    @Published var numberOfGroupPlayers: Int? = nil
+    @Published var numberOfAdvancePlayers: Int? = nil
     
     let sportTypes: [String: [String]] = [
         "Football": ["Single Elimination", "Double Elimination", "Round Robin", "Group Stage and KO"],
         "Hockey": ["Single Elimination", "Round Robin", "Playoff", "NHL", "Group Stage and KO"],
         "Tennis": ["Single Elimination"],
         "F1": ["Championship"]
+    ]
+    
+    let advanceTeams: [Int: [Int]] = [
+        2: [1],
+        4: [1,2],
+        8: [1,2,4],
+        16: [1,2,4]
     ]
     
     let onSave: () -> Void
@@ -70,6 +81,8 @@ class NewTournamentViewModel: ObservableObject {
             sport: self.selectedSport ?? "",
             type: self.selectedType ?? "",
             groupNumber: self.groupNumber,
+            numberOfAdvancePlayers: self.numberOfAdvancePlayers ?? 2,
+            numberOfGroupPlayers: self.numberOfGroupPlayers ?? 1,
             playOFFMatches: self.playOFFMatches,
             qualifiedToNextRound: self.qualifiedToNextRound,
             numberOfRaces: isF1 ? Int(numberOfRaces) : nil,  // 🔥 Uloženie počtu pretekov pre F1
@@ -116,7 +129,7 @@ class NewTournamentViewModel: ObservableObject {
         }
     }
     
-    // ✅ GENEROVANIE ŠTANDARDNÝCH TURNOS (PRE OSTATNÉ ŠPORTY)
+    // ✅ GENEROVANIE ŠTANDARDNÝCH TURNAJOV (PRE OSTATNÉ ŠPORTY)
     private func generateStandardTournament(tournament: Tournament, players: [Player]) {
         var matches: [TournamentMatch] = []
         
@@ -126,7 +139,7 @@ class NewTournamentViewModel: ObservableObject {
         case "Single Elimination", "Double Elimination", "Playoff":
             matches = generateElimination(players: players, tournament: tournament)
         case "Group Stage and KO":
-            matches = generateGSKO(players: players, numberOfGroups: 4, advancingPerGroup: 2, tournament: tournament, groupMatchesCount: 1)
+            matches = generateGSKO(players: players, numberOfGroups: self.numberOfGroupPlayers ?? 2, advancingPerGroup: self.numberOfAdvancePlayers ?? 2, tournament: tournament, groupMatchesCount: 1)
         default:
             break
         }
@@ -142,5 +155,37 @@ class NewTournamentViewModel: ObservableObject {
                 realm.add(tournament, update: .modified)
             }
         }
+    }
+    
+    var teamsPerGroupOptions: [Int] {
+        let players = Int(numberOfPlayers)
+        switch players {
+        case 4:
+            return [2]
+        case 8:
+            return [2, 4]
+        case 16:
+            return [2, 4, 8]
+        case 32:
+            return [4, 8, 16]
+        case 64:
+            return [8, 16]
+        default:
+            if players < 8 {
+                return [2]
+            } else if players < 16 {
+                return [2, 4]
+            } else if players < 32 {
+                return [2, 4, 8]
+            } else if players < 64 {
+                return [4, 8, 16]
+            } else {
+                return [8, 16]
+            }
+        }
+    }
+    var advancingOptions: [Int] {
+        let key = numberOfGroupPlayers ?? teamsPerGroupOptions.first ?? 1
+        return advanceTeams[key] ?? [1]
     }
 }

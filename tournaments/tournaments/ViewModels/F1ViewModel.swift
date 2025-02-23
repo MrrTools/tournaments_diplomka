@@ -76,45 +76,160 @@ class F1ViewModel: ObservableObject {
         // 2) Potom ich všetky naraz pridáme do Realm
         try? realm.write {
             realm.add(newRaces)
+            
+            for race in newRaces {
+                self.tournament.f1Race.append(race)
+            }
         }
         
+        
+        
         loadRaces()
-        //updateStandings()
     }
+    
+    private func parseFastestLap(_ s: String) -> Double {
+        // Očakávame formát "min:sec:ms", napr. "1:15:836"
+        let comps = s.split(separator: ":")
+        // Musia byť presne 3 časti
+        guard comps.count == 3 else {
+            return Double.greatestFiniteMagnitude // nepoužiteľný reťazec
+        }
+        // Skúsime skonvertovať min, sec, ms na Double
+        guard
+            let minutes = Double(comps[0]),
+            let seconds = Double(comps[1]),
+            let milliseconds = Double(comps[2])
+        else {
+            return Double.greatestFiniteMagnitude
+        }
+        // Výpočet: min * 60 + sec + (ms / 1000)
+        let totalSeconds = minutes * 60.0 + seconds + (milliseconds / 1000.0)
+        return totalSeconds
+    }
+
     
     func updateStandings() {
         guard let realm = realm else { return }
-        
-        var playerPoints: [Player: Int] = [:]
-        var teamPoints: [String: Int] = [:]
-        
-        let allResults = realm.objects(F1Race.self).filter("tournament == %@", tournament)
-        
-        for result in allResults {
-            guard let player = result.player, let team = player.team, !team.isEmpty else { continue }
-            
-            let points = calculatePoints(position: result.position)
-            playerPoints[player, default: 0] += points
-            teamPoints[team, default: 0] += points
-        }
-        
+
+        // 1) Načítame všetky existujúce PlayerTable/TeamTable pre tento turnaj
+        let allPlayerTables = realm.objects(F1PlayerTable.self)
+            .filter("tournament == %@", tournament)
+        let allTeamTables = realm.objects(F1TeamTable.self)
+            .filter("tournament == %@", tournament)
+
+        // 2) V write transakcii vyresetujeme body, wins, podiums, fastestLaps
         try? realm.write {
-            realm.delete(realm.objects(F1PlayerTable.self).filter("tournament == %@", tournament))
-            realm.delete(realm.objects(F1TeamTable.self).filter("tournament == %@", tournament))
-            
-            for (player, points) in playerPoints {
-                let standing = F1PlayerTable(player: player, totalPoints: points, tournament: tournament)
-                realm.add(standing)
+            for pt in allPlayerTables {
+                pt.totalPoints = 0
+                pt.wins = 0
+                pt.podiums = 0
+                pt.fastestLaps = 0
             }
-            
-            for (team, points) in teamPoints {
-                let teamStanding = F1TeamTable(teamName: team, totalPoints: points, tournament: tournament)
-                realm.add(teamStanding)
+            for tt in allTeamTables {
+                tt.totalPoints = 0
+                tt.wins = 0
+                tt.podiums = 0
+                tt.fastestLaps = 0
             }
         }
-        
+
+        // 3) Všetky preteky (F1Race) pre daný turnaj
+        let allResults = realm.objects(F1Race.self)
+            .filter("tournament == %@", tournament)
+
+        // 4) V prvej fáze pripočítame body, wins, podiums
+        try? realm.write {
+            for result in allResults {
+                guard let player = result.player else { continue }
+                let teamName = player.team ?? ""
+                if teamName.isEmpty { continue }
+
+                // finalPos = buď 'finished' (ak je to reťazec s číslom) alebo 'position'
+                let finalPos = Int(result.finished) ?? result.position ?? 9999
+                let points = calculatePoints(position: finalPos)
+
+                // ===== PLAYER TABLE =====
+                if let existingPT = allPlayerTables.first(where: { $0.player == player }) {
+                    existingPT.totalPoints += points
+
+                    // Pódium: ak finalPos <= 3
+                    if finalPos <= 3 { existingPT.podiums += 1 }
+                    // Víťazstvo: ak finalPos == 1
+                    if finalPos == 1 { existingPT.wins += 1 }
+
+                } else {
+                    // Neexistuje -> vytvoríme
+                    let newPT = F1PlayerTable(player: player, totalPoints: points, tournament: tournament)
+                    if finalPos <= 3 { newPT.podiums = 1 }
+                    if finalPos == 1 { newPT.wins = 1 }
+                    realm.add(newPT)
+                }
+
+                // ===== TEAM TABLE =====
+                if let existingTT = allTeamTables.first(where: { $0.teamName == teamName }) {
+                    existingTT.totalPoints += points
+                    if finalPos <= 3 { existingTT.podiums += 1 }
+                    if finalPos == 1 { existingTT.wins += 1 }
+                } else {
+                    let newTT = F1TeamTable(teamName: teamName, totalPoints: points, tournament: tournament)
+                    if finalPos <= 3 { newTT.podiums = 1 }
+                    if finalPos == 1 { newTT.wins = 1 }
+                    realm.add(newTT)
+                }
+            }
+        }
+
+        // predpokladajme, že ste už vymazali / vynulovali staré polia
+        // a pripočítali body za pozície v prvej fáze
+
+        let racesGrouped = Dictionary(grouping: allResults, by: { $0.raceNumber })
+
+        try? realm.write {
+            for (_, raceGroup) in racesGrouped {
+                // Nájdeme pretek (všetky F1Race s rovnakým raceNumber)
+                // Najprv vyfiltrujeme len tie, ktoré majú aspoň nejaký reťazec v fastestLap
+                let validResults = raceGroup.filter {
+                    parseFastestLap($0.fastestLap) < Double.greatestFiniteMagnitude
+                }
+                // Potom hľadáme objekt s najmenšou hodnotou parseFastestLap
+                guard let best = validResults.min(by: {
+                    parseFastestLap($0.fastestLap) < parseFastestLap($1.fastestLap)
+                }) else {
+                    // v tomto preteku nikto nemá validnú fastestLap
+                    continue
+                }
+                // best je F1Race s najlepším (najmenším) časom
+                guard let bestPlayer = best.player else { continue }
+                let bestTeamName = bestPlayer.team ?? ""
+
+                // Zvýšime fastestLaps o 1
+                if let existingPT = allPlayerTables.first(where: { $0.player == bestPlayer }) {
+                    existingPT.fastestLaps += 1
+                } else {
+                    let newPT = F1PlayerTable(player: bestPlayer, totalPoints: 0, tournament: tournament)
+                    newPT.fastestLaps = 1
+                    realm.add(newPT)
+                }
+
+                // Tím
+                if !bestTeamName.isEmpty,
+                   let existingTT = allTeamTables.first(where: { $0.teamName == bestTeamName }) {
+                    existingTT.fastestLaps += 1
+                } else if !bestTeamName.isEmpty {
+                    let newTT = F1TeamTable(teamName: bestTeamName, totalPoints: 0, tournament: tournament)
+                    newTT.fastestLaps = 1
+                    realm.add(newTT)
+                }
+            }
+        }
+
+
+        // 6) Napokon načítame výsledné záznamy do @Published polia
         loadStandings()
     }
+
+
+
     
     private func calculatePoints(position: Int?) -> Int {
         guard let pos = position else { return 0 }
@@ -160,6 +275,6 @@ class F1ViewModel: ObservableObject {
             }
         }
         loadRaces()
-        // updateStandings() ak je treba
+        updateStandings()
     }
 }

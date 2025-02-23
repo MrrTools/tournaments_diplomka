@@ -9,15 +9,17 @@ struct RaceResultsView: View {
     @Binding var showRaceDialog: Bool
     @Binding var selectedRaces: Int?
     
-    // Zoznam pretekov (nestriedene) – môže byť priamo z viewModelu alebo inak
+    // Toto pole obsahuje všetky F1Race; môže prísť napr. z viewModel.races
     var table: [F1Race]
     
-    // Computed property: výsledok bude **vždy** zoradený podľa `position`
-    var sortedTable: [F1Race] {
-        table.sorted { a, b in
+    // Vráti len tie záznamy, ktoré patria k vybranému raceNumber,
+    // a zoradí ich podľa position (vzostupne).
+    var filteredAndSortedTable: [F1Race] {
+        let filtered = table.filter { $0.raceNumber == selectedRaceNumber }
+        return filtered.sorted { a, b in
             let posA = a.position ?? Int.max
             let posB = b.position ?? Int.max
-            return posA < posB  // vzostupné poradie
+            return posA < posB
         }
     }
     
@@ -33,21 +35,21 @@ struct RaceResultsView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
             
-            // 2) Skontrolujeme, či daný pretek existuje
+            // 2) Zistíme, či existuje pretek s daným raceNumber
             if let race = viewModel.getRace(for: selectedRaceNumber) {
-                // Zobrazenie detailov pretekov
+                // Zobrazenie detailov vybraného preteku
                 VStack(alignment: .leading) {
                     Text(race.name).bold()
                     Text("\(race.country) - \(race.laps) laps")
                 }
                 .padding()
                 
-                // 3) Editovateľná tabuľka zobrazujúca "sortedTable"
-                Table(sortedTable) {
+                // 3) Editovateľná tabuľka so záznamami pre daný raceNumber
+                Table(filteredAndSortedTable) {
                     
-                    // Index stĺpec
+                    // Index stĺpec (poradové číslo v rámci pretekov)
                     TableColumn("Index") { entry in
-                        if let index = sortedTable.firstIndex(where: { $0._id == entry._id }) {
+                        if let index = filteredAndSortedTable.firstIndex(where: { $0._id == entry._id }) {
                             Text("\(index + 1)")
                         }
                     }
@@ -67,10 +69,11 @@ struct RaceResultsView: View {
                                     entry.position.map(String.init) ?? ""
                                 },
                                 set: { newValue in
-                                    // Pri zmene textu konvertujeme späť na Int
+                                    // Konverzia na Int
                                     let newPos = Int(newValue) ?? (entry.position ?? 0)
                                     // Uložíme do DB
                                     viewModel.updateRace(entry, position: newPos)
+                                    // Následne môžeme načítať znovu preteky, ak chceš okamžitý refresh
                                     viewModel.loadRaces()
                                 }
                             )
@@ -155,8 +158,8 @@ struct RaceResultsView: View {
                 }
                 
             } else {
+                // 4) Ak taký race neexistuje, ponúkni tlačidlo "+" na jeho vytvorenie
                 Spacer()
-                // 4) Ak pretek neexistuje, ponúkni tlačidlo "+"
                 Button(action: {
                     selectedRaces = selectedRaceNumber
                     showRaceDialog = true

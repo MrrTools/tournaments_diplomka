@@ -23,7 +23,7 @@ struct SingleEliminationView: View {
                                 $0.fixturesRound == roundIndex + 1 &&
                                 (viewModel.tournament.type == "Group Stage and KO" ? $0.matchIndex != 0 : true)
                             }
-                            .sorted { $0.matchIndex < $1.matchIndex }
+                           .sorted { $0.matchIndex < $1.matchIndex }
                         
                         ForEach(0..<viewModel.matchesInSection[roundIndex], id: \.self) { matchIndex in
                             ZStack {
@@ -54,21 +54,33 @@ struct SingleEliminationView: View {
             .padding()
         }
         .navigationBarTitle("Tournament Bracket", displayMode: .inline)
-        .sheet(isPresented: Binding(            get: { showScoreDialog },
-                                                set: { showScoreDialog = $0 }
-                                   ))
-        {
+        .sheet(isPresented: Binding(
+            get: { showScoreDialog },
+            set: { showScoreDialog = $0 }
+        )) {
             if let match = selectedMatch {
-                EditModalDialogView(
-                    match: match,
-                    isPresented: $showScoreDialog,
-                    rematchFlag: rematchFlag,  // Posielame flag
-                    onSave: viewModel.updateMatchScore
-                )
-                .background(Color.clear)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if match.tournament?.type == "Playoff" {
+                    EditPlayoffDialogView(
+                        match: match,
+                        isPresented: $showScoreDialog,
+                        playOffMatches: match.tournament?.playOFFMatches ?? 3,
+                        onSave: viewModel.updateMatchScore
+                    )
+                    .background(Color.clear)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    EditModalDialogView(
+                        match: match,
+                        isPresented: $showScoreDialog,
+                        rematchFlag: rematchFlag,
+                        onSave: viewModel.updateMatchScore
+                    )
+                    .background(Color.clear)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
         }
+
     }
     
     @ViewBuilder
@@ -136,7 +148,7 @@ struct MatchViewv: View {
             if let setsString = match?.setsString,
                !setsString.isEmpty,
                let t = match?.tournament,
-               t.sport == "Tennis" {
+               t.sport == "Tennis" || t.sport == "Hockey" {
                 
                 let sets = setsString.split(separator: ";").map { String($0) }
                 
@@ -160,6 +172,6 @@ struct MatchViewv: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.purple, lineWidth: 2)
         )
-        .frame(width: 200, height: 120)
+        .frame(width: 300, height: 120)
     }
 }
