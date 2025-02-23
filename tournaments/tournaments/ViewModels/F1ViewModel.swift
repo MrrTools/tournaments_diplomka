@@ -159,6 +159,7 @@ class F1ViewModel: ObservableObject {
                 // alebo ak je to priamo Int, tak race.finished = fin
             }
         }
+        loadRaces()
         // updateStandings() ak je treba
     }
 }

@@ -9,8 +9,17 @@ struct RaceResultsView: View {
     @Binding var showRaceDialog: Bool
     @Binding var selectedRaces: Int?
     
-    // Zoznam pretekov, ktoré chcete zobraziť v tabuľke
+    // Zoznam pretekov (nestriedene) – môže byť priamo z viewModelu alebo inak
     var table: [F1Race]
+    
+    // Computed property: výsledok bude **vždy** zoradený podľa `position`
+    var sortedTable: [F1Race] {
+        table.sorted { a, b in
+            let posA = a.position ?? Int.max
+            let posB = b.position ?? Int.max
+            return posA < posB  // vzostupné poradie
+        }
+    }
     
     var body: some View {
         VStack {
@@ -33,12 +42,12 @@ struct RaceResultsView: View {
                 }
                 .padding()
                 
-                // 3) Editovateľná tabuľka
-                Table(table) {
+                // 3) Editovateľná tabuľka zobrazujúca "sortedTable"
+                Table(sortedTable) {
                     
                     // Index stĺpec
                     TableColumn("Index") { entry in
-                        if let index = table.firstIndex(where: { $0._id == entry._id }) {
+                        if let index = sortedTable.firstIndex(where: { $0._id == entry._id }) {
                             Text("\(index + 1)")
                         }
                     }
@@ -62,6 +71,7 @@ struct RaceResultsView: View {
                                     let newPos = Int(newValue) ?? (entry.position ?? 0)
                                     // Uložíme do DB
                                     viewModel.updateRace(entry, position: newPos)
+                                    viewModel.loadRaces()
                                 }
                             )
                         )
@@ -70,6 +80,7 @@ struct RaceResultsView: View {
                         .keyboardType(.numberPad)
                     }
                     
+                    // Start Position
                     TableColumn("Start Position") { entry in
                         TextField(
                             "",
@@ -77,10 +88,8 @@ struct RaceResultsView: View {
                                 get: { String(entry.startPosition) },
                                 set: { newValue in
                                     let newStartPos = Int(newValue) ?? entry.startPosition
-                                    viewModel.updateRace(
-                                        entry,
-                                        startPosition: newStartPos
-                                    )
+                                    viewModel.updateRace(entry, startPosition: newStartPos)
+                                    viewModel.loadRaces()
                                 }
                             )
                         )
@@ -89,22 +98,15 @@ struct RaceResultsView: View {
                         .keyboardType(.numberPad)
                     }
                     
+                    // Finish Position
                     TableColumn("Finish Position") { entry in
                         TextField(
                             "",
                             text: Binding(
-                                get: {
-                                    // Ak je v modeli `finished` typu String, vrátime rovno entry.finished
-                                    // Ak je to Int, tak prevádzame na String
-                                    entry.finished
-                                },
+                                get: { entry.finished },
                                 set: { newValue in
-                                    // Ak je `finished` string, len ho uložíme
-                                    // Ak je to Int, konvertujeme, napr.:
-                                    viewModel.updateRace(
-                                        entry,
-                                        finished: newValue
-                                    )
+                                    viewModel.updateRace(entry, finished: newValue)
+                                    viewModel.loadRaces()
                                 }
                             )
                         )
@@ -113,8 +115,7 @@ struct RaceResultsView: View {
                         .keyboardType(.numberPad)
                     }
                     
-                    
-                    // Edit: Fastest Lap
+                    // Fastest Lap
                     TableColumn("Fastest Lap") { entry in
                         TextField(
                             "",
@@ -122,6 +123,7 @@ struct RaceResultsView: View {
                                 get: { entry.fastestLap },
                                 set: { newValue in
                                     viewModel.updateRace(entry, fastestLap: newValue)
+                                    viewModel.loadRaces()
                                 }
                             )
                         )
@@ -129,7 +131,7 @@ struct RaceResultsView: View {
                         .frame(width: 80)
                     }
                     
-                    // Edit: Pitstops
+                    // Pitstops
                     TableColumn("Pitstops Number") { entry in
                         TextField(
                             "",
@@ -138,6 +140,7 @@ struct RaceResultsView: View {
                                 set: { newValue in
                                     let newStops = Int(newValue) ?? entry.pitStops
                                     viewModel.updateRace(entry, pitStops: newStops)
+                                    viewModel.loadRaces()
                                 }
                             )
                         )
@@ -146,14 +149,14 @@ struct RaceResultsView: View {
                         .frame(width: 50)
                     }
                 }
-                // Povolené potiahnutie pre refresh, ak to chceš
+                // Povolené potiahnutie pre refresh
                 .refreshable {
                     viewModel.loadStandings()
                 }
                 
             } else {
                 Spacer()
-                // 4) Ak preteky neexistujú, ponúkni tlačidlo "+"
+                // 4) Ak pretek neexistuje, ponúkni tlačidlo "+"
                 Button(action: {
                     selectedRaces = selectedRaceNumber
                     showRaceDialog = true
