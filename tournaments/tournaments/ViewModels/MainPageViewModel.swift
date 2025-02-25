@@ -17,7 +17,6 @@ class MainPageViewModel: ObservableObject {
         realm = RealmManager.shared.realm
         loadTournaments()
     }
-    
     func loadTournaments() {
         guard let realm = realm else { return }
         let tournamentsResults = realm.objects(Tournament.self)
@@ -37,5 +36,7 @@ class MainPageViewModel: ObservableObject {
         }
         loadTournaments()
     }
+    
+    
 }
 

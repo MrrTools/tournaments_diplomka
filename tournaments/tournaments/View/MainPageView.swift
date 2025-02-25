@@ -80,7 +80,7 @@ struct MainPageView: View {
         case "Group Stage and KO":
             GSKOView(viewModel: TournamentGenerateModel(tournament: tournament),
                      gskoVM: GSKOViewModel(viewModel: TournamentGenerateModel(tournament: tournament)),
-                     numberOfGroups: 4)
+                     numberOfGroups: tournament.numberOfGroups ?? 4)
         case "Championship":
             F1View(viewModel: F1ViewModel(tournament: tournament))
             

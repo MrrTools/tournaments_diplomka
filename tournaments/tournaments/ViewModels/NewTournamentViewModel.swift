@@ -54,7 +54,6 @@ class NewTournamentViewModel: ObservableObject {
     init(onSave: @escaping () -> Void) {
         self.onSave = onSave
     }
-    
     private func updatePlayersArray() {
         let count = Int(numberOfPlayers)
         if players.count < count {
@@ -66,6 +65,11 @@ class NewTournamentViewModel: ObservableObject {
         }
     }
     
+    private func calculateNumberOfGroups(for players: [Player]) -> Int {
+        let groupSize = numberOfGroupPlayers ?? teamsPerGroupOptions.first ?? 2
+        return players.count / groupSize
+    }
+    
     func saveTournament() {
         let players = self.players.enumerated().map { (index, name) -> Player in
             let photoData = self.playerPhotos[index]?.jpegData(compressionQuality: 1.0)
@@ -74,6 +78,7 @@ class NewTournamentViewModel: ObservableObject {
         }
         
         let isF1 = selectedSport == "F1"
+        let groups = calculateNumberOfGroups(for: players)
 
         let tournament = Tournament(
             name: self.tournamentName,
@@ -82,10 +87,13 @@ class NewTournamentViewModel: ObservableObject {
             type: self.selectedType ?? "",
             groupNumber: self.groupNumber,
             numberOfAdvancePlayers: self.numberOfAdvancePlayers ?? 2,
-            numberOfGroupPlayers: self.numberOfGroupPlayers ?? 1,
+            numberOfGroups: groups,
             playOFFMatches: self.playOFFMatches,
             qualifiedToNextRound: self.qualifiedToNextRound,
-            numberOfRaces: isF1 ? Int(numberOfRaces) : nil,  // 🔥 Uloženie počtu pretekov pre F1
+            riposeFinal: self.riposeFinal,
+            riposeKnockOut: self.riposeKnockOut,
+            riposeMatches: self.riposeMateches,
+            numberOfRaces: isF1 ? Int(numberOfRaces) : nil,
             players: players,
             matches: [],
             table: [],
@@ -139,7 +147,7 @@ class NewTournamentViewModel: ObservableObject {
         case "Single Elimination", "Double Elimination", "Playoff":
             matches = generateElimination(players: players, tournament: tournament)
         case "Group Stage and KO":
-            matches = generateGSKO(players: players, numberOfGroups: self.numberOfGroupPlayers ?? 2, advancingPerGroup: self.numberOfAdvancePlayers ?? 2, tournament: tournament, groupMatchesCount: 1)
+            matches = generateGSKO(players: players, numberOfPlayersInGroup: self.numberOfGroupPlayers ?? 2, advancingPerGroup: self.numberOfAdvancePlayers ?? 2, tournament: tournament, riposeMatches: riposeMateches)
         default:
             break
         }

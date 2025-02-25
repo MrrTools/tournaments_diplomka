@@ -25,7 +25,7 @@ struct EditPlayoffDialogView: View {
     
     // Callback, ktorý po uložení odošle:
     // match, skóre zápasu, a nové hodnoty série pre hráča 1 a hráča 2.
-    var onSave: (TournamentMatch, Int, Int, String, Int) -> Void
+    var onSave: (TournamentMatch, Int, Int, String, Int, Bool) -> Void
     
     var body: some View {
         ZStack {
@@ -152,7 +152,7 @@ struct EditPlayoffDialogView: View {
             } else if score2 > score1 {
                 newSeriesScorePlayer2 += 1
             }
-            onSave(match, newSeriesScorePlayer1, newSeriesScorePlayer2, matchString, 0)
+            onSave(match, newSeriesScorePlayer1, newSeriesScorePlayer2, matchString, 0, false)
             isPresented = false
         }
     }

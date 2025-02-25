@@ -14,6 +14,7 @@ struct RoundRobinView: View {
     @State private var selectedMatch: TournamentMatch?
     @State private var showSettings = false
     @State private var rematchFlag = 0
+    @State private var koFlag = 0
     
     var body: some View {
         VStack {
@@ -69,7 +70,7 @@ struct RoundRobinView: View {
                                    ))
         {
             if let match = selectedMatch {
-                EditModalDialogView(match: match, isPresented: $showScoreDialog, rematchFlag: rematchFlag, onSave: viewModel.updateMatchScore)
+                EditModalDialogView(match: match, isPresented: $showScoreDialog, rematchFlag: rematchFlag, koFlag: (koFlag != 0), onSave: viewModel.updateMatchScore)
                     .background(Color.clear)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 

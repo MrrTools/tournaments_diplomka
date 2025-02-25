@@ -16,10 +16,13 @@ class Tournament: Object, ObjectKeyIdentifiable {
     @Persisted var type: String = ""
     @Persisted var groupNumber: Int?
     @Persisted var numberOfAdvancePlayers: Int?
-    @Persisted var numberOfGroupPlayers: Int?
+    @Persisted var numberOfGroups: Int?
     @Persisted var playOFFMatches: Int?
     @Persisted var qualifiedToNextRound: Int?
     @Persisted var numberOfRaces: Int?
+    @Persisted var riposeFinal: Bool?
+    @Persisted var riposeKnockOut: Bool?
+    @Persisted var riposeMatches: Bool?
     @Persisted var players: List<Player>
     @Persisted var matches: List<TournamentMatch>
     @Persisted var table: List<TournamentTable>
@@ -29,7 +32,7 @@ class Tournament: Object, ObjectKeyIdentifiable {
     @Persisted var f1PlayerTable: List<F1PlayerTable>
     
     
-    convenience init(name: String, owner: String, sport: String, type: String, groupNumber: Int?, numberOfAdvancePlayers: Int?, numberOfGroupPlayers: Int?, playOFFMatches: Int?, qualifiedToNextRound: Int?, numberOfRaces: Int?, players: [Player], matches: [TournamentMatch], table: [TournamentTable], settings: [TournamentSettings], f1Race: [F1Race], f1TeamTable: [F1TeamTable], f1PlayerTable: [F1PlayerTable]) {
+    convenience init(name: String, owner: String, sport: String, type: String, groupNumber: Int?, numberOfAdvancePlayers: Int?, numberOfGroups: Int?, playOFFMatches: Int?, qualifiedToNextRound: Int?, riposeFinal: Bool?, riposeKnockOut: Bool?, riposeMatches: Bool?, numberOfRaces: Int?, players: [Player], matches: [TournamentMatch], table: [TournamentTable], settings: [TournamentSettings], f1Race: [F1Race], f1TeamTable: [F1TeamTable], f1PlayerTable: [F1PlayerTable]) {
         self.init()
         self.name = name
         self.owner = owner
@@ -37,10 +40,13 @@ class Tournament: Object, ObjectKeyIdentifiable {
         self.type = type
         self.groupNumber = groupNumber
         self.numberOfAdvancePlayers = numberOfAdvancePlayers
-        self.numberOfGroupPlayers = numberOfGroupPlayers
+        self.numberOfGroups = numberOfGroups
         self.playOFFMatches = playOFFMatches
         self.qualifiedToNextRound = qualifiedToNextRound
         self.numberOfRaces = numberOfRaces
+        self.riposeFinal = riposeFinal
+        self.riposeKnockOut = riposeKnockOut
+        self.riposeMatches = riposeMatches
         self.players.append(objectsIn: players)
         self.matches.append(objectsIn: matches)
         self.table.append(objectsIn: table)

@@ -35,7 +35,6 @@ class TournamentGenerateModel: ObservableObject {
     
     var rounds: [[TournamentMatch]] {
         var rounds: [[TournamentMatch]] = []
-        print("Number of Rounds: \(numberOfRounds)")
         for round in 1...numberOfRounds {
             if isGroupStageAndKO {
                 let matchesInRound = matches.filter { $0.fixturesRound == round &&
@@ -48,6 +47,7 @@ class TournamentGenerateModel: ObservableObject {
                 rounds.append(matchesInRound)
             }
         }
+        print("GroupIndex: \(selectedGroupIndex + 1)")
         return rounds
     }
     
@@ -92,7 +92,7 @@ class TournamentGenerateModel: ObservableObject {
         objectWillChange.send()
     }
     
-    func updateMatchScore(match: TournamentMatch, player1Score: Int, player2Score: Int, setsString: String, rematchFlag: Int) {
+    func updateMatchScore(match: TournamentMatch, player1Score: Int, player2Score: Int, setsString: String, rematchFlag: Int, koFlag: Bool) {
         if let realm = RealmManager.shared.realm {
             
             if match.player1Score != 0 || match.player2Score != 0 {
@@ -130,7 +130,8 @@ class TournamentGenerateModel: ObservableObject {
         
         
         if let tournament = match.tournament {
-            if tournament.type == "Single Elimination" || tournament.type ==  "Group Stage and KO"
+            let isFinalMatch = match.fixturesRound == EliminationRounds
+            if tournament.type == "Single Elimination" || (tournament.type ==  "Group Stage and KO" && koFlag && (tournament.riposeKnockOut == false && tournament.riposeFinal == false) || (tournament.riposeFinal == false && !isFinalMatch))
                 || (tournament.type ==  "Playoff" && playOffLegDone){
                 var winner: Player?
                 if player1Score > player2Score {
@@ -142,7 +143,10 @@ class TournamentGenerateModel: ObservableObject {
                 guard let actualWinner = winner else { return }
                 
                 addWinnerToNextRound(winner: actualWinner, match: match)
-            } else if tournament.type == "Double Elimination" {
+            } else if tournament.type == "Double Elimination" ||
+                        (tournament.type == "Group Stage and KO" &&
+                        ((tournament.riposeKnockOut == true && tournament.riposeFinal == true) ||
+                        (tournament.riposeFinal == true && isFinalMatch))){
                 
                 let firstMatchCompleted = match.player1Score != 0 || match.player2Score != 0
                 let rematchCompleted = match.player1ScoreRematch != 0 || match.player2ScoreRematch != 0
@@ -195,6 +199,7 @@ class TournamentGenerateModel: ObservableObject {
             try? realm.write {
                 newMatch.player1 = winner
                 realm.add(newMatch)
+                match.tournament?.matches.append(newMatch)
             }
             loadMatches()
             objectWillChange.send()
@@ -350,9 +355,11 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Tourname
     return matches
 }
 
-func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,tournament: Tournament, groupMatchesCount: Int) -> [TournamentMatch] {
+func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGroup: Int,tournament: Tournament, riposeMatches: Bool) -> [TournamentMatch] {
     // Ak hráčov náhodne premiešame, každá skupina bude inak poskladaná
     let allPlayers = players.shuffled()
+    let numberOfGroups = allPlayers.count / numberOfPlayersInGroup
+    //let numberOfGroups = 4
     
     // 1. Rozdelenie hráčov do skupín
     var groups: [[Player]] = Array(repeating: [], count: numberOfGroups)
@@ -397,7 +404,24 @@ func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,
                         realm.add(match)
                     }
                 }
+                // odvety
+                if riposeMatches {
+                    let riposeMatch = TournamentMatch()
+                    riposeMatch.player1 = awayTeam
+                    riposeMatch.player2 = homeTeam
+                    riposeMatch.fixturesRound = groupCount - 1 + round
+                    riposeMatch.tournament = tournament
+                    riposeMatch.groupIndex = groupIndex + 1
+                    
+                    // Použití RealmManager pro uložení turnaje
+                    if let realm = RealmManager.shared.realm {
+                        try? realm.write {
+                            realm.add(riposeMatch)
+                        }
+                    }
+                }
             }
+            
             // Implementujeme tzv. "circle shift" - posunieme posledného hráča dopredu
             // aby sme zachovali Round Robin
             let last = groupPlayers.removeLast()
@@ -422,7 +446,6 @@ func generateGSKO(players: [Player],numberOfGroups: Int, advancingPerGroup: Int,
             realm.add(tournament, update: .modified)
         }
     }
-    
     
     return groupMatches
 }

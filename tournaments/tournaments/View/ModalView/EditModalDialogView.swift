@@ -17,8 +17,9 @@ struct EditModalDialogView: View {
     @State private var player1Score: String = ""
     @State private var player2Score: String = ""
     @State private var setsString: String = ""
-    var rematchFlag: Int 
-    var onSave: (TournamentMatch, Int, Int, String, Int) -> Void
+    var rematchFlag: Int
+    var koFlag: Bool
+    var onSave: (TournamentMatch, Int, Int, String, Int, Bool) -> Void
     
     var body: some View {
         ZStack {
@@ -122,7 +123,7 @@ struct EditModalDialogView: View {
                 
                 Button(action: {
                     if let p1Score = Int(player1Score), let p2Score = Int(player2Score) {
-                        onSave(match, p1Score, p2Score, setsString, rematchFlag)
+                        onSave(match, p1Score, p2Score, setsString, rematchFlag, koFlag)
                         isPresented = false
                     }
                 }) {

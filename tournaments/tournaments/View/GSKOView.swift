@@ -6,14 +6,14 @@ struct GSKOView: View {
     @ObservedObject var gskoVM: GSKOViewModel
     
     let numberOfGroups: Int
-    
-    @State private var selectedGroupIndex = 0
     @State private var selectedTabIndex = 0
     
     @State private var showScoreDialog = false
     @State private var selectedMatch: TournamentMatch?
     @State private var showSettings = false
     @State private var rematchFlag = 0
+    @State private var koFlag = false
+    @State private var navigateToKO = false
     
     var body: some View {
         VStack(spacing: 16) {
@@ -45,7 +45,7 @@ struct GSKOView: View {
             }
             
             // V závislosti od stavu Knockout Stage zobraziť buď SingleEliminationView, alebo Group Stage
-            if gskoVM.showKnockoutStage {
+            if gskoVM.showKnockoutStage || navigateToKO {
                 // KO fáza
                 SingleEliminationView(viewModel: viewModel)
                     .transition(.opacity)
@@ -54,7 +54,7 @@ struct GSKOView: View {
                 VStack(spacing: 16) {
                     
                     // Picker na výber skupín
-                    Picker("Skupina", selection: $selectedGroupIndex) {
+                    Picker("Skupina", selection: $viewModel.selectedGroupIndex) {
                         ForEach(0..<numberOfGroups, id: \.self) { index in
                             Text("Group \(Character(UnicodeScalar(65 + index)!))")
                                 .tag(index)
@@ -62,9 +62,6 @@ struct GSKOView: View {
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
-                    .onChange(of: selectedGroupIndex) { newValue, transaction in
-                        viewModel.selectedGroupIndex = newValue
-                    }
                     
                     // Druhý picker (TabView) na zobrazenie "Table" alebo "Matches"
                     Picker("", selection: $selectedTabIndex) {
@@ -87,19 +84,23 @@ struct GSKOView: View {
                             if !gskoVM.showHideComponets {
                                 Button(action: {
                                     gskoVM.proceedAfterAllResults()
+                                    gskoVM.showHideComponets = true
+
+                                    
+
                                 }) {
-                                Text("Knockout Stage")
-                                    .font(.headline)
-                                    .padding()
-                                    .frame(maxWidth: 200)
-                                    .background(Color.purple)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                            }
+                                    Text("Knockout Stage")
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: 200)
+                                        .background(Color.purple)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                }
                                 .padding(.vertical, 16)
                                 .disabled(!gskoVM.allResultsFilled)
                                 .opacity(gskoVM.allResultsFilled ? 1.0 : 0.5)
-                        }
+                            }
                             
                         }
                         .tag(0)
@@ -147,6 +148,7 @@ struct GSKOView: View {
                     match: match,
                     isPresented: $showScoreDialog,
                     rematchFlag: rematchFlag,
+                    koFlag: koFlag,
                     onSave: viewModel.updateMatchScore
                 )
                 .background(Color.clear)
@@ -159,7 +161,7 @@ struct GSKOView: View {
     var groupTableEntries: [TournamentTable] {
         let totalPlayers = viewModel.tournament.players.count
         let playersPerGroup = totalPlayers / numberOfGroups
-        let start = selectedGroupIndex * playersPerGroup
+        let start = viewModel.selectedGroupIndex * playersPerGroup
         let end = start + playersPerGroup
         
         guard viewModel.table.count >= end else {

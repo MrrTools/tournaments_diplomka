@@ -42,14 +42,12 @@ class GSKOViewModel: ObservableObject {
     //Generuje Knockout Stage len raz
     func proceedAfterAllResults() {
         guard !showKnockoutStage else { return }
-        createKnockoutStage()
+        createKnockoutStage(advancingPerGroup: viewModel.tournament.numberOfAdvancePlayers ?? 2, groupsCount: viewModel.tournament.numberOfGroups ?? 4)
         checkIfKnockoutStageExists()
     }
     
     // Generovanie KO fázy
-    func createKnockoutStage() {
-        let advancingPerGroup = 2
-        let groupsCount = 4
+    func createKnockoutStage(advancingPerGroup: Int, groupsCount: Int) {
         var advancingPlayers: [Player] = []
         
         for groupIndex in 1...groupsCount {
@@ -78,10 +76,11 @@ class GSKOViewModel: ObservableObject {
 
         if let realm = RealmManager.shared.realm {
             try? realm.write {
-                realm.add(matches)
+                viewModel.tournament.matches.append(objectsIn: matches)
+                realm.add(viewModel.tournament, update: .modified)
             }
         }
-        
+        objectWillChange.send()
         checkIfKnockoutStageExists()
     }
 }
