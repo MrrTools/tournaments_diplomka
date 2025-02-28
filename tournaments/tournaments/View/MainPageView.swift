@@ -8,6 +8,7 @@ import RealmSwift
 
 struct MainPageView: View {
     @ObservedObject var viewModel: MainPageViewModel
+    @State private var navigateToLogin = false
     let showPublicTournaments: Bool
 
     init(showPublicTournaments: Bool = false) {
@@ -16,9 +17,33 @@ struct MainPageView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 HStack {
+                    
+                    Text("Tournaments")
+                        .font(.largeTitle)
+                        .bold()
+                    
+                    Spacer()
+
+                    Button(action: {
+                        AuthService.shared.logout()
+                        navigateToLogin = true
+                    }) {
+                        Image(systemName: "power")
+                            .font(.title2)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.purple)
+                            .clipShape(Circle())
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+
+                HStack {
+                    Spacer()
                     NavigationLink(destination: NewTournamentView(viewModel: NewTournamentViewModel(onSave: {
                         viewModel.loadTournaments()
                     }))) {
@@ -29,9 +54,10 @@ struct MainPageView: View {
                             .background(Color.purple)
                             .clipShape(Circle())
                     }
+                    Spacer()
                 }
                 .padding()
-                
+
                 List {
                     ForEach(viewModel.tournaments, id: \.id) { tournament in
                         NavigationLink(destination: destinationView(for: tournament)) {
@@ -64,31 +90,34 @@ struct MainPageView: View {
             }
             .background(Color.black.opacity(0.9))
             .foregroundColor(.white)
-            .navigationBarTitle("Tournaments")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 viewModel.loadTournaments()
             }
+            .navigationDestination(isPresented: $navigateToLogin) {
+                LoginView()
+                    .navigationBarBackButtonHidden(true)
+            }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
     }
 
     @ViewBuilder
     private func destinationView(for tournament: Tournament) -> some View {
         let tournamentModel = TournamentGenerateModel(tournament: tournament)
-        
+
         switch tournament.type {
         case "Round Robin":
             RoundRobinView(viewModel: tournamentModel)
-            
+
         case "Single Elimination", "Double Elimination", "Playoff":
             SingleEliminationView(viewModel: tournamentModel)
-            
+
         case "Group Stage and KO":
             GSKOView(gskoVM: GSKOViewModel(viewModel: tournamentModel), viewModel: tournamentModel, numberOfGroups: tournament.numberOfGroups ?? 4)
 
         case "Championship":
             F1View(viewModel: F1ViewModel(tournament: tournament))
-            
+
         default:
             Text("Unsupported tournament type")
         }

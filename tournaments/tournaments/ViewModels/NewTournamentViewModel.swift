@@ -77,6 +77,7 @@ class NewTournamentViewModel: ObservableObject {
             return Player(name: name, team: team, photoData: photoData)
         }
         
+        let userEmail = AuthService.shared.currentUser?.email
         let isF1 = selectedSport == "F1"
         let groups = calculateNumberOfGroups(for: players)
 
@@ -101,7 +102,7 @@ class NewTournamentViewModel: ObservableObject {
             f1Race: [],
             f1TeamTable: [],
             f1PlayerTable: [],
-            email: nil
+            email: userEmail
         )
         
         if let realm = RealmManager.shared.realm {
