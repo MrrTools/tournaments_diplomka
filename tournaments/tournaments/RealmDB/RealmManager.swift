@@ -60,6 +60,9 @@ class RealmManager: ObservableObject {
             if subs.first(named: "all-F1Race") == nil {
                 subs.append(QuerySubscription<F1Race>(name: "all-F1Race"))
             }
+            if subs.first(named: "all-AppUser") == nil {
+                subs.append(QuerySubscription<AppUser>(name: "all-AppUser"))
+            }
             
         }, rerunOnOpen: true)
         

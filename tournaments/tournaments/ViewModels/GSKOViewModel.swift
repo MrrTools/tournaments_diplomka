@@ -14,10 +14,20 @@ class GSKOViewModel: ObservableObject {
     @ObservedObject var viewModel: TournamentGenerateModel
     @Published var showKnockoutStage = false
     @Published var showHideComponets = false
+    @Published var selectedGroupIndex: Int = 0
+    @Published var filteredTable: [TournamentTable] = []
+    
     
     init(viewModel: TournamentGenerateModel) {
         self.viewModel = viewModel
         checkIfKnockoutStageExists()
+        filterData()
+    }
+    
+    //Aktualizuje filtrované zápasy a tabuľku pre vybranú skupinu
+    func filterData() {
+        filteredTable = viewModel.table.filter { $0.groupIndex == selectedGroupIndex + 1 }
+        objectWillChange.send()
     }
     
     // Automaticky skontroluje, či knockout zápasy už existujú
@@ -44,6 +54,8 @@ class GSKOViewModel: ObservableObject {
         guard !showKnockoutStage else { return }
         createKnockoutStage(advancingPerGroup: viewModel.tournament.numberOfAdvancePlayers ?? 2, groupsCount: viewModel.tournament.numberOfGroups ?? 4)
         checkIfKnockoutStageExists()
+        self.viewModel.loadMatches()
+        self.viewModel.objectWillChange.send()
     }
     
     // Generovanie KO fázy
@@ -80,7 +92,6 @@ class GSKOViewModel: ObservableObject {
                 realm.add(viewModel.tournament, update: .modified)
             }
         }
-        objectWillChange.send()
         checkIfKnockoutStageExists()
     }
 }

@@ -17,6 +17,7 @@ class TournamentTable: Object, ObjectKeyIdentifiable {
     @Persisted var wins: Int = 0
     @Persisted var losses: Int = 0
     @Persisted var draws: Int = 0
+    @Persisted var groupIndex: Int = 0
     @Persisted var tournament: Tournament?
     
     convenience init(player: Player?, tournament: Tournament?) {

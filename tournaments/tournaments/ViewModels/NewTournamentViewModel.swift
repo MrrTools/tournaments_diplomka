@@ -100,7 +100,8 @@ class NewTournamentViewModel: ObservableObject {
             settings: [],
             f1Race: [],
             f1TeamTable: [],
-            f1PlayerTable: []
+            f1PlayerTable: [],
+            email: nil
         )
         
         if let realm = RealmManager.shared.realm {

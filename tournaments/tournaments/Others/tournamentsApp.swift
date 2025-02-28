@@ -18,7 +18,7 @@ struct tournamentsApp: SwiftUI.App {
             VStack {
                 
                 if let configuration = realmManager.configuration, let realm = realmManager.realm {
-                    MainPageView()
+                    LoginView()
                         .preferredColorScheme(.dark)
                         .environment(\.realmConfiguration, configuration)
                         .environment(\.realm, realm)

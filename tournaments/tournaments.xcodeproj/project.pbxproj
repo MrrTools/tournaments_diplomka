@@ -33,6 +33,10 @@
 		4683559E2D67F0CF005EE2D0 /* F1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4683559D2D67F0C8005EE2D0 /* F1View.swift */; };
 		468355A02D67F100005EE2D0 /* F1ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4683559F2D67F0F9005EE2D0 /* F1ViewModel.swift */; };
 		468355A42D6A3A56005EE2D0 /* RaceResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355A32D6A3A4F005EE2D0 /* RaceResultsView.swift */; };
+		468355AE2D711807005EE2D0 /* AppUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355AD2D711807005EE2D0 /* AppUser.swift */; };
+		468355B02D71182D005EE2D0 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355AF2D71182D005EE2D0 /* AuthService.swift */; };
+		468355B22D71186C005EE2D0 /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355B12D71186C005EE2D0 /* RegistrationView.swift */; };
+		468355B42D71188D005EE2D0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355B32D71188D005EE2D0 /* LoginView.swift */; };
 		469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */; };
 		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
 		46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */; };
@@ -80,6 +84,10 @@
 		4683559D2D67F0C8005EE2D0 /* F1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1View.swift; sourceTree = "<group>"; };
 		4683559F2D67F0F9005EE2D0 /* F1ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F1ViewModel.swift; sourceTree = "<group>"; };
 		468355A32D6A3A4F005EE2D0 /* RaceResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceResultsView.swift; sourceTree = "<group>"; };
+		468355AD2D711807005EE2D0 /* AppUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUser.swift; sourceTree = "<group>"; };
+		468355AF2D71182D005EE2D0 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		468355B12D71186C005EE2D0 /* RegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationView.swift; sourceTree = "<group>"; };
+		468355B32D71188D005EE2D0 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentSettings.swift; sourceTree = "<group>"; };
 		46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSKOView.swift; sourceTree = "<group>"; };
 		46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardView.swift; sourceTree = "<group>"; };
@@ -145,6 +153,8 @@
 			children = (
 				468355A72D6BA443005EE2D0 /* ModalView */,
 				468355A32D6A3A4F005EE2D0 /* RaceResultsView.swift */,
+				468355B32D71188D005EE2D0 /* LoginView.swift */,
+				468355B12D71186C005EE2D0 /* RegistrationView.swift */,
 				4683559D2D67F0C8005EE2D0 /* F1View.swift */,
 				46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */,
 				466B70BC2C3AA8FE00BF7426 /* MainPageView.swift */,
@@ -172,6 +182,7 @@
 		464657A32BE680C400A963C2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				468355AD2D711807005EE2D0 /* AppUser.swift */,
 				4683559B2D67EE24005EE2D0 /* F1TeamTable.swift */,
 				468355992D67ED2F005EE2D0 /* F1PlayerTable.swift */,
 				468355972D67ECA5005EE2D0 /* F1Race.swift */,
@@ -187,6 +198,7 @@
 		464657A42BE680D700A963C2 /* Others */ = {
 			isa = PBXGroup;
 			children = (
+				468355AF2D71182D005EE2D0 /* AuthService.swift */,
 				4646579F2BE6758400A963C2 /* Launch Screen.storyboard */,
 				462FA4BA2BD2E45700175699 /* tournamentsApp.swift */,
 				462FA4BE2BD2E45800175699 /* Assets.xcassets */,
@@ -284,12 +296,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				468355B02D71182D005EE2D0 /* AuthService.swift in Sources */,
 				466B70D12C3B0D7A00BF7426 /* Tournament.swift in Sources */,
 				4683559A2D67ED3D005EE2D0 /* F1PlayerTable.swift in Sources */,
 				466B70E82C45C73100BF7426 /* TournamentGenerateModel.swift in Sources */,
 				466B70E22C45AF1900BF7426 /* SingleEliminationView.swift in Sources */,
 				46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */,
+				468355B22D71186C005EE2D0 /* RegistrationView.swift in Sources */,
 				468355982D67ECAC005EE2D0 /* F1Race.swift in Sources */,
+				468355AE2D711807005EE2D0 /* AppUser.swift in Sources */,
 				462102CF2C5956D700924E6E /* MatchView.swift in Sources */,
 				469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */,
 				466B70C52C3AFCD400BF7426 /* ImagePicker.swift in Sources */,
@@ -307,6 +322,7 @@
 				466B70BD2C3AA8FE00BF7426 /* MainPageView.swift in Sources */,
 				46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */,
 				462FA4BB2BD2E45700175699 /* tournamentsApp.swift in Sources */,
+				468355B42D71188D005EE2D0 /* LoginView.swift in Sources */,
 				466B70C32C3AB51200BF7426 /* NewTournamentViewModel.swift in Sources */,
 				465554212C714A3500C1CB7C /* Player.swift in Sources */,
 			);
@@ -439,6 +455,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tournaments/Preview Content\"";
@@ -448,6 +465,7 @@
 				INFOPLIST_FILE = tournaments/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Tournaments;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera usage description";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -474,6 +492,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tournaments/Preview Content\"";
@@ -483,6 +502,7 @@
 				INFOPLIST_FILE = tournaments/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Tournaments;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera usage description";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

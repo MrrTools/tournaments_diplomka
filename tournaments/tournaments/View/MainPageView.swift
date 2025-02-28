@@ -1,16 +1,20 @@
-// Created by: Lukas Sarocky
 //  MainPageView.swift
 //  tournaments
 //
 //  Created by Lukas Sarocky on 07.07.2024.
-//
 
 import SwiftUI
 import RealmSwift
 
 struct MainPageView: View {
-    @ObservedObject var viewModel = MainPageViewModel()
-    
+    @ObservedObject var viewModel: MainPageViewModel
+    let showPublicTournaments: Bool
+
+    init(showPublicTournaments: Bool = false) {
+        self.showPublicTournaments = showPublicTournaments
+        self.viewModel = MainPageViewModel(showPublicTournaments: showPublicTournaments)
+    }
+
     var body: some View {
         NavigationView {
             VStack {
@@ -55,7 +59,7 @@ struct MainPageView: View {
                         }
                     }
                 }
-                
+
                 Spacer()
             }
             .background(Color.black.opacity(0.9))
@@ -67,20 +71,21 @@ struct MainPageView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
-    
+
     @ViewBuilder
     private func destinationView(for tournament: Tournament) -> some View {
+        let tournamentModel = TournamentGenerateModel(tournament: tournament)
+        
         switch tournament.type {
         case "Round Robin":
-            RoundRobinView(viewModel: TournamentGenerateModel(tournament: tournament))
+            RoundRobinView(viewModel: tournamentModel)
             
         case "Single Elimination", "Double Elimination", "Playoff":
-            SingleEliminationView(viewModel: TournamentGenerateModel(tournament: tournament))
+            SingleEliminationView(viewModel: tournamentModel)
             
         case "Group Stage and KO":
-            GSKOView(viewModel: TournamentGenerateModel(tournament: tournament),
-                     gskoVM: GSKOViewModel(viewModel: TournamentGenerateModel(tournament: tournament)),
-                     numberOfGroups: tournament.numberOfGroups ?? 4)
+            GSKOView(gskoVM: GSKOViewModel(viewModel: tournamentModel), viewModel: tournamentModel, numberOfGroups: tournament.numberOfGroups ?? 4)
+
         case "Championship":
             F1View(viewModel: F1ViewModel(tournament: tournament))
             
@@ -88,10 +93,4 @@ struct MainPageView: View {
             Text("Unsupported tournament type")
         }
     }
-    
-}
-
-
-#Preview {
-    MainPageView()
 }
