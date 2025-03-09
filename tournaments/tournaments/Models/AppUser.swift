@@ -11,7 +11,7 @@ import RealmSwift
 
 class AppUser: Object, ObjectKeyIdentifiable {
     @Persisted(primaryKey: true) var _id: ObjectId
-    @Persisted var email: String
+    @Persisted var email: String = ""
     @Persisted var hashedPassword: String
     @Persisted var createdAt: Date = Date()
     

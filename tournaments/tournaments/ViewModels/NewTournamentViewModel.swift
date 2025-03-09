@@ -17,7 +17,6 @@ class NewTournamentViewModel: ObservableObject {
     @Published var selectedSport: String? = nil
     @Published var selectedType: String? = nil
     @Published var groupNumber: Int? = nil
-    @Published var qualifiedToNextRound: Int? = nil
     @Published var numberOfPlayers: Double = 2 {
         didSet {
             updatePlayersArray()
@@ -90,7 +89,6 @@ class NewTournamentViewModel: ObservableObject {
             numberOfAdvancePlayers: self.numberOfAdvancePlayers ?? 2,
             numberOfGroups: groups,
             playOFFMatches: self.playOFFMatches,
-            qualifiedToNextRound: self.qualifiedToNextRound,
             riposeFinal: self.riposeFinal,
             riposeKnockOut: self.riposeKnockOut,
             riposeMatches: self.riposeMateches,
@@ -145,7 +143,7 @@ class NewTournamentViewModel: ObservableObject {
         
         switch selectedType {
         case "Round Robin":
-            matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMateches: riposeMateches)
+            matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMatches: riposeMateches)
         case "Single Elimination", "Double Elimination", "Playoff":
             matches = generateElimination(players: players, tournament: tournament)
         case "Group Stage and KO":

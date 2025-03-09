@@ -18,16 +18,20 @@ class MainPageViewModel: ObservableObject {
     func loadTournaments() {
         guard let realm = realm else { return }
 
-        if showPublicTournaments {
-            // Show only tournaments with no owner (public tournaments)
-            tournaments = Array(realm.objects(Tournament.self).filter("email == nil"))
-        } else if let user = currentUser {
-            // Show tournaments belonging to the logged-in user
-            tournaments = Array(realm.objects(Tournament.self).filter("email == %@", user.email))
-        } else {
+        switch (showPublicTournaments, currentUser) {
+        case (true, _):
+            tournaments = Array(realm.objects(Tournament.self)
+                .filter("email == nil"))
+            
+        case (false, let user?) where user.email != "":
+            tournaments = Array(realm.objects(Tournament.self)
+                .filter("email == %@", user.email))
+        
+        default:
             tournaments = []
         }
     }
+
 
     func deleteTournament(tournament: Tournament) {
         guard let realm = realm else { return }

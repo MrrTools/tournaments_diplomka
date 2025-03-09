@@ -134,9 +134,9 @@ class TournamentGenerateModel: ObservableObject {
             return threshold == player1Score || threshold == player2Score
         }
         
-
+        
         if let tournament = match.tournament {
-                let isFinalMatch = match.fixturesRound ==  EliminationRounds
+            let isFinalMatch = match.fixturesRound ==  EliminationRounds
             if tournament.type == "Single Elimination" || (tournament.type ==  "Group Stage and KO" && !koFlag && (tournament.riposeKnockOut == false && tournament.riposeFinal == false) || (tournament.riposeFinal == false && !isFinalMatch))
                 || (tournament.type ==  "Playoff" && playOffLegDone){
                 var winner: Player?
@@ -151,8 +151,8 @@ class TournamentGenerateModel: ObservableObject {
                 addWinnerToNextRound(winner: actualWinner, match: match)
             } else if tournament.type == "Double Elimination" ||
                         (tournament.type == "Group Stage and KO" &&
-                        ((tournament.riposeKnockOut == true && tournament.riposeFinal == true) ||
-                        (tournament.riposeFinal == true && isFinalMatch))){
+                         ((tournament.riposeKnockOut == true && tournament.riposeFinal == true) ||
+                          (tournament.riposeFinal == true && isFinalMatch))){
                 
                 let firstMatchCompleted = match.player1Score != 0 || match.player2Score != 0
                 let rematchCompleted = match.player1ScoreRematch != 0 || match.player2ScoreRematch != 0
@@ -262,12 +262,12 @@ class TournamentGenerateModel: ObservableObject {
     }
 }
 
-// Generování Round Robin zápasů a jejich ukládání do MongoDB Realm
-func generateRoundRobinMatches(players: [Player], tournament: Tournament, riposeMateches: Bool) -> [TournamentMatch] {
-    let matches: [TournamentMatch] = []
+//Generovanie Round Robin
+func generateRoundRobinMatches(players: [Player], tournament: Tournament, riposeMatches: Bool) -> [TournamentMatch] {
+    var matches: [TournamentMatch] = []
     var players = players
     
-    // Pokud je počet týmů lichý, přidejte "BYE"
+    // Ak je nepárny počet hráčov, pridáme "BYE" hráča
     if players.count % 2 != 0 {
         players.append(Player(name: "BYE", team: ""))
     }
@@ -276,49 +276,44 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
         for j in 0..<players.count / 2 {
             let homeTeam = players[j]
             let awayTeam = players[players.count - 1 - j]
-            print("Round: \(i) Home: \(homeTeam.name) Away: \(awayTeam.name)")
+            
+            // Preskočíme zápasy s "BYE" tímom
             if homeTeam.name == "BYE" || awayTeam.name == "BYE" {
                 continue
             }
+            
             let match = TournamentMatch()
             match.player1 = homeTeam
             match.player2 = awayTeam
             match.fixturesRound = i
             match.tournament = tournament
+            matches.append(match)
             
-            
-            // Použití RealmManager pro uložení turnaje
-            if let realm = RealmManager.shared.realm {
-                try? realm.write {
-                    realm.add(match)
-                }
-            }
-            
-            
-            // odvety
-            if riposeMateches {
+            // Odveta (ak je povolená)
+            if riposeMatches {
                 let riposeMatch = TournamentMatch()
                 riposeMatch.player1 = awayTeam
                 riposeMatch.player2 = homeTeam
                 riposeMatch.fixturesRound = players.count - 1 + i
                 riposeMatch.tournament = tournament
-                
-                // Použití RealmManager pro uložení turnaje
-                if let realm = RealmManager.shared.realm {
-                    try? realm.write {
-                        realm.add(riposeMatch)
-                    }
-                }
+                matches.append(riposeMatch)
             }
-            
         }
+        
+        // Rotácia tímov pre ďalšie kolo
         let lastTeam = players.removeLast()
         players.insert(lastTeam, at: 1)
     }
     
+    if let realm = RealmManager.shared.realm {
+        try? realm.write {
+            realm.add(matches)
+        }
+    }
     
     return matches
 }
+
 
 
 func generateElimination(players: [Player], tournament: Tournament) -> [TournamentMatch] {
@@ -341,8 +336,6 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Tourname
         switch tournament.type {
         case "Double Elimination":
             match.rematchFlag = 1
-        case "Playoff":
-            match.plafOFFMatchCount = 1
         default:
             break  // Žiadna špeciálna akcia pre iné typy turnajov
         }
@@ -365,17 +358,17 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
     // Ak hráčov náhodne premiešame, každá skupina bude inak poskladaná
     let allPlayers = players.shuffled()
     let numberOfGroups = allPlayers.count / numberOfPlayersInGroup
-
+    
     // 1. Rozdelenie hráčov do skupín
     var groups: [[Player]] = Array(repeating: [], count: numberOfGroups)
     for (i, player) in allPlayers.enumerated() {
         groups[i % numberOfGroups].append(player)
     }
-
+    
     // 2. Vygenerovanie Round Robin zápasov pre každú skupinu
     var groupMatches: [TournamentMatch] = []
     var groupTables: [TournamentTable] = [] // Tabuľky pre všetky skupiny
-
+    
     for (groupIndex, originalGroupPlayers) in groups.enumerated() {
         // Skopírujeme hráčov danej skupiny, prípadne pridáme "BYE" pri nepárnom počte
         var groupPlayers = originalGroupPlayers
@@ -383,7 +376,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
             groupPlayers.append(Player(name: "BYE", team: ""))
         }
         let groupCount = groupPlayers.count
-
+        
         // Round Robin logika: i od 1 do groupCount-1
         for round in 1..<(groupCount) {
             for j in 0..<(groupCount / 2) {
@@ -391,23 +384,23 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                 let awayIndex = groupCount - 1 - j
                 let homeTeam = groupPlayers[homeIndex]
                 let awayTeam = groupPlayers[awayIndex]
-
+                
                 let match = TournamentMatch()
                 match.player1 = homeTeam
                 match.player2 = awayTeam
                 match.groupIndex = groupIndex + 1 // ✅ Ukladáme groupIndex do zápasu
                 match.fixturesRound = round
                 match.tournament = tournament
-
+                
                 groupMatches.append(match)
-
+                
                 // Uloženie zápasu do Realm
                 if let realm = RealmManager.shared.realm {
                     try? realm.write {
                         realm.add(match)
                     }
                 }
-
+                
                 // Odvety
                 if riposeMatches {
                     let riposeMatch = TournamentMatch()
@@ -416,7 +409,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                     riposeMatch.fixturesRound = groupCount - 1 + round
                     riposeMatch.tournament = tournament
                     riposeMatch.groupIndex = groupIndex + 1 // ✅ Ukladáme groupIndex aj pre odvetu
-
+                    
                     if let realm = RealmManager.shared.realm {
                         try? realm.write {
                             realm.add(riposeMatch)
@@ -424,12 +417,12 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                     }
                 }
             }
-
+            
             // Implementujeme tzv. "circle shift" - posunieme posledného hráča dopredu
             let last = groupPlayers.removeLast()
             groupPlayers.insert(last, at: 1)
         }
-
+        
         // 3. Vytvorenie tabuľky pre danú skupinu
         let tables = groupPlayers
             .filter { $0.name != "BYE" }
@@ -441,7 +434,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
         
         groupTables.append(contentsOf: tables)
     }
-
+    
     // 4. Uloženie zápasov a tabuliek do databázy
     if let realm = RealmManager.shared.realm {
         try? realm.write {
@@ -450,7 +443,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
             realm.add(tournament, update: .modified)
         }
     }
-
+    
     return groupMatches
 }
 
