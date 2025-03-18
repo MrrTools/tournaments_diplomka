@@ -30,9 +30,10 @@ class Tournament: Object, ObjectKeyIdentifiable {
     @Persisted var f1TeamTable: List<F1TeamTable>
     @Persisted var f1PlayerTable: List<F1PlayerTable>
     @Persisted var email: String?
+    @Persisted var createdDate: Date = Date()
     
     
-    convenience init(name: String, owner: String, sport: String, type: String, groupNumber: Int?, numberOfAdvancePlayers: Int?, numberOfGroups: Int?, playOFFMatches: Int?, riposeFinal: Bool?, riposeKnockOut: Bool?, riposeMatches: Bool?, numberOfRaces: Int?, players: [Player], matches: [TournamentMatch], table: [TournamentTable], settings: [TournamentSettings], f1Race: [F1Race], f1TeamTable: [F1TeamTable], f1PlayerTable: [F1PlayerTable], email: String?) {
+    convenience init(name: String, owner: String, sport: String, type: String, groupNumber: Int?, numberOfAdvancePlayers: Int?, numberOfGroups: Int?, playOFFMatches: Int?, riposeFinal: Bool?, riposeKnockOut: Bool?, riposeMatches: Bool?, numberOfRaces: Int?, players: [Player], matches: [TournamentMatch], table: [TournamentTable], settings: [TournamentSettings], f1Race: [F1Race], f1TeamTable: [F1TeamTable], f1PlayerTable: [F1PlayerTable], email: String?, createdDate: Date = Date()) {
         self.init()
         self.name = name
         self.owner = owner
@@ -54,6 +55,7 @@ class Tournament: Object, ObjectKeyIdentifiable {
         self.f1TeamTable.append(objectsIn: f1TeamTable)
         self.f1PlayerTable.append(objectsIn: f1PlayerTable)
         self.email = email
+        self.createdDate = createdDate
     }
 }
 

@@ -57,7 +57,7 @@ struct NewTournamentView: View {
                     playoffSection
                 }
                 playersCountSection
-                if viewModel.selectedType == "Round Robin" || viewModel.selectedType == "Group Stage and KO" {
+                if  viewModel.selectedType == "Group Stage and KO" {
                     groupStageSection
                 }
                 playersSection
@@ -158,7 +158,7 @@ struct NewTournamentView: View {
     }
     
     private var racesSection: some View {
-        Section(header: Text("Počet pretekov")) {
+        Section(header: Text("Number of races")) {
             VStack {
                 Slider(
                     value: $viewModel.numberOfRaces,
@@ -168,15 +168,15 @@ struct NewTournamentView: View {
                         viewModel.isEditing = editing
                     }
                 )
-                Text("Počet pretekov: \(Int(viewModel.numberOfRaces))")
+                Text("Number of races: \(Int(viewModel.numberOfRaces))")
                     .foregroundColor(viewModel.isEditing ? .red : .purple)
             }
         }
     }
     
     private var playoffSection: some View {
-        Section(header: Text("Počet víťazných zápasov")) {
-            Picker("Počet víťazných zápasov", selection: $viewModel.playOFFMatches) {
+        Section(header: Text("Number of Matches")) {
+            Picker("Number of Matches", selection: $viewModel.playOFFMatches) {
                 ForEach([3, 5, 7], id: \.self) { value in
                     Text("\(value)").tag(value)
                 }
@@ -186,7 +186,7 @@ struct NewTournamentView: View {
     }
     
     private var playersCountSection: some View {
-        Section(header: Text("Počet hráčů")) {
+        Section(header: Text("Number of Players")) {
             VStack {
                 Slider(
                     value: Binding(
@@ -203,7 +203,7 @@ struct NewTournamentView: View {
                     in: Double(availableCounts.first ?? 2)...Double(availableCounts.last ?? 64),
                     step: 1
                 )
-                Text("Počet hráčů: \(Int(viewModel.numberOfPlayers))")
+                Text("Number of Players: \(Int(viewModel.numberOfPlayers))")
                     .foregroundColor(viewModel.isEditing ? .red : .purple)
             }
         }
@@ -229,7 +229,7 @@ struct NewTournamentView: View {
     }
     
     private var playersSection: some View {
-        Section(header: Text("Hráči")) {
+        Section(header: Text("Players")) {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
                 ForEach(0..<Int(viewModel.numberOfPlayers), id: \.self) { index in
                     VStack {
@@ -246,7 +246,7 @@ struct NewTournamentView: View {
                                     .foregroundColor(.gray)
                                     .clipShape(Circle())
                             }
-                            TextField("Hráč \(index + 1)", text: $viewModel.players[index])
+                            TextField("Player \(index + 1)", text: $viewModel.players[index])
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .multilineTextAlignment(.center)
                             Spacer()
@@ -276,12 +276,12 @@ struct NewTournamentView: View {
     }
     
     private var photoSection: some View {
-        Section(header: Text("Přidat fotku hráče")) {
+        Section(header: Text("Add photos")) {
             HStack {
-                Picker("Vyberte hráče", selection: $selectedPlayerIndex) {
-                    Text("Vyberte hráče").tag(Int?.none)
+                Picker("Select player", selection: $selectedPlayerIndex) {
+                    Text("Select player").tag(Int?.none)
                     ForEach(0..<Int(viewModel.numberOfPlayers), id: \.self) { index in
-                        Text(viewModel.players[index].isEmpty ? "Hráč \(index + 1)" : viewModel.players[index])
+                        Text(viewModel.players[index].isEmpty ? "Player \(index + 1)" : viewModel.players[index])
                             .tag(Int?.some(index))
                             .foregroundColor(.purple)
                     }
@@ -293,7 +293,7 @@ struct NewTournamentView: View {
                         showImagePicker = true
                     }
                 }) {
-                    Text("Přidat fotku")
+                    Text("Add photo")
                         .padding(.horizontal)
                         .padding(.vertical, 10)
                         .background(Color.purple)
@@ -320,7 +320,7 @@ struct NewTournamentView: View {
         .padding()
     }
     
-    // MARK: - Validace formuláře
+    // MARK: - Validation
     private func validateForm() {
         nameError = nil
         ownerError = nil

@@ -388,7 +388,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                 let match = TournamentMatch()
                 match.player1 = homeTeam
                 match.player2 = awayTeam
-                match.groupIndex = groupIndex + 1 // ✅ Ukladáme groupIndex do zápasu
+                match.groupIndex = groupIndex + 1
                 match.fixturesRound = round
                 match.tournament = tournament
                 
@@ -408,7 +408,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                     riposeMatch.player2 = homeTeam
                     riposeMatch.fixturesRound = groupCount - 1 + round
                     riposeMatch.tournament = tournament
-                    riposeMatch.groupIndex = groupIndex + 1 // ✅ Ukladáme groupIndex aj pre odvetu
+                    riposeMatch.groupIndex = groupIndex + 1
                     
                     if let realm = RealmManager.shared.realm {
                         try? realm.write {
@@ -428,7 +428,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
             .filter { $0.name != "BYE" }
             .map { player in
                 let table = TournamentTable(player: player, tournament: tournament)
-                table.groupIndex = groupIndex + 1 // ✅ Ukladáme groupIndex do tabuľky
+                table.groupIndex = groupIndex + 1
                 return table
             }
         
@@ -439,7 +439,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
     if let realm = RealmManager.shared.realm {
         try? realm.write {
             tournament.matches.append(objectsIn: groupMatches)
-            tournament.table.append(objectsIn: groupTables) // ✅ Tabuľky teraz obsahujú groupIndex
+            tournament.table.append(objectsIn: groupTables)
             realm.add(tournament, update: .modified)
         }
     }

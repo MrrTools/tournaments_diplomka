@@ -33,6 +33,7 @@ class NewTournamentViewModel: ObservableObject {
     @Published var playOFFMatches: Int? = nil
     @Published var numberOfGroupPlayers: Int? = nil
     @Published var numberOfAdvancePlayers: Int? = nil
+    @Published var createdDate: Date = Date()
     
     let sportTypes: [String: [String]] = [
         "Football": ["Single Elimination", "Double Elimination", "Round Robin", "Group Stage and KO"],
@@ -79,7 +80,7 @@ class NewTournamentViewModel: ObservableObject {
         let userEmail = AuthService.shared.currentUser?.email
         let isF1 = selectedSport == "F1"
         let groups = calculateNumberOfGroups(for: players)
-
+        
         let tournament = Tournament(
             name: self.tournamentName,
             owner: self.owner,
@@ -100,7 +101,8 @@ class NewTournamentViewModel: ObservableObject {
             f1Race: [],
             f1TeamTable: [],
             f1PlayerTable: [],
-            email: userEmail
+            email: userEmail,
+            createdDate: createdDate
         )
         
         if let realm = RealmManager.shared.realm {
@@ -120,7 +122,7 @@ class NewTournamentViewModel: ObservableObject {
         onSave()
     }
     
-    // ✅ GENEROVANIE F1 STANDINGS (BEZ PRETEKOV)
+    // GENEROVANIE F1 STANDINGS (BEZ PRETEKOV)
     private func generateF1Standings(tournament: Tournament, players: [Player]) {
         let driverStandings = players.map { F1PlayerTable(player: $0, tournament: tournament) }
         
@@ -137,7 +139,7 @@ class NewTournamentViewModel: ObservableObject {
         }
     }
     
-    // ✅ GENEROVANIE ŠTANDARDNÝCH TURNAJOV (PRE OSTATNÉ ŠPORTY)
+    // GENEROVANIE ŠTANDARDNÝCH TURNAJOV (PRE OSTATNÉ ŠPORTY)
     private func generateStandardTournament(tournament: Tournament, players: [Player]) {
         var matches: [TournamentMatch] = []
         
@@ -154,7 +156,7 @@ class NewTournamentViewModel: ObservableObject {
         
         let table: [TournamentTable] = players.map { TournamentTable(player: $0, tournament: tournament) }
         let settings = TournamentSettings(tournament: tournament)
-
+        
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.matches.append(objectsIn: matches)

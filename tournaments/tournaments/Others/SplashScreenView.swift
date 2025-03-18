@@ -13,26 +13,26 @@ struct SplashScreenView: View {
     @State private var fadeOut = false
     @State private var progress: Double = 0.0
     @State private var isActive = false
-
+    
     var body: some View {
         if isActive {
             MainPageView()
         } else {
             ZStack {
                 Color.black.edgesIgnoringSafeArea(.all)
-
+                
                 VStack {
-                    Image("Image") // Nahraď svojím logom
+                    Image("Image")
                         .resizable()
                         .scaledToFit()
                         .opacity(fadeOut ? 0 : 1)
-
+                    
                     Text("Loading...")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
                         .padding(.top, 8)
-
+                    
                     ProgressView(value: progress, total: 100)
                         .progressViewStyle(LinearProgressViewStyle(tint: .purple))
                         .frame(width: 200)
@@ -58,10 +58,10 @@ struct SplashScreenView: View {
                     }
                 }
             }
-
+            
         }
     }
-
+    
     private func startLoading() {
         Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
             if progress < 100 {

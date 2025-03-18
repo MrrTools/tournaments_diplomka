@@ -16,7 +16,7 @@ class F1TeamTable: Object, ObjectKeyIdentifiable {
     @Persisted var fastestLaps: Int = 0
     @Persisted var podiums: Int = 0
     @Persisted var tournament: Tournament?
-
+    
     convenience init(teamName: String, totalPoints: Int = 0, wins: Int = 0, fastestLaps: Int = 0, podiums: Int = 0, tournament: Tournament?) {
         self.init()
         self.teamName = teamName

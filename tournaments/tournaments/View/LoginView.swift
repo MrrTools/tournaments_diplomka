@@ -13,31 +13,31 @@ struct LoginView: View {
     @State private var errorMessage: String?
     @State private var navigateToMainPage = false
     @State private var showPublicTournaments = false
-
+    
     var body: some View {
         NavigationStack {
             VStack {
                 
-
+                
                 Text("Login")
                     .font(.largeTitle)
                     .bold()
                     .padding()
-
+                
                 Form {
                     Section {
                         TextField("Email", text: $email)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .autocapitalization(.none)
-
+                        
                         SecureField("Password", text: $password)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
-
+                        
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
                                 .foregroundColor(.red)
                         }
-
+                        
                         Button(action: {
                             AuthService.shared.loginUser(email: email, password: password) { success, error, user in
                                 if success {
@@ -54,12 +54,12 @@ struct LoginView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(.purple)
                     }
-
+                    
                     Section {
                         NavigationLink("Register", destination: RegistrationView())
                             .frame(maxWidth: .infinity)
                     }
-
+                    
                     Section {
                         Button(action: {
                             showPublicTournaments = true
@@ -72,11 +72,11 @@ struct LoginView: View {
                         .foregroundColor(.purple)
                     }
                 }
-
-                Spacer() // Posunie Form hore, aby bol v strede obrazovky
+                
+                Spacer()
             }
             .padding()
-            .frame(maxHeight: .infinity) // Rozťahuje obsah na celú výšku
+            .frame(maxHeight: .infinity)
             .background(Color.black.opacity(0.9))
             .foregroundColor(.white)
             .navigationDestination(isPresented: $navigateToMainPage) {

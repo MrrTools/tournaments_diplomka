@@ -38,38 +38,38 @@ struct RegistrationView: View {
                             .padding()
                     }
                 }
-                    
-                    Section {
-                        Button(action: {
-                            AuthService.shared.registerUser(email: email, password: password, confirmPassword: confirmPassword) { success, error in
-                                if success {
-                                    print("User registered successfully")
-                                    navigateToLogin = true
-                                } else {
-                                    self.errorMessage = error
-                                }
+                
+                Section {
+                    Button(action: {
+                        AuthService.shared.registerUser(email: email, password: password, confirmPassword: confirmPassword) { success, error in
+                            if success {
+                                print("User registered successfully")
+                                navigateToLogin = true
+                            } else {
+                                self.errorMessage = error
                             }
-                        }) {
-                            Text("Register")
-                                .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.purple)
+                    }) {
+                        Text("Register")
+                            .frame(maxWidth: .infinity)
                     }
-                    Section {
-                        NavigationLink("Continue without registration", destination: MainPageView(showPublicTournaments: true))
-                            .padding()
-                    }
-                    
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
                 }
-                .padding()
-                .frame(maxHeight: .infinity)
-                .background(Color.black.opacity(0.9))
-                .foregroundColor(.white)
-                .navigationDestination(isPresented: $navigateToLogin) {
-                         LoginView()
-                             .navigationBarBackButtonHidden(true)
-                     }
+                Section {
+                    NavigationLink("Continue without registration", destination: MainPageView(showPublicTournaments: true))
+                        .padding()
+                }
+                
+            }
+            .padding()
+            .frame(maxHeight: .infinity)
+            .background(Color.black.opacity(0.9))
+            .foregroundColor(.white)
+            .navigationDestination(isPresented: $navigateToLogin) {
+                LoginView()
+                    .navigationBarBackButtonHidden(true)
             }
         }
     }
+}

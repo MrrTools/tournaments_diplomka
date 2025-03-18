@@ -12,7 +12,7 @@ import RealmSwift
 @main
 struct tournamentsApp: SwiftUI.App {
     @StateObject private var realmManager = RealmManager.shared
-
+    
     var body: some Scene {
         WindowGroup {
             if realmManager.isInitialized,
@@ -23,7 +23,7 @@ struct tournamentsApp: SwiftUI.App {
                     .environment(\.realmConfiguration, configuration)
                     .environment(\.realm, realm)
             } else {
-                SplashScreenView() // 🔹 Splash Screen sa zobrazí pri spustení
+                SplashScreenView()
             }
         }
     }

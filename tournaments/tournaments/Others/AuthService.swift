@@ -15,7 +15,7 @@ class AuthService {
     private var realm: Realm?
     
     @Published var currentUser: AppUser?
-
+    
     private init() {
         self.realm = RealmManager.shared.realm
         loadCurrentUser()
@@ -25,13 +25,13 @@ class AuthService {
         guard let realm = realm else { return }
         currentUser = realm.objects(AppUser.self).first
     }
-
+    
     func hashPassword(_ password: String) -> String {
         let data = Data(password.utf8)
         let hashed = SHA256.hash(data: data)
         return hashed.compactMap { String(format: "%02x", $0) }.joined()
     }
-
+    
     func registerUser(email: String, password: String, confirmPassword: String, completion: @escaping (Bool, String?) -> Void) {
         guard let realm = realm else {
             completion(false, "Database error")
@@ -42,13 +42,13 @@ class AuthService {
             completion(false, "Passwords do not match")
             return
         }
-
+        
         let existingUser = realm.objects(AppUser.self).filter("email == %@", email).first
         guard existingUser == nil else {
             completion(false, "User already exists")
             return
         }
-
+        
         let hashedPassword = hashPassword(password)
         let newUser = AppUser(email: email, hashedPassword: hashedPassword)
         
@@ -59,7 +59,7 @@ class AuthService {
         
         completion(true, nil)
     }
-
+    
     func loginUser(email: String, password: String, completion: @escaping (Bool, String?, AppUser?) -> Void) {
         guard let realm = realm else {
             completion(false, "Database error", nil)
@@ -74,7 +74,7 @@ class AuthService {
             completion(false, "Invalid email or password", nil)
         }
     }
-
+    
     func logout() {
         currentUser = nil
     }

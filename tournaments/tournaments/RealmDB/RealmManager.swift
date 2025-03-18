@@ -16,7 +16,7 @@ class RealmManager: ObservableObject {
     static let shared = RealmManager()
     @Published var user: User?
     @Published var configuration: Realm.Configuration?
-    @Published var isInitialized = false // 🔹 Sledovanie dokončenia inicializácie
+    @Published var isInitialized = false
     
     private init() {
         self.app = App(id: "application-1-ijrhwpn")
@@ -69,7 +69,7 @@ class RealmManager: ObservableObject {
             realm = try await Realm(configuration: configuration!, downloadBeforeOpen: .always)
             
             DispatchQueue.main.async {
-                self.isInitialized = true // 🔹 Synchronizácia je hotová
+                self.isInitialized = true
             }
         } catch {
             print("Error initializing Realm: \(error)")
