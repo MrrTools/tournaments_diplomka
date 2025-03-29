@@ -10,14 +10,16 @@ import RealmSwift
 
 struct SettingsView: View {
     var settings: TournamentSettings
+    @Binding var isPresented: Bool
     @Environment(\.presentationMode) var presentationMode
     
     @State private var winPoints: Int
     @State private var losePoints: Int
     @State private var drawPoints: Int
     
-    init(settings: TournamentSettings) {
+    init(settings: TournamentSettings, isPresented: Binding<Bool>) {
         self.settings = settings
+        self._isPresented = isPresented
         _winPoints = State(initialValue: settings.winPoints)
         _losePoints = State(initialValue: settings.losePoints)
         _drawPoints = State(initialValue: settings.drawPoints)
@@ -28,6 +30,18 @@ struct SettingsView: View {
             Color.black.opacity(0.8).edgesIgnoringSafeArea(.all)
             
             VStack {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                }
                 Text("Additional settings")
                     .font(.title2)
                     .bold()

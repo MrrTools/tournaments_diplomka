@@ -48,7 +48,7 @@ class GSKOViewModel: ObservableObject {
             return true
         }
     }
-
+    
     //Generuje Knockout Stage len raz
     func proceedAfterAllResults() {
         guard !showKnockoutStage else { return }
@@ -85,7 +85,7 @@ class GSKOViewModel: ObservableObject {
         }
         
         let matches = generateElimination(players: advancingPlayers, tournament: viewModel.tournament)
-
+        
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 viewModel.tournament.matches.append(objectsIn: matches)

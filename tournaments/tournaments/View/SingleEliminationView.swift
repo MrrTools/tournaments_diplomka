@@ -21,8 +21,8 @@ struct SingleEliminationView: View {
                     VStack(spacing: 90) {
                         let matchesForRound = getMatchesForRound(roundIndex)
                         let expectedMatchCount = viewModel.matchesInSection[safe: roundIndex] ?? 0
-                        let isFinalRound = roundIndex + 1 == viewModel.EliminationRounds // 🔥 Finále je posledné kolo
-
+                        let isFinalRound = roundIndex + 1 == viewModel.EliminationRounds // Finále je posledné kolo
+                        
                         ForEach(0..<expectedMatchCount, id: \.self) { matchIndex in
                             MatchViewv(
                                 match: matchesForRound[safe: matchIndex],
@@ -31,7 +31,7 @@ struct SingleEliminationView: View {
                                 rematchFlag: $rematchFlag,
                                 riposeFinal: viewModel.tournament.riposeFinal ?? false,
                                 riposeKnockout: viewModel.tournament.riposeKnockOut ?? false,
-                                isFinalMatch: isFinalRound // 🔥 Informácia o finálovom zápase
+                                isFinalMatch: isFinalRound // Informácia o finálovom zápase
                             )
                         }
                     }
@@ -67,8 +67,8 @@ struct SingleEliminationView: View {
             }
         }
     }
-
-    /// 🔥 Získať zápasy pre dané kolo
+    
+    // Získať zápasy pre dané kolo
     private func getMatchesForRound(_ roundIndex: Int) -> [TournamentMatch] {
         viewModel.matches
             .filter { $0.fixturesRound == roundIndex + 1 && (viewModel.tournament.type == "Group Stage and KO" ? $0.matchIndex != 0 : true) }
@@ -76,7 +76,7 @@ struct SingleEliminationView: View {
     }
 }
 
-/// ✅ **Match View so správnym `Binding` pre `sheet`**
+//Match View so správnym `Binding` pre `sheet`
 struct MatchViewv: View {
     var match: TournamentMatch?
     @Binding var showScoreDialog: Bool
@@ -84,30 +84,30 @@ struct MatchViewv: View {
     @Binding var rematchFlag: Int
     let riposeFinal: Bool
     let riposeKnockout: Bool
-    let isFinalMatch: Bool // 🔥 Informácia, či je to finálový zápas
-
+    let isFinalMatch: Bool // Informácia, či je to finálový zápas
+    
     var body: some View {
         VStack(spacing: 8) {
             Text(match?.player1?.name ?? "TBD")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
+            
             Button(action: { openScoreDialog(for: match, rematch: 0) }) {
                 ScoreButtonContent(score: match?.player1Score ?? 0, vsScore: match?.player2Score ?? 0)
             }
-
-            // 🔥 Podmienka pre rematch button:
+            
+            //  Podmienka pre rematch button:
             // Ak je `riposeFinal` true a `riposeKnockout` false, zobrazí sa len vo finále (posledné kolo)
             if match?.rematchFlag == 1 || riposeKnockout || (riposeFinal && isFinalMatch) {
                 Button(action: { openScoreDialog(for: match, rematch: 1) }) {
                     ScoreButtonContent(score: match?.player1ScoreRematch ?? 0, vsScore: match?.player2ScoreRematch ?? 0)
                 }
             }
-
+            
             Text(match?.player2?.name ?? "TBD")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .trailing)
-
+            
             if let setsString = match?.setsString, !setsString.isEmpty {
                 SetsView(setsString: setsString, sport: match?.tournament?.sport)
             }
@@ -119,7 +119,7 @@ struct MatchViewv: View {
         .frame(width: 300, height: 120)
     }
     
-    /// Otvorí dialógové okno pre skóre zápasu
+    // Otvorí dialógové okno pre skóre zápasu
     private func openScoreDialog(for match: TournamentMatch?, rematch: Int) {
         if let match = match {
             selectedMatch = match
@@ -129,11 +129,11 @@ struct MatchViewv: View {
     }
 }
 
-/// ✅ **Tlačidlo pre skóre zápasu**
+// Tlačidlo pre skóre zápasu
 struct ScoreButtonContent: View {
     let score: Int
     let vsScore: Int
-
+    
     var body: some View {
         Text("\(score) - \(vsScore)")
             .font(.subheadline)
@@ -144,11 +144,11 @@ struct ScoreButtonContent: View {
     }
 }
 
-/// ✅ **Zobrazenie setov pre Tennis / Hockey**
+//Zobrazenie setov pre Tennis a zapasy playoff
 struct SetsView: View {
     let setsString: String
     let sport: String?
-
+    
     var body: some View {
         if let sport = sport, sport == "Tennis" || sport == "Hockey" {
             let sets = setsString.split(separator: ";").map { String($0) }
@@ -167,7 +167,6 @@ struct SetsView: View {
     }
 }
 
-/// ✅ **Bezpečné načítanie indexov v poli**
 extension Array {
     subscript(safe index: Index) -> Element? {
         return indices.contains(index) ? self[index] : nil

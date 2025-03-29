@@ -58,9 +58,12 @@ struct RoundRobinView: View {
             .frame(height: 500)
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
-        .sheet(isPresented: $showSettings) {
+        .sheet(isPresented: Binding(            get: { showSettings },
+                                                set: { showSettings = $0 }
+                                   ))
+        {
             if let settings = viewModel.tournament.settings.first {
-                SettingsView(settings: settings)
+                SettingsView(settings: settings, isPresented: $showSettings)
                     .background(Color.clear)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -77,5 +80,5 @@ struct RoundRobinView: View {
             }
             
         }
-    }
+    } 
 }
