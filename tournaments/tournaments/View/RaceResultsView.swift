@@ -37,12 +37,36 @@ struct RaceResultsView: View {
             
             // 2) Zistíme, či existuje pretek s daným raceNumber
             if let race = viewModel.getRace(for: selectedRaceNumber) {
-                // Zobrazenie detailov vybraného preteku
-                VStack(alignment: .leading) {
-                    Text(race.name).bold()
-                    Text("\(race.country) - \(race.laps) laps")
+                HStack(spacing: 12) {
+                    Image(systemName: "car.fill")
+                        .foregroundColor(.orange)
+
+                    Text(race.name)
+                        .font(.headline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundColor(.red)
+                        Text(race.country)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "flag.checkered")
+                            .foregroundColor(.blue)
+                        Text("\(race.laps) laps")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.secondarySystemBackground)))
+                .shadow(radius: 4)
+                .padding(.horizontal)
                 
                 // 3) Editovateľná tabuľka so záznamami pre daný raceNumber
                 Table(filteredAndSortedTable) {
@@ -102,7 +126,7 @@ struct RaceResultsView: View {
                     }
                     
                     // Finish Position
-                    TableColumn("Finish Position") { entry in
+                    TableColumn("Finished") { entry in
                         TextField(
                             "",
                             text: Binding(
