@@ -42,6 +42,7 @@
 		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
 		46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */; };
 		46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB382D5BF97100FDBBA7 /* GSKOViewModel.swift */; };
+		POWERSYNC0032C3B126E00FW /* PowerSync in Frameworks */ = {isa = PBXBuildFile; productRef = POWERSYNC0022C3B126E00PS /* PowerSync */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -106,6 +107,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				466B70DB2C3B126D00BF7426 /* RealmSwift in Frameworks */,
+				POWERSYNC0032C3B126E00FW /* PowerSync in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +242,7 @@
 			name = tournaments;
 			packageProductDependencies = (
 				466B70DA2C3B126D00BF7426 /* RealmSwift */,
+				POWERSYNC0022C3B126E00PS /* PowerSync */,
 			);
 			productName = tournaments;
 			productReference = 462FA4B72BD2E45700175699 /* tournaments.app */;
@@ -271,6 +274,7 @@
 			mainGroup = 462FA4AE2BD2E45700175699;
 			packageReferences = (
 				466B70D72C3B126D00BF7426 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				POWERSYNC0012C3B126E00BF /* XCRemoteSwiftPackageReference "powersync-swift" */,
 			);
 			productRefGroup = 462FA4B82BD2E45700175699 /* Products */;
 			projectDirPath = "";
@@ -560,6 +564,14 @@
 				kind = branch;
 			};
 		};
+		POWERSYNC0012C3B126E00BF /* XCRemoteSwiftPackageReference "powersync-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/powersync-ja/powersync-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -567,6 +579,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 466B70D72C3B126D00BF7426 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
+		};
+		POWERSYNC0022C3B126E00PS /* PowerSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = POWERSYNC0012C3B126E00BF /* XCRemoteSwiftPackageReference "powersync-swift" */;
+			productName = PowerSync;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
