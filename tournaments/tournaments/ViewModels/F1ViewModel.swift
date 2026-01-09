@@ -76,14 +76,28 @@ class F1ViewModel: ObservableObject {
         // 2) Potom ich všetky naraz pridáme do Realm
         try? realm.write {
             realm.add(newRaces)
-            
+
             for race in newRaces {
                 self.tournament.f1Race.append(race)
             }
         }
-        
-        
-        
+
+        // Zápis do MongoDB
+        Task {
+            for race in newRaces {
+                try? await MongoDBManager.shared.insertF1Race([
+                    "_id": race._id.stringValue,
+                    "tournament_id": tournament._id.stringValue,
+                    "name": name,
+                    "country": country,
+                    "laps": laps,
+                    "date": date,
+                    "raceNumber": raceNumber,
+                    "player": race.player?.name ?? ""
+                ])
+            }
+        }
+
         loadRaces()
     }
     
@@ -226,6 +240,29 @@ class F1ViewModel: ObservableObject {
 
         // 6) Napokon načítame výsledné záznamy do @Published polia
         loadStandings()
+
+        // Zápis do MongoDB
+        Task {
+            try? await MongoDBManager.shared.updateTournament(
+                id: tournament._id.stringValue,
+                updates: [
+                    "f1PlayerStandings": allPlayerTables.map { [
+                        "player": $0.player?.name ?? "",
+                        "points": $0.totalPoints,
+                        "wins": $0.wins,
+                        "podiums": $0.podiums,
+                        "fastestLaps": $0.fastestLaps
+                    ]},
+                    "f1TeamStandings": allTeamTables.map { [
+                        "team": $0.teamName,
+                        "points": $0.totalPoints,
+                        "wins": $0.wins,
+                        "podiums": $0.podiums,
+                        "fastestLaps": $0.fastestLaps
+                    ]}
+                ]
+            )
+        }
     }
 
 

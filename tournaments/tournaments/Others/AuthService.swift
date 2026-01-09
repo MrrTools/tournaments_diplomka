@@ -51,12 +51,21 @@ class AuthService {
         
         let hashedPassword = hashPassword(password)
         let newUser = AppUser(email: email, hashedPassword: hashedPassword)
-        
+
         try? realm.write {
             realm.add(newUser)
             currentUser = newUser  // Nastavíme aktuálneho používateľa
         }
-        
+
+        // Zápis do MongoDB
+        Task {
+            try? await MongoDBManager.shared.insertUser([
+                "_id": newUser._id.stringValue,
+                "email": email,
+                "hashedPassword": hashedPassword
+            ])
+        }
+
         completion(true, nil)
     }
     

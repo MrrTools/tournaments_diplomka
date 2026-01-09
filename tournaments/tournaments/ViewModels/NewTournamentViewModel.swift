@@ -76,11 +76,11 @@ class NewTournamentViewModel: ObservableObject {
             let team = self.f1Teams.indices.contains(index) ? self.f1Teams[index] : ""
             return Player(name: name, team: team, photoData: photoData)
         }
-        
+
         let userEmail = AuthService.shared.currentUser?.email
         let isF1 = selectedSport == "F1"
         let groups = calculateNumberOfGroups(for: players)
-        
+
         let tournament = Tournament(
             name: self.tournamentName,
             owner: self.owner,
@@ -104,37 +104,61 @@ class NewTournamentViewModel: ObservableObject {
             email: userEmail,
             createdDate: createdDate
         )
-        
+
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 realm.add(tournament)
             }
-            
+
+            // Zápis do MongoDB
+            Task {
+                try? await MongoDBManager.shared.insertTournament([
+                    "_id": tournament._id.stringValue,
+                    "name": tournament.name,
+                    "owner": tournament.owner,
+                    "sport": tournament.sport,
+                    "type": tournament.type,
+                    "email": tournament.email ?? "",
+                    "createdDate": tournament.createdDate
+                ])
+            }
+
             onSave()
         }
-        
+
         if isF1 {
             generateF1Standings(tournament: tournament, players: players)
         } else {
             generateStandardTournament(tournament: tournament, players: players)
         }
-        
+
         onSave()
     }
     
     // GENEROVANIE F1 STANDINGS (BEZ PRETEKOV)
     private func generateF1Standings(tournament: Tournament, players: [Player]) {
         let driverStandings = players.map { F1PlayerTable(player: $0, tournament: tournament) }
-        
+
         let teamStandings = Dictionary(grouping: players, by: { $0.team! }).map { (team, drivers) in
             F1TeamTable(teamName: team, tournament: tournament)
         }
-        
+
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.f1PlayerTable.append(objectsIn: driverStandings)
                 tournament.f1TeamTable.append(objectsIn: teamStandings)
                 realm.add(tournament, update: .modified)
+            }
+
+            // Zápis do MongoDB
+            Task {
+                try? await MongoDBManager.shared.updateTournament(
+                    id: tournament._id.stringValue,
+                    updates: [
+                        "f1PlayerTable": driverStandings.map { ["player": $0.player?.name ?? "", "points": $0.totalPoints] },
+                        "f1TeamTable": teamStandings.map { ["team": $0.teamName, "points": $0.totalPoints] }
+                    ]
+                )
             }
         }
     }
@@ -142,7 +166,7 @@ class NewTournamentViewModel: ObservableObject {
     // GENEROVANIE ŠTANDARDNÝCH TURNAJOV (PRE OSTATNÉ ŠPORTY)
     private func generateStandardTournament(tournament: Tournament, players: [Player]) {
         var matches: [TournamentMatch] = []
-        
+
         switch selectedType {
         case "Round Robin":
             matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMatches: riposeMateches)
@@ -153,16 +177,38 @@ class NewTournamentViewModel: ObservableObject {
         default:
             break
         }
-        
+
         let table: [TournamentTable] = players.map { TournamentTable(player: $0, tournament: tournament) }
         let settings = TournamentSettings(tournament: tournament)
-        
+
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 tournament.matches.append(objectsIn: matches)
                 tournament.table.append(objectsIn: table)
                 tournament.settings.append(settings)
                 realm.add(tournament, update: .modified)
+            }
+
+            // Zápis do MongoDB
+            Task {
+                // Zápis zápasov
+                for match in matches {
+                    try? await MongoDBManager.shared.insertMatch([
+                        "_id": match._id.stringValue,
+                        "tournament_id": tournament._id.stringValue,
+                        "player1": match.player1?.name ?? "",
+                        "player2": match.player2?.name ?? "",
+                        "round": match.round
+                    ])
+                }
+
+                // Aktualizácia turnaja s tabuľkou
+                try? await MongoDBManager.shared.updateTable(
+                    tournamentId: tournament._id.stringValue,
+                    table: [
+                        "players": table.map { ["name": $0.player?.name ?? "", "points": $0.points, "wins": $0.wins] }
+                    ]
+                )
             }
         }
     }
