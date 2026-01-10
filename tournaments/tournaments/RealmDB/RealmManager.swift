@@ -27,11 +27,9 @@ class RealmManager: ObservableObject {
     func initialize() async {
         do {
             // Inicializácia lokálnej Realm databázy
-            realm = try await Realm()
-
-            DispatchQueue.main.async {
-                self.isInitialized = true
-            }
+            let realmInstance = try Realm()
+            realm = realmInstance
+            isInitialized = true
         } catch {
             print("Error initializing Realm: \(error)")
         }

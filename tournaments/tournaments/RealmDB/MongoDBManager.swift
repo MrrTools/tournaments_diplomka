@@ -34,18 +34,18 @@ class MongoDBManager: ObservableObject {
 
     func connect() async throws {
         do {
-            // Vytvorenie MongoDB klienta
-            client = try MongoClient(connectionString, using: nil)
+            // Vytvorenie MongoDB klienta (bez EventLoopGroup pre novšiu verziu driver)
+            client = try MongoClient(connectionString)
             database = client?.db(databaseName)
 
             // Test pripojenia
             let command: BSONDocument = ["ping": .int32(1)]
-            _ = try await database?.runCommand(command, options: nil)
+            _ = try await database?.runCommand(command)
         } catch {
             print("MongoDB connection failed: \(error)")
             throw error
         }
-        
+
         await MainActor.run {
             self.isConnected = true
         }
