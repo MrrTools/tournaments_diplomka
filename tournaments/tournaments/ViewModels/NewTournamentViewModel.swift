@@ -198,7 +198,7 @@ class NewTournamentViewModel: ObservableObject {
                         "tournament_id": tournament._id.stringValue,
                         "player1": match.player1?.name ?? "",
                         "player2": match.player2?.name ?? "",
-                        "round": match.round
+                        "round": match.fixturesRound
                     ])
                 }
 

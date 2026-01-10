@@ -16,11 +16,9 @@ struct tournamentsApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
             if realmManager.isInitialized,
-               let configuration = realmManager.configuration,
                let realm = realmManager.realm {
                 LoginView()
                     .preferredColorScheme(.dark)
-                    .environment(\.realmConfiguration, configuration)
                     .environment(\.realm, realm)
             } else {
                 SplashScreenView()
