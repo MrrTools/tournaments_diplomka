@@ -6,11 +6,12 @@
 //
 
 import Foundation
-// POZNÁMKA: MongoDB Swift Driver musí byť pridaný cez Swift Package Manager
+import MongoSwift
+
+// POZNÁMKA: MongoDB Swift Driver je pridaný cez Swift Package Manager
 // V Xcode: File -> Add Package Dependencies...
 // URL: https://github.com/mongodb/mongo-swift-driver
 // Version: 1.3.1 alebo novšia
- import MongoSwift
 
 class MongoDBManager: ObservableObject {
 
