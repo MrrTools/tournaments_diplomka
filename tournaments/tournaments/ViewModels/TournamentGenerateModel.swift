@@ -124,20 +124,6 @@ class TournamentGenerateModel: ObservableObject {
                 realm.add(match, update: .modified)
             }
 
-            // Zápis do MongoDB
-            Task {
-                try? await MongoDBManager.shared.updateMatch(
-                    id: match._id.stringValue,
-                    updates: [
-                        "player1Score": rematchFlag == 1 ? match.player1Score : player1Score,
-                        "player2Score": rematchFlag == 1 ? match.player2Score : player2Score,
-                        "player1ScoreRematch": rematchFlag == 1 ? player1Score : match.player1ScoreRematch,
-                        "player2ScoreRematch": rematchFlag == 1 ? player2Score : match.player2ScoreRematch,
-                        "setsString": setsString
-                    ]
-                )
-            }
-
             updateTable(for: match, player1Score: player1Score, player2Score: player2Score, remove: false)
             loadMatches()
             loadTable()
@@ -211,17 +197,6 @@ class TournamentGenerateModel: ObservableObject {
                 }
                 realm.add(nextMatch, update: .modified)
             }
-
-            // Zápis do MongoDB
-            Task {
-                try? await MongoDBManager.shared.updateMatch(
-                    id: nextMatch._id.stringValue,
-                    updates: [
-                        "player1": nextMatch.player1?.name ?? "",
-                        "player2": nextMatch.player2?.name ?? ""
-                    ]
-                )
-            }
         } else {
             let newMatch = TournamentMatch()
             newMatch.fixturesRound = nextRound
@@ -232,18 +207,6 @@ class TournamentGenerateModel: ObservableObject {
                 newMatch.player1 = winner
                 realm.add(newMatch)
                 match.tournament?.matches.append(newMatch)
-            }
-
-            // Zápis do MongoDB
-            Task {
-                try? await MongoDBManager.shared.insertMatch([
-                    "_id": newMatch._id.stringValue,
-                    "tournament_id": match.tournament?._id.stringValue ?? "",
-                    "player1": winner.name,
-                    "player2": "",
-                    "round": nextRound,
-                    "matchIndex": nextMatchIndex
-                ])
             }
 
             loadMatches()
@@ -294,24 +257,6 @@ class TournamentGenerateModel: ObservableObject {
                         print("Found existing match with index \(player2Table.goalsScored) in round \(player2Table.goalsConceded )")
                         realm.add(player1Table, update: .modified)
                         realm.add(player2Table, update: .modified)
-                    }
-
-                    // Zápis do MongoDB
-                    Task {
-                        try? await MongoDBManager.shared.updateTable(
-                            tournamentId: tournament._id.stringValue,
-                            table: [
-                                "players": tournament.table.map { [
-                                    "name": $0.player?.name ?? "",
-                                    "points": $0.points,
-                                    "wins": $0.wins,
-                                    "losses": $0.losses,
-                                    "draws": $0.draws,
-                                    "goalsScored": $0.goalsScored,
-                                    "goalsConceded": $0.goalsConceded
-                                ]}
-                            ]
-                        )
                     }
                 }
             }

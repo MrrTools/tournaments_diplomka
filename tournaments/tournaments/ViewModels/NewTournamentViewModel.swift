@@ -110,19 +110,6 @@ class NewTournamentViewModel: ObservableObject {
                 realm.add(tournament)
             }
 
-            // Zápis do MongoDB
-            Task {
-                try? await MongoDBManager.shared.insertTournament([
-                    "_id": tournament._id.stringValue,
-                    "name": tournament.name,
-                    "owner": tournament.owner,
-                    "sport": tournament.sport,
-                    "type": tournament.type,
-                    "email": tournament.email ?? "",
-                    "createdDate": tournament.createdDate
-                ])
-            }
-
             onSave()
         }
 
@@ -148,17 +135,6 @@ class NewTournamentViewModel: ObservableObject {
                 tournament.f1PlayerTable.append(objectsIn: driverStandings)
                 tournament.f1TeamTable.append(objectsIn: teamStandings)
                 realm.add(tournament, update: .modified)
-            }
-
-            // Zápis do MongoDB
-            Task {
-                try? await MongoDBManager.shared.updateTournament(
-                    id: tournament._id.stringValue,
-                    updates: [
-                        "f1PlayerTable": driverStandings.map { ["player": $0.player?.name ?? "", "points": $0.totalPoints] },
-                        "f1TeamTable": teamStandings.map { ["team": $0.teamName, "points": $0.totalPoints] }
-                    ]
-                )
             }
         }
     }
@@ -187,28 +163,6 @@ class NewTournamentViewModel: ObservableObject {
                 tournament.table.append(objectsIn: table)
                 tournament.settings.append(settings)
                 realm.add(tournament, update: .modified)
-            }
-
-            // Zápis do MongoDB
-            Task {
-                // Zápis zápasov
-                for match in matches {
-                    try? await MongoDBManager.shared.insertMatch([
-                        "_id": match._id.stringValue,
-                        "tournament_id": tournament._id.stringValue,
-                        "player1": match.player1?.name ?? "",
-                        "player2": match.player2?.name ?? "",
-                        "round": match.fixturesRound
-                    ])
-                }
-
-                // Aktualizácia turnaja s tabuľkou
-                try? await MongoDBManager.shared.updateTable(
-                    tournamentId: tournament._id.stringValue,
-                    table: [
-                        "players": table.map { ["name": $0.player?.name ?? "", "points": $0.points, "wins": $0.wins] }
-                    ]
-                )
             }
         }
     }

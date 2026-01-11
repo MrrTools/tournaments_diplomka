@@ -35,7 +35,6 @@ class MainPageViewModel: ObservableObject {
     
     func deleteTournament(tournament: Tournament) {
         guard let realm = realm else { return }
-        let tournamentId = tournament._id.stringValue
 
         try? realm.write {
             realm.delete(tournament.table)
@@ -46,11 +45,6 @@ class MainPageViewModel: ObservableObject {
             realm.delete(tournament.f1TeamTable)
             realm.delete(tournament.f1PlayerTable)
             realm.delete(tournament)
-        }
-
-        // Vymazanie z MongoDB
-        Task {
-            try? await MongoDBManager.shared.deleteTournament(id: tournamentId)
         }
 
         loadTournaments()
