@@ -101,10 +101,13 @@ class TournamentGenerateModel: ObservableObject {
     func updateMatchScore(match: TournamentMatch, player1Score: Int, player2Score: Int, setsString: String, rematchFlag: Int, koFlag: Bool) {
         if let realm = RealmManager.shared.realm {
             
-            if match.player1Score != 0 || match.player2Score != 0 {
+            // Kontrola, či bol prvý zápas už vyhodnotený
+            if match.isPlayed {
                 updateTable(for: match, player1Score: match.player1Score, player2Score: match.player2Score, remove: true)
             }
-            if match.player1ScoreRematch != 0 || match.player2ScoreRematch != 0 {
+            
+            // Kontrola, či bola odveta už vyhodnotená
+            if match.isRematchPlayed {
                 updateTable(for: match, player1Score: match.player1ScoreRematch, player2Score: match.player2ScoreRematch, remove: true)
             }
             
@@ -113,9 +116,11 @@ class TournamentGenerateModel: ObservableObject {
                 if rematchFlag == 1 {
                     match.player1ScoreRematch = player1Score
                     match.player2ScoreRematch = player2Score
+                    match.isRematchPlayed = true
                 } else {
                     match.player1Score = player1Score
                     match.player2Score = player2Score
+                    match.isPlayed = true
                 }
 
 
@@ -155,9 +160,8 @@ class TournamentGenerateModel: ObservableObject {
                          ((tournament.riposeKnockOut == true && tournament.riposeFinal == true) ||
                           (tournament.riposeFinal == true && isFinalMatch))){
                 
-                let firstMatchCompleted = match.player1Score != 0 || match.player2Score != 0
-                let rematchCompleted = match.player1ScoreRematch != 0 || match.player2ScoreRematch != 0
-                if firstMatchCompleted && rematchCompleted {
+                // Kontrola, či sú oba zápasy dokončené pomocou flagov
+                if match.isPlayed && match.isRematchPlayed {
                     var winner: Player?
                     if match.player1Score + match.player1ScoreRematch  > match.player2Score + match.player2ScoreRematch {
                         winner = match.player1

@@ -27,26 +27,34 @@ struct MatchesView: View {
                         Text(match.player1?.name ?? "TBD")
                             .font(.headline)
                             .frame(minWidth: 100, alignment: .leading)
+                            .foregroundColor(.white)
                         Spacer()
                         Button(action: {
                             selectedMatch = match
                             showScoreDialog = true
                         }) {
-                            Text("\(match.player1Score) - \(match.player2Score)")
-                                .font(.subheadline)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .background(Color.purple)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
+                            HStack(spacing: 8) {
+                                // Indikátor pre prvý zápas
+                                Image(systemName: match.isPlayed ? "checkmark.square.fill" : "square")
+                                    .foregroundColor(match.isPlayed ? .purple : .gray)
+                                
+                                Text("\(match.player1Score) - \(match.player2Score)")
+                                    .font(.subheadline)
+                            }
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 20)
+                            .background(match.isPlayed ? Color.purple.opacity(0.3) : Color.gray.opacity(0.3))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
                         }
                         Spacer()
                         Text(match.player2?.name ?? "TBD")
                             .font(.headline)
                             .frame(minWidth: 100, alignment: .trailing)
+                            .foregroundColor(.white)
                     }
                     .padding(.vertical, 5)
-                    .background(Color.gray.opacity(0.1))
+                    .background(match.isPlayed ? Color.purple.opacity(0.15) : Color.gray.opacity(0.1))
                     .cornerRadius(8)
                 }
                 .listRowBackground(Color.clear)

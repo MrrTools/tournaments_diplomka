@@ -91,29 +91,39 @@ struct MatchViewv: View {
             Text(match?.player1?.name ?? "TBD")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(.white)
             
             Button(action: { openScoreDialog(for: match, rematch: 0) }) {
-                ScoreButtonContent(score: match?.player1Score ?? 0, vsScore: match?.player2Score ?? 0)
+                ScoreButtonContent(
+                    score: match?.player1Score ?? 0,
+                    vsScore: match?.player2Score ?? 0,
+                    isPlayed: match?.isPlayed ?? false
+                )
             }
             
             //  Podmienka pre rematch button:
             // Ak je `riposeFinal` true a `riposeKnockout` false, zobrazí sa len vo finále (posledné kolo)
             if match?.rematchFlag == 1 || riposeKnockout || (riposeFinal && isFinalMatch) {
                 Button(action: { openScoreDialog(for: match, rematch: 1) }) {
-                    ScoreButtonContent(score: match?.player1ScoreRematch ?? 0, vsScore: match?.player2ScoreRematch ?? 0)
+                    ScoreButtonContent(
+                        score: match?.player1ScoreRematch ?? 0,
+                        vsScore: match?.player2ScoreRematch ?? 0,
+                        isPlayed: match?.isRematchPlayed ?? false
+                    )
                 }
             }
             
             Text(match?.player2?.name ?? "TBD")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .trailing)
+                .foregroundColor(.white)
             
             if let setsString = match?.setsString, !setsString.isEmpty {
                 SetsView(setsString: setsString, sport: match?.tournament?.sport)
             }
         }
         .padding(8)
-        .background(Color.black.opacity(0.8))
+        .background((match?.isPlayed ?? false) ? Color.purple.opacity(0.2) : Color.black.opacity(0.8))
         .cornerRadius(10)
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.purple, lineWidth: 2))
         .frame(width: 300, height: 120)
@@ -133,14 +143,21 @@ struct MatchViewv: View {
 struct ScoreButtonContent: View {
     let score: Int
     let vsScore: Int
+    let isPlayed: Bool
     
     var body: some View {
-        Text("\(score) - \(vsScore)")
-            .font(.subheadline)
-            .padding()
-            .background(Color.purple)
-            .foregroundColor(.white)
-            .cornerRadius(8)
+        HStack(spacing: 8) {
+            // Indikátor dokončenia zápasu
+            Image(systemName: isPlayed ? "checkmark.square.fill" : "square")
+                .foregroundColor(isPlayed ? .purple : .gray)
+            
+            Text("\(score) - \(vsScore)")
+                .font(.subheadline)
+        }
+        .padding()
+        .background(isPlayed ? Color.purple.opacity(0.4) : Color.gray.opacity(0.4))
+        .foregroundColor(.white)
+        .cornerRadius(8)
     }
 }
 

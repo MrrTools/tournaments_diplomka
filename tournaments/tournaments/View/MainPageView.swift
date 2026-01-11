@@ -7,13 +7,14 @@ import SwiftUI
 import RealmSwift
 
 struct MainPageView: View {
-    @ObservedObject var viewModel: MainPageViewModel
+    @StateObject private var viewModel: MainPageViewModel
+    @ObservedObject private var authService = AuthService.shared
     @State private var navigateToLogin = false
     let showPublicTournaments: Bool
     
     init(showPublicTournaments: Bool = false) {
         self.showPublicTournaments = showPublicTournaments
-        self.viewModel = MainPageViewModel(showPublicTournaments: showPublicTournaments)
+        _viewModel = StateObject(wrappedValue: MainPageViewModel(showPublicTournaments: showPublicTournaments))
     }
     
     var body: some View {

@@ -1,23 +1,34 @@
 import Foundation
 import RealmSwift
 import SwiftUI
+import Combine
 
 class MainPageViewModel: ObservableObject {
     @Published var tournaments: [Tournament] = []
     
     private var realm: Realm?
     private let showPublicTournaments: Bool
-    private let currentUser: AppUser?
+    private var cancellables = Set<AnyCancellable>()
     
     init(showPublicTournaments: Bool) {
         self.realm = RealmManager.shared.realm
         self.showPublicTournaments = showPublicTournaments
-        self.currentUser = AuthService.shared.currentUser
+        
+        // Načítame turnaje pri inicializácii
         loadTournaments()
+        
+        // Sledujeme zmeny v currentUser
+        AuthService.shared.$currentUser
+            .sink { [weak self] _ in
+                self?.loadTournaments()
+            }
+            .store(in: &cancellables)
     }
     
     func loadTournaments() {
         guard let realm = realm else { return }
+        
+        let currentUser = AuthService.shared.currentUser
         
         switch (showPublicTournaments, currentUser) {
         case (true, _):

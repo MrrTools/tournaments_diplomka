@@ -9,8 +9,9 @@
 import Foundation
 import CryptoKit
 import RealmSwift
+import Combine
 
-class AuthService {
+class AuthService: ObservableObject {
     static let shared = AuthService()
     private var realm: Realm?
     
@@ -54,8 +55,11 @@ class AuthService {
 
         try? realm.write {
             realm.add(newUser)
-            currentUser = newUser  // Nastavíme aktuálneho používateľa
         }
+        
+        // Nastavíme aktuálneho používateľa PO zápise do DB
+        currentUser = newUser
+        objectWillChange.send()
 
         completion(true, nil)
     }
@@ -69,6 +73,7 @@ class AuthService {
         let hashedPassword = hashPassword(password)
         if let user = realm.objects(AppUser.self).filter("email == %@ AND hashedPassword == %@", email, hashedPassword).first {
             currentUser = user  // Uložíme prihláseného používateľa
+            objectWillChange.send()
             completion(true, nil, user)
         } else {
             completion(false, "Invalid email or password", nil)
@@ -77,5 +82,7 @@ class AuthService {
     
     func logout() {
         currentUser = nil
+        // Explicitne upovedomíme o zmene
+        objectWillChange.send()
     }
 }

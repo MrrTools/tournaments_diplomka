@@ -27,7 +27,7 @@ class RealmManager: ObservableObject {
     func initialize() async {
         do {
             // Inicializácia lokálnej Realm databázy
-            let realmInstance = try Realm()
+            let realmInstance = try await Realm()
             realm = realmInstance
             isInitialized = true
         } catch {

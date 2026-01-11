@@ -12,7 +12,6 @@
 		462FA4BB2BD2E45700175699 /* tournamentsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462FA4BA2BD2E45700175699 /* tournamentsApp.swift */; };
 		462FA4BF2BD2E45800175699 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 462FA4BE2BD2E45800175699 /* Assets.xcassets */; };
 		462FA4C22BD2E45800175699 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 462FA4C12BD2E45800175699 /* Preview Assets.xcassets */; };
-		46404BE92F1192B40028BC3A /* MongoDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46404BE82F1192B40028BC3A /* MongoDBManager.swift */; };
 		464657A02BE6758400A963C2 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4646579F2BE6758400A963C2 /* Launch Screen.storyboard */; };
 		465554212C714A3500C1CB7C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465554202C714A3500C1CB7C /* Player.swift */; };
 		465E610D2D7274B700EE8950 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465E610C2D7274B700EE8950 /* SplashScreenView.swift */; };
@@ -43,8 +42,6 @@
 		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
 		46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */; };
 		46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB382D5BF97100FDBBA7 /* GSKOViewModel.swift */; };
-		46CB7B512F11AAE700972DB7 /* MongoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 46CB7B502F11AAE700972DB7 /* MongoSwift */; };
-		46CB7B532F11AAE700972DB7 /* MongoSwiftSync in Frameworks */ = {isa = PBXBuildFile; productRef = 46CB7B522F11AAE700972DB7 /* MongoSwiftSync */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -68,7 +65,6 @@
 		462FA4BA2BD2E45700175699 /* tournamentsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tournamentsApp.swift; sourceTree = "<group>"; };
 		462FA4BE2BD2E45800175699 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		462FA4C12BD2E45800175699 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		46404BE82F1192B40028BC3A /* MongoDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MongoDBManager.swift; sourceTree = "<group>"; };
 		4646579F2BE6758400A963C2 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		465554202C714A3500C1CB7C /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		465E610C2D7274B700EE8950 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; usesTabs = 0; };
@@ -110,8 +106,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				466B70DB2C3B126D00BF7426 /* RealmSwift in Frameworks */,
-				46CB7B512F11AAE700972DB7 /* MongoSwift in Frameworks */,
-				46CB7B532F11AAE700972DB7 /* MongoSwiftSync in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,7 +214,6 @@
 			isa = PBXGroup;
 			children = (
 				466B70CE2C3B0D3700BF7426 /* RealmManager.swift */,
-				46404BE82F1192B40028BC3A /* MongoDBManager.swift */,
 			);
 			path = RealmDB;
 			sourceTree = "<group>";
@@ -247,8 +240,6 @@
 			name = tournaments;
 			packageProductDependencies = (
 				466B70DA2C3B126D00BF7426 /* RealmSwift */,
-				46CB7B502F11AAE700972DB7 /* MongoSwift */,
-				46CB7B522F11AAE700972DB7 /* MongoSwiftSync */,
 			);
 			productName = tournaments;
 			productReference = 462FA4B72BD2E45700175699 /* tournaments.app */;
@@ -317,7 +308,6 @@
 				46B3CB392D5BF97100FDBBA7 /* GSKOViewModel.swift in Sources */,
 				468355B22D71186C005EE2D0 /* RegistrationView.swift in Sources */,
 				468355982D67ECAC005EE2D0 /* F1Race.swift in Sources */,
-				46404BE92F1192B40028BC3A /* MongoDBManager.swift in Sources */,
 				468355AE2D711807005EE2D0 /* AppUser.swift in Sources */,
 				462102CF2C5956D700924E6E /* MatchView.swift in Sources */,
 				469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */,
@@ -586,16 +576,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 466B70D72C3B126D00BF7426 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
-		};
-		46CB7B502F11AAE700972DB7 /* MongoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 46CB7B4F2F11AAE700972DB7 /* XCRemoteSwiftPackageReference "mongo-swift-driver" */;
-			productName = MongoSwift;
-		};
-		46CB7B522F11AAE700972DB7 /* MongoSwiftSync */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 46CB7B4F2F11AAE700972DB7 /* XCRemoteSwiftPackageReference "mongo-swift-driver" */;
-			productName = MongoSwiftSync;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -28,6 +28,8 @@ class TournamentMatch: Object, ObjectKeyIdentifiable {
     @Persisted var matchIndex: Int = 0
     @Persisted var groupIndex: Int = 0
     @Persisted var rematchFlag: Int = 0
+    @Persisted var isPlayed: Bool = false
+    @Persisted var isRematchPlayed: Bool = false
     
     
     convenience init(player1: Player?, player2: Player?, player1Score: Int = 0, player2Score: Int = 0, setsString: String?, fixturesRound: Int = 0, matchDate: Date = Date(), tournament: Tournament?, matchIndex: Int = 0, rematchFlag: Int = 0, player1ScoreRematch: Int = 0, player2ScoreRematch: Int = 0, groupIndex: Int = 0) {
