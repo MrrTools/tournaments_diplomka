@@ -143,17 +143,44 @@ class TournamentGenerateModel: ObservableObject {
         
         if let tournament = match.tournament {
             let isFinalMatch = match.fixturesRound ==  EliminationRounds
-            if tournament.type == "Single Elimination" || (tournament.type ==  "Group Stage and KO" && !koFlag && (tournament.riposeKnockOut == false && tournament.riposeFinal == false) || (tournament.riposeFinal == false && !isFinalMatch))
-                || (tournament.type ==  "Playoff" && playOffLegDone){
+
+            // Single Elimination - vždy postupuje víťaz
+            if tournament.type == "Single Elimination" {
                 var winner: Player?
                 if player1Score > player2Score {
                     winner = match.player1
                 } else if player2Score > player1Score {
                     winner = match.player2
                 }
-                
+
                 guard let actualWinner = winner else { return }
-                
+                addWinnerToNextRound(winner: actualWinner, match: match)
+            }
+            // Group Stage and KO - postupuje víťaz len v KO fáze
+            else if tournament.type == "Group Stage and KO" && !koFlag {
+                if (tournament.riposeKnockOut == false && tournament.riposeFinal == false) ||
+                   (tournament.riposeFinal == true && isFinalMatch) {
+                    var winner: Player?
+                    if player1Score > player2Score {
+                        winner = match.player1
+                    } else if player2Score > player1Score {
+                        winner = match.player2
+                    }
+
+                    guard let actualWinner = winner else { return }
+                    addWinnerToNextRound(winner: actualWinner, match: match)
+                }
+            }
+            // Playoff - postupuje víťaz po dokončení série
+            else if tournament.type == "Playoff" && playOffLegDone {
+                var winner: Player?
+                if player1Score > player2Score {
+                    winner = match.player1
+                } else if player2Score > player1Score {
+                    winner = match.player2
+                }
+
+                guard let actualWinner = winner else { return }
                 addWinnerToNextRound(winner: actualWinner, match: match)
             } else if tournament.type == "Double Elimination" ||
                         (tournament.type == "Group Stage and KO" &&
