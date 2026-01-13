@@ -310,13 +310,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
         let lastTeam = players.removeLast()
         players.insert(lastTeam, at: 1)
     }
-    
-    if let realm = RealmManager.shared.realm {
-        try? realm.write {
-            realm.add(matches)
-        }
-    }
-    
+
     return matches
 }
 
@@ -345,18 +339,10 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Tourname
         default:
             break  // Žiadna špeciálna akcia pre iné typy turnajov
         }
-        
-        
-        // Použití RealmManager pro uložení turnaje
-        if let realm = RealmManager.shared.realm {
-            try? realm.write {
-                tournament.matches.append(objectsIn: matches)
-            }
-        }
-        
+
         matches.append(match)
     }
-    
+
     return matches
 }
 
@@ -397,16 +383,9 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                 match.groupIndex = groupIndex + 1
                 match.fixturesRound = round
                 match.tournament = tournament
-                
+
                 groupMatches.append(match)
-                
-                // Uloženie zápasu do Realm
-                if let realm = RealmManager.shared.realm {
-                    try? realm.write {
-                        realm.add(match)
-                    }
-                }
-                
+
                 // Odvety
                 if riposeMatches {
                     let riposeMatch = TournamentMatch()
@@ -415,12 +394,8 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                     riposeMatch.fixturesRound = groupCount - 1 + round
                     riposeMatch.tournament = tournament
                     riposeMatch.groupIndex = groupIndex + 1
-                    
-                    if let realm = RealmManager.shared.realm {
-                        try? realm.write {
-                            realm.add(riposeMatch)
-                        }
-                    }
+
+                    groupMatches.append(riposeMatch)
                 }
             }
             
@@ -440,16 +415,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
         
         groupTables.append(contentsOf: tables)
     }
-    
-    // 4. Uloženie zápasov a tabuliek do databázy
-    if let realm = RealmManager.shared.realm {
-        try? realm.write {
-            tournament.matches.append(objectsIn: groupMatches)
-            tournament.table.append(objectsIn: groupTables)
-            realm.add(tournament, update: .modified)
-        }
-    }
-    
+
     return groupMatches
 }
 
