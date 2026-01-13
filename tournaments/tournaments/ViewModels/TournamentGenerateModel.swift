@@ -143,17 +143,44 @@ class TournamentGenerateModel: ObservableObject {
         
         if let tournament = match.tournament {
             let isFinalMatch = match.fixturesRound ==  EliminationRounds
-            if tournament.type == "Single Elimination" || (tournament.type ==  "Group Stage and KO" && !koFlag && (tournament.riposeKnockOut == false && tournament.riposeFinal == false) || (tournament.riposeFinal == false && !isFinalMatch))
-                || (tournament.type ==  "Playoff" && playOffLegDone){
+
+            // Single Elimination - vždy postupuje víťaz
+            if tournament.type == "Single Elimination" {
                 var winner: Player?
                 if player1Score > player2Score {
                     winner = match.player1
                 } else if player2Score > player1Score {
                     winner = match.player2
                 }
-                
+
                 guard let actualWinner = winner else { return }
-                
+                addWinnerToNextRound(winner: actualWinner, match: match)
+            }
+            // Group Stage and KO - postupuje víťaz len v KO fáze
+            else if tournament.type == "Group Stage and KO" && !koFlag {
+                if (tournament.riposeKnockOut == false && tournament.riposeFinal == false) ||
+                   (tournament.riposeFinal == true && isFinalMatch) {
+                    var winner: Player?
+                    if player1Score > player2Score {
+                        winner = match.player1
+                    } else if player2Score > player1Score {
+                        winner = match.player2
+                    }
+
+                    guard let actualWinner = winner else { return }
+                    addWinnerToNextRound(winner: actualWinner, match: match)
+                }
+            }
+            // Playoff - postupuje víťaz po dokončení série
+            else if tournament.type == "Playoff" && playOffLegDone {
+                var winner: Player?
+                if player1Score > player2Score {
+                    winner = match.player1
+                } else if player2Score > player1Score {
+                    winner = match.player2
+                }
+
+                guard let actualWinner = winner else { return }
                 addWinnerToNextRound(winner: actualWinner, match: match)
             } else if tournament.type == "Double Elimination" ||
                         (tournament.type == "Group Stage and KO" &&
@@ -310,13 +337,7 @@ func generateRoundRobinMatches(players: [Player], tournament: Tournament, ripose
         let lastTeam = players.removeLast()
         players.insert(lastTeam, at: 1)
     }
-    
-    if let realm = RealmManager.shared.realm {
-        try? realm.write {
-            realm.add(matches)
-        }
-    }
-    
+
     return matches
 }
 
@@ -345,18 +366,10 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Tourname
         default:
             break  // Žiadna špeciálna akcia pre iné typy turnajov
         }
-        
-        
-        // Použití RealmManager pro uložení turnaje
-        if let realm = RealmManager.shared.realm {
-            try? realm.write {
-                tournament.matches.append(objectsIn: matches)
-            }
-        }
-        
+
         matches.append(match)
     }
-    
+
     return matches
 }
 
@@ -397,16 +410,9 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                 match.groupIndex = groupIndex + 1
                 match.fixturesRound = round
                 match.tournament = tournament
-                
+
                 groupMatches.append(match)
-                
-                // Uloženie zápasu do Realm
-                if let realm = RealmManager.shared.realm {
-                    try? realm.write {
-                        realm.add(match)
-                    }
-                }
-                
+
                 // Odvety
                 if riposeMatches {
                     let riposeMatch = TournamentMatch()
@@ -415,12 +421,8 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
                     riposeMatch.fixturesRound = groupCount - 1 + round
                     riposeMatch.tournament = tournament
                     riposeMatch.groupIndex = groupIndex + 1
-                    
-                    if let realm = RealmManager.shared.realm {
-                        try? realm.write {
-                            realm.add(riposeMatch)
-                        }
-                    }
+
+                    groupMatches.append(riposeMatch)
                 }
             }
             
@@ -440,16 +442,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
         
         groupTables.append(contentsOf: tables)
     }
-    
-    // 4. Uloženie zápasov a tabuliek do databázy
-    if let realm = RealmManager.shared.realm {
-        try? realm.write {
-            tournament.matches.append(objectsIn: groupMatches)
-            tournament.table.append(objectsIn: groupTables)
-            realm.add(tournament, update: .modified)
-        }
-    }
-    
+
     return groupMatches
 }
 
