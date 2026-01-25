@@ -20,8 +20,8 @@ class GSKOViewModel: ObservableObject {
     
     init(viewModel: TournamentGenerateModel) {
         self.viewModel = viewModel
-        checkIfKnockoutStageExists()
-        filterData()
+        // Nenačítavame tu dáta, lebo viewModel ešte nemá načítané matches
+        // checkIfKnockoutStageExists() a filterData() sa zavolajú v GSKOView.loadData()
     }
     
     //Aktualizuje filtrované zápasy a tabuľku pre vybranú skupinu

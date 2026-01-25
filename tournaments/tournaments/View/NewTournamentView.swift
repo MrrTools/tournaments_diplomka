@@ -5,7 +5,8 @@ struct NewTournamentView: View {
     
     @State private var showImagePicker = false
     @State private var selectedPlayerIndex: Int? = nil
-    
+    @State private var showBackgroundImagePicker = false
+
     @Environment(\.presentationMode) var presentationMode
     
     // Možné počty hráčov podľa typu turnaja
@@ -62,6 +63,7 @@ struct NewTournamentView: View {
                 }
                 playersSection
                 photoSection
+                backgroundImageSection
             }
             .padding()
             
@@ -76,6 +78,12 @@ struct NewTournamentView: View {
                     sourceType: .camera
                 )
             }
+        }
+        .sheet(isPresented: $showBackgroundImagePicker) {
+            ImagePicker(
+                selectedImage: $viewModel.backgroundImage,
+                sourceType: .photoLibrary
+            )
         }
     }
     
@@ -303,7 +311,35 @@ struct NewTournamentView: View {
             }
         }
     }
-    
+
+    private var backgroundImageSection: some View {
+        Section(header: Text("Tournament Background")) {
+            VStack(spacing: 10) {
+                if let backgroundImage = viewModel.backgroundImage {
+                    Image(uiImage: backgroundImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 150)
+                        .cornerRadius(10)
+                }
+
+                Button(action: {
+                    showBackgroundImagePicker = true
+                }) {
+                    HStack {
+                        Image(systemName: "photo.fill")
+                        Text(viewModel.backgroundImage == nil ? "Select Background Image" : "Change Background Image")
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.purple)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+            }
+        }
+    }
+
     private var createTournamentButton: some View {
         Button(action: {
             validateForm()
