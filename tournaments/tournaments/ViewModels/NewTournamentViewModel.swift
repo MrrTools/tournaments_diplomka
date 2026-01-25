@@ -142,19 +142,23 @@ class NewTournamentViewModel: ObservableObject {
     // GENEROVANIE ŠTANDARDNÝCH TURNAJOV (PRE OSTATNÉ ŠPORTY)
     private func generateStandardTournament(tournament: Tournament, players: [Player]) {
         var matches: [TournamentMatch] = []
+        var table: [TournamentTable] = []
 
         switch selectedType {
         case "Round Robin":
             matches = generateRoundRobinMatches(players: players, tournament: tournament, riposeMatches: riposeMateches)
+            table = players.map { TournamentTable(player: $0, tournament: tournament) }
         case "Single Elimination", "Double Elimination", "Playoff":
             matches = generateElimination(players: players, tournament: tournament)
+            table = players.map { TournamentTable(player: $0, tournament: tournament) }
         case "Group Stage and KO":
-            matches = generateGSKO(players: players, numberOfPlayersInGroup: self.numberOfGroupPlayers ?? 2, advancingPerGroup: self.numberOfAdvancePlayers ?? 2, tournament: tournament, riposeMatches: riposeMateches)
+            let (gskoMatches, gskoTables) = generateGSKO(players: players, numberOfPlayersInGroup: self.numberOfGroupPlayers ?? 2, advancingPerGroup: self.numberOfAdvancePlayers ?? 2, tournament: tournament, riposeMatches: riposeMateches)
+            matches = gskoMatches
+            table = gskoTables
         default:
             break
         }
 
-        let table: [TournamentTable] = players.map { TournamentTable(player: $0, tournament: tournament) }
         let settings = TournamentSettings(tournament: tournament)
 
         if let realm = RealmManager.shared.realm {
