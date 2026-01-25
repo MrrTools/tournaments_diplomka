@@ -180,6 +180,10 @@ struct GSKOView: View {
     }
     
     private func loadData() {
+        // Pri každom zobrazení view resetuj na group stage
+        // Užívateľ môže manuálne prepnúť na KO pomocou pickeru
+        gskoVM.showKnockoutStage = false
+
         gskoVM.filterData()
         viewModel.loadTable()
         viewModel.loadMatches()
