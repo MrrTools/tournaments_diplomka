@@ -67,6 +67,7 @@ class TournamentGenerateModel: ObservableObject {
     }
     
     var EliminationRounds: Int {
+        guard numberOfPlayers > 0 else { return 0 }
         return Int(log2(Double(numberOfPlayers)))
     }
     
@@ -76,7 +77,24 @@ class TournamentGenerateModel: ObservableObject {
     
     //$0 swift uzaver aktualna hodnota v poli
     var numberOfFixtures: Int {
-        return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament && (tournament.type == "Group Stage and KO" ? $0.groupIndex == 0 : true) }.count
+        if tournament.type == "Group Stage and KO" {
+            // Pre GSKO: najprv skús nájsť KO zápasy
+            let koMatches = matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament && $0.groupIndex == 0 }.count
+
+            // Ak KO zápasy existujú, použi ich počet
+            if koMatches > 0 {
+                return koMatches
+            }
+
+            // Ak ešte neexistujú KO zápasy, vypočítaj z postupujúcich hráčov
+            let numberOfGroups = tournament.numberOfGroups ?? 4
+            let advancingPerGroup = tournament.numberOfAdvancePlayers ?? 2
+            let totalAdvancing = numberOfGroups * advancingPerGroup
+            return totalAdvancing / 2
+        }
+
+        // Pre iné typy turnajov
+        return matches.filter { $0.fixturesRound == 1 && $0.tournament == tournament }.count
     }
     
     //bitovy posun pre pocet kol pole napr 16 teamov [8,4,2,1]
