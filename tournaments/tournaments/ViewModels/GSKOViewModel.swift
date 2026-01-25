@@ -32,27 +32,42 @@ class GSKOViewModel: ObservableObject {
     
     // Automaticky skontroluje, či knockout zápasy už existujú
     func checkIfKnockoutStageExists() {
-        showKnockoutStage = viewModel.matches.contains(where: { $0.groupIndex == 0 })
+        // Len nastavíme či komponenty existujú, NEprepíname automaticky showKnockoutStage
         showHideComponets = viewModel.matches.contains(where: { $0.groupIndex == 0 })
     }
     
     //Podmienka správne kontroluje stav turnaja
     var allResultsFilled: Bool {
-        switch (viewModel.matches.contains { $0.groupIndex != 0 && ($0.player1Score == 0 && $0.player2Score == 0) },
-                showKnockoutStage) {
-        case (true, _):
-            return false
-        case (false, true):
-            return false
-        case (false, false):
-            return true
-        }
+        // Získame všetky group stage zápasy (groupIndex != 0)
+        let groupStageMatches = viewModel.matches.filter { $0.groupIndex != 0 }
+
+        // Ak nie sú žiadne group stage zápasy, nemôžeme pokračovať
+        guard !groupStageMatches.isEmpty else { return false }
+
+        // Skontrolujeme, či sú VŠETKY group stage zápasy dokončené
+        // Zápas je dokončený ak je označený ako "played"
+        let allCompleted = groupStageMatches.allSatisfy { $0.isPlayed }
+
+        return allCompleted
     }
     
     //Generuje Knockout Stage len raz
     func proceedAfterAllResults() {
-        guard !showKnockoutStage else { return }
+        // Kontrola či KO zápasy už neexistujú
+        let koMatchesExist = viewModel.matches.contains(where: { $0.groupIndex == 0 })
+        guard !koMatchesExist else {
+            // KO zápasy už existujú, len prepneme na KO view
+            showKnockoutStage = true
+            checkIfKnockoutStageExists()
+            return
+        }
+
+        // Kontrola či sú všetky group stage zápasy dokončené
+        guard allResultsFilled else { return }
+
+        // Vytvoríme KO stage
         createKnockoutStage(advancingPerGroup: viewModel.tournament.numberOfAdvancePlayers ?? 2, groupsCount: viewModel.tournament.numberOfGroups ?? 4)
+        showKnockoutStage = true
         checkIfKnockoutStageExists()
         self.viewModel.loadMatches()
         self.viewModel.objectWillChange.send()
@@ -61,31 +76,47 @@ class GSKOViewModel: ObservableObject {
     // Generovanie KO fázy
     func createKnockoutStage(advancingPerGroup: Int, groupsCount: Int) {
         var advancingPlayers: [Player] = []
-        
+
         for groupIndex in 1...groupsCount {
-            let groupMatches = viewModel.matches.filter { $0.groupIndex == groupIndex }
-            var playerStats: [Player: TournamentTable] = [:]
-            
-            for match in groupMatches {
-                if let player1 = match.player1, let player2 = match.player2 {
-                    if let table1 = viewModel.table.first(where: { $0.player == player1 }) {
-                        playerStats[player1] = table1
+            // Získame tabuľku pre danú skupinu a zoradíme hráčov
+            let groupTable = viewModel.table
+                .filter { $0.groupIndex == groupIndex }
+                .sorted { table1, table2 in
+                    // Primárne zoradenie: body
+                    if table1.points != table2.points {
+                        return table1.points > table2.points
                     }
-                    if let table2 = viewModel.table.first(where: { $0.player == player2 }) {
-                        playerStats[player2] = table2
+                    // Sekundárne: skóre rozdielu
+                    let diff1 = table1.goalsScored - table1.goalsConceded
+                    let diff2 = table2.goalsScored - table2.goalsConceded
+                    if diff1 != diff2 {
+                        return diff1 > diff2
                     }
+                    // Terciárne: počet vstrelených gólov
+                    if table1.goalsScored != table2.goalsScored {
+                        return table1.goalsScored > table2.goalsScored
+                    }
+                    // Ak je všetko rovnaké, ponechaj pôvodné poradie
+                    return true
                 }
-            }
-            
-            let qualified = playerStats.sorted { $0.value.points > $1.value.points }
+
+            // Vyberieme top X hráčov z tejto skupiny
+            let qualified = groupTable
                 .prefix(advancingPerGroup)
-                .map { $0.key }
-            
+                .compactMap { $0.player }
+
             advancingPlayers.append(contentsOf: qualified)
         }
-        
+
+        // Overíme, že máme správny počet hráčov
+        let expectedPlayers = groupsCount * advancingPerGroup
+        guard advancingPlayers.count == expectedPlayers else {
+            print("ERROR: Expected \(expectedPlayers) players, got \(advancingPlayers.count)")
+            return
+        }
+
         let matches = generateElimination(players: advancingPlayers, tournament: viewModel.tournament)
-        
+
         if let realm = RealmManager.shared.realm {
             try? realm.write {
                 viewModel.tournament.matches.append(objectsIn: matches)
