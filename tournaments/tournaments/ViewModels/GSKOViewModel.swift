@@ -57,14 +57,23 @@ class GSKOViewModel: ObservableObject {
         let koMatchesExist = viewModel.matches.contains(where: { $0.groupIndex == 0 })
         guard !koMatchesExist else {
             // KO zápasy už existujú, len prepneme na KO view
+            print("DEBUG: KO matches already exist, switching to KO view")
             showKnockoutStage = true
             checkIfKnockoutStageExists()
             return
         }
 
         // Kontrola či sú všetky group stage zápasy dokončené
-        guard allResultsFilled else { return }
+        let groupStageMatches = viewModel.matches.filter { $0.groupIndex != 0 }
+        let completedMatches = groupStageMatches.filter { $0.isPlayed }
+        print("DEBUG: Group stage matches: \(groupStageMatches.count), completed: \(completedMatches.count)")
 
+        guard allResultsFilled else {
+            print("DEBUG: Not all results filled, cannot create KO stage")
+            return
+        }
+
+        print("DEBUG: Creating KO stage...")
         // Vytvoríme KO stage
         createKnockoutStage(advancingPerGroup: viewModel.tournament.numberOfAdvancePlayers ?? 2, groupsCount: viewModel.tournament.numberOfGroups ?? 4)
         showKnockoutStage = true

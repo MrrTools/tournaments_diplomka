@@ -180,10 +180,13 @@ struct GSKOView: View {
     }
     
     private func loadData() {
-        gskoVM.filterData()
-        viewModel.loadTable()
+        // Najprv načítame dáta z databázy
         viewModel.loadMatches()
+        viewModel.loadTable()
+
+        // Potom skontrolujeme stav KO stage
         gskoVM.checkIfKnockoutStageExists()
+        gskoVM.filterData()
 
         // Nastavíme showKnockoutStage podľa toho, či KO zápasy existujú
         // Ak KO zápasy existujú → zobraz KO stage
