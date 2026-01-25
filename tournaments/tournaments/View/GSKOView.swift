@@ -184,5 +184,11 @@ struct GSKOView: View {
         viewModel.loadTable()
         viewModel.loadMatches()
         gskoVM.checkIfKnockoutStageExists()
+
+        // Nastavíme showKnockoutStage podľa toho, či KO zápasy existujú
+        // Ak KO zápasy existujú → zobraz KO stage
+        // Ak neexistujú → zobraz group stage
+        let koMatchesExist = viewModel.matches.contains(where: { $0.groupIndex == 0 })
+        gskoVM.showKnockoutStage = koMatchesExist
     }
 }
