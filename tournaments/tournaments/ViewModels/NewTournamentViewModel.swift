@@ -34,6 +34,7 @@ class NewTournamentViewModel: ObservableObject {
     @Published var numberOfGroupPlayers: Int? = nil
     @Published var numberOfAdvancePlayers: Int? = nil
     @Published var createdDate: Date = Date()
+    @Published var backgroundImage: UIImage? = nil
     
     let sportTypes: [String: [String]] = [
         "Football": ["Single Elimination", "Double Elimination", "Round Robin", "Group Stage and KO"],
@@ -81,6 +82,9 @@ class NewTournamentViewModel: ObservableObject {
         let isF1 = selectedSport == "F1"
         let groups = calculateNumberOfGroups(for: players)
 
+        // Konvertuj backgroundImage na Data
+        let backgroundImageData = backgroundImage?.jpegData(compressionQuality: 0.8)
+
         let tournament = Tournament(
             name: self.tournamentName,
             owner: self.owner,
@@ -102,7 +106,8 @@ class NewTournamentViewModel: ObservableObject {
             f1TeamTable: [],
             f1PlayerTable: [],
             email: userEmail,
-            createdDate: createdDate
+            createdDate: createdDate,
+            backgroundImageData: backgroundImageData
         )
 
         if let realm = RealmManager.shared.realm {

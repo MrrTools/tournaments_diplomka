@@ -14,25 +14,46 @@ struct GSKOView: View {
     @State private var koFlag = false
     
     var body: some View {
-        VStack(spacing: 16) {
-            tournamentHeader
-            
-            if gskoVM.showHideComponets {
-                stagePicker
-            }
-            
-            if gskoVM.showKnockoutStage {
-                SingleEliminationView(viewModel: gskoVM.viewModel)
-                    .transition(.opacity)
+        ZStack {
+            // Background image
+            if let backgroundImageData = viewModel.tournament.backgroundImageData,
+               let uiImage = UIImage(data: backgroundImageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(0.3)
             } else {
-                groupStageView
+                Color.black.edgesIgnoringSafeArea(.all)
             }
+
+            // Content
+            VStack(spacing: 16) {
+                tournamentHeader
+
+                if gskoVM.showHideComponets {
+                    stagePicker
+                }
+
+                if gskoVM.showKnockoutStage {
+                    SingleEliminationView(viewModel: gskoVM.viewModel)
+                        .transition(.opacity)
+                } else {
+                    groupStageView
+                }
+            }
+            .padding(.bottom)
         }
-        .padding(.bottom)
-        .background(Color.black.edgesIgnoringSafeArea(.all))
         .navigationTitle("Group Stage")
         .onAppear {
             loadData()
+        }
+        .onDisappear {
+            // Pri opustení view resetujeme na group stage
+            // Aby sa pri návrate vždy zobrazila group stage (ak KO neexistuje)
+            if !viewModel.matches.contains(where: { $0.groupIndex == 0 }) {
+                gskoVM.showKnockoutStage = false
+            }
         }
         .sheet(isPresented: $showSettings) {
             settingsSheet

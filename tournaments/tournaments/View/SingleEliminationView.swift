@@ -15,29 +15,44 @@ struct SingleEliminationView: View {
     @State private var koFlag = true
     
     var body: some View {
-        ScrollView([.horizontal, .vertical], showsIndicators: false) {
-            HStack(spacing: 100) {
-                ForEach(0..<viewModel.EliminationRounds, id: \.self) { roundIndex in
-                    VStack(spacing: 90) {
-                        let matchesForRound = getMatchesForRound(roundIndex)
-                        let expectedMatchCount = viewModel.matchesInSection[safe: roundIndex] ?? 0
-                        let isFinalRound = roundIndex + 1 == viewModel.EliminationRounds // Finále je posledné kolo
-                        
-                        ForEach(0..<expectedMatchCount, id: \.self) { matchIndex in
-                            MatchViewv(
-                                match: matchesForRound[safe: matchIndex],
-                                showScoreDialog: $showScoreDialog,
-                                selectedMatch: $selectedMatch,
-                                rematchFlag: $rematchFlag,
-                                riposeFinal: viewModel.tournament.riposeFinal ?? false,
-                                riposeKnockout: viewModel.tournament.riposeKnockOut ?? false,
-                                isFinalMatch: isFinalRound // Informácia o finálovom zápase
-                            )
+        ZStack {
+            // Background image
+            if let backgroundImageData = viewModel.tournament.backgroundImageData,
+               let uiImage = UIImage(data: backgroundImageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(0.3)
+            } else {
+                Color.black.edgesIgnoringSafeArea(.all)
+            }
+
+            // Content
+            ScrollView([.horizontal, .vertical], showsIndicators: false) {
+                HStack(spacing: 100) {
+                    ForEach(0..<viewModel.EliminationRounds, id: \.self) { roundIndex in
+                        VStack(spacing: 90) {
+                            let matchesForRound = getMatchesForRound(roundIndex)
+                            let expectedMatchCount = viewModel.matchesInSection[safe: roundIndex] ?? 0
+                            let isFinalRound = roundIndex + 1 == viewModel.EliminationRounds // Finále je posledné kolo
+
+                            ForEach(0..<expectedMatchCount, id: \.self) { matchIndex in
+                                MatchViewv(
+                                    match: matchesForRound[safe: matchIndex],
+                                    showScoreDialog: $showScoreDialog,
+                                    selectedMatch: $selectedMatch,
+                                    rematchFlag: $rematchFlag,
+                                    riposeFinal: viewModel.tournament.riposeFinal ?? false,
+                                    riposeKnockout: viewModel.tournament.riposeKnockOut ?? false,
+                                    isFinalMatch: isFinalRound // Informácia o finálovom zápase
+                                )
+                            }
                         }
                     }
                 }
+                .padding()
             }
-            .padding()
         }
         .navigationBarTitle("Tournament Bracket", displayMode: .inline)
         .sheet(isPresented: Binding(

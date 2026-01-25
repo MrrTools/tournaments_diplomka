@@ -13,38 +13,52 @@ struct F1View: View {
     @State private var selectedRaces: Int?
     
     var body: some View {
-        VStack {
-            ZStack {
-                Text(viewModel.tournament.name)
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.horizontal)
+        ZStack {
+            // Background image
+            if let backgroundImageData = viewModel.tournament.backgroundImageData,
+               let uiImage = UIImage(data: backgroundImageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(0.3)
+            } else {
+                Color.black.edgesIgnoringSafeArea(.all)
             }
-            TabView {
-                PlayerStandingsView(viewModel: viewModel)
-                    .tabItem {
-                        Image(systemName: "list.number")
-                        Text("Player Table")
-                        
-                    }
-                
-                TeamStandingsView(viewModel: viewModel)
-                    .tabItem {
-                        Image(systemName: "list.number")
-                        Text("Team Table")
-                        
-                    }
-                
-                RaceResultsView(viewModel: viewModel, showRaceDialog: $showRaceDialog, selectedRaces: $selectedRaces, table: viewModel.races)
-                    .tabItem {
-                        Image(systemName: "calendar")
-                        Text("Races")
-                            .foregroundColor(.purple)
-                    }
+
+            // Content
+            VStack {
+                ZStack {
+                    Text(viewModel.tournament.name)
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.horizontal)
+                }
+                TabView {
+                    PlayerStandingsView(viewModel: viewModel)
+                        .tabItem {
+                            Image(systemName: "list.number")
+                            Text("Player Table")
+
+                        }
+
+                    TeamStandingsView(viewModel: viewModel)
+                        .tabItem {
+                            Image(systemName: "list.number")
+                            Text("Team Table")
+
+                        }
+
+                    RaceResultsView(viewModel: viewModel, showRaceDialog: $showRaceDialog, selectedRaces: $selectedRaces, table: viewModel.races)
+                        .tabItem {
+                            Image(systemName: "calendar")
+                            Text("Races")
+                                .foregroundColor(.purple)
+                        }
+                }
+                .frame(height: 500)
             }
-            .frame(height: 500)
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
         .sheet(isPresented: Binding(            get: { showRaceDialog },
                                                 set: { showRaceDialog = $0 }
                                    ))

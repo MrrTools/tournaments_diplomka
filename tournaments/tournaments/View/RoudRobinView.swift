@@ -17,47 +17,61 @@ struct RoundRobinView: View {
     @State private var koFlag = 0
     
     var body: some View {
-        VStack {
-            ZStack {
-                Text(viewModel.tournament.name)
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.horizontal)
-                
-                HStack {
-                    Spacer()
-                    
-                    Button(action: {
-                        showSettings.toggle()
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .padding()
-                        
+        ZStack {
+            // Background image
+            if let backgroundImageData = viewModel.tournament.backgroundImageData,
+               let uiImage = UIImage(data: backgroundImageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(0.3)
+            } else {
+                Color.black.edgesIgnoringSafeArea(.all)
+            }
+
+            // Content
+            VStack {
+                ZStack {
+                    Text(viewModel.tournament.name)
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.horizontal)
+
+                    HStack {
+                        Spacer()
+
+                        Button(action: {
+                            showSettings.toggle()
+                        }) {
+                            Image(systemName: "gearshape.fill")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .padding()
+
+                        }
                     }
+                    .padding(.trailing)
                 }
-                .padding(.trailing)
+                .padding(.top)
+                TabView {
+                    LeaderBoardView(table: viewModel.table, viewModel: viewModel)
+                        .tabItem {
+                            Image(systemName: "list.number")
+                            Text("Table")
+
+                        }
+
+                    MatchesView(viewModel: viewModel, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
+                        .tabItem {
+                            Image(systemName: "calendar")
+                            Text("Matches")
+                                .foregroundColor(.purple)
+                        }
+                }
+                .frame(height: 500)
             }
-            .padding(.top)
-            TabView {
-                LeaderBoardView(table: viewModel.table, viewModel: viewModel)
-                    .tabItem {
-                        Image(systemName: "list.number")
-                        Text("Table")
-                        
-                    }
-                
-                MatchesView(viewModel: viewModel, showScoreDialog: $showScoreDialog, selectedMatch: $selectedMatch)
-                    .tabItem {
-                        Image(systemName: "calendar")
-                        Text("Matches")
-                            .foregroundColor(.purple)
-                    }
-            }
-            .frame(height: 500)
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
         .sheet(isPresented: Binding(            get: { showSettings },
                                                 set: { showSettings = $0 }
                                    ))
