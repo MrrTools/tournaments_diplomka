@@ -391,7 +391,7 @@ func generateElimination(players: [Player], tournament: Tournament) -> [Tourname
     return matches
 }
 
-func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGroup: Int, tournament: Tournament, riposeMatches: Bool) -> [TournamentMatch] {
+func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGroup: Int, tournament: Tournament, riposeMatches: Bool) -> ([TournamentMatch], [TournamentTable]) {
     // Ak hráčov náhodne premiešame, každá skupina bude inak poskladaná
     let allPlayers = players.shuffled()
     let numberOfGroups = allPlayers.count / numberOfPlayersInGroup
@@ -461,7 +461,7 @@ func generateGSKO(players: [Player], numberOfPlayersInGroup: Int, advancingPerGr
         groupTables.append(contentsOf: tables)
     }
 
-    return groupMatches
+    return (groupMatches, groupTables)
 }
 
 
