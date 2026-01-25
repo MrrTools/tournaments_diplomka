@@ -180,13 +180,15 @@ struct GSKOView: View {
     }
     
     private func loadData() {
-        // Pri každom zobrazení view resetuj na group stage
-        // Užívateľ môže manuálne prepnúť na KO pomocou pickeru
-        gskoVM.showKnockoutStage = false
-
         gskoVM.filterData()
         viewModel.loadTable()
         viewModel.loadMatches()
         gskoVM.checkIfKnockoutStageExists()
+
+        // Nastavíme showKnockoutStage podľa toho, či KO zápasy existujú
+        // Ak KO zápasy existujú → zobraz KO stage
+        // Ak neexistujú → zobraz group stage
+        let koMatchesExist = viewModel.matches.contains(where: { $0.groupIndex == 0 })
+        gskoVM.showKnockoutStage = koMatchesExist
     }
 }
