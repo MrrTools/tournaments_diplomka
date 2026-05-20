@@ -61,7 +61,7 @@ class AuthService: ObservableObject {
         let hashedPassword = hashPassword(password)
         let newUser = AppUser(email: email, hashedPassword: hashedPassword)
 
-        try? realm.write {
+        RealmManager.safeWrite(realm, operation: "registerUser") {
             realm.add(newUser)
         }
 

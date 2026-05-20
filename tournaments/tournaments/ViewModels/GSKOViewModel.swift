@@ -127,7 +127,7 @@ class GSKOViewModel: ObservableObject {
         let matches = generateElimination(players: advancingPlayers, tournament: viewModel.tournament)
 
         if let realm = RealmManager.shared.realm {
-            try? realm.write {
+            RealmManager.safeWrite(realm, operation: "createKnockoutStage") {
                 viewModel.tournament.matches.append(objectsIn: matches)
                 realm.add(viewModel.tournament, update: .modified)
             }
