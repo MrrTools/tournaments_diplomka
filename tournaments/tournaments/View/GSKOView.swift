@@ -15,17 +15,7 @@ struct GSKOView: View {
     
     var body: some View {
         ZStack {
-            // Background image
-            if let backgroundImageData = viewModel.tournament.backgroundImageData,
-               let uiImage = UIImage(data: backgroundImageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .edgesIgnoringSafeArea(.all)
-                    .opacity(0.3)
-            } else {
-                Color.black.edgesIgnoringSafeArea(.all)
-            }
+            TournamentBackgroundView(backgroundImageData: viewModel.tournament.backgroundImageData)
 
             // Content
             VStack(spacing: 16) {
@@ -107,8 +97,6 @@ struct GSKOView: View {
             .padding(.horizontal)
             .onChange(of: gskoVM.selectedGroupIndex) { newIndex in
                 gskoVM.viewModel.selectedGroupIndex = newIndex
-                gskoVM.viewModel.loadMatches()
-                gskoVM.viewModel.loadTable()
                 gskoVM.filterData()
             }
             
@@ -118,10 +106,8 @@ struct GSKOView: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
-            .onChange(of: selectedTabIndex) { newIndex in
-                if newIndex == 0 { // Ak sa používateľ prepne na "Table"
-                    gskoVM.viewModel.loadTable()
-                }
+            .onChange(of: selectedTabIndex) { _ in
+                // Data is already loaded in onAppear
             }
             
             TabView(selection: $selectedTabIndex) {

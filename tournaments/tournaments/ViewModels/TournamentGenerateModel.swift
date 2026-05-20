@@ -128,8 +128,8 @@ class TournamentGenerateModel: ObservableObject {
             if match.isRematchPlayed {
                 updateTable(for: match, player1Score: match.player1ScoreRematch, player2Score: match.player2ScoreRematch, remove: true)
             }
-            
-            try? realm.write {
+
+            RealmManager.safeWrite(realm, operation: "updateMatchScore") {
 
                 if rematchFlag == 1 {
                     match.player1ScoreRematch = player1Score
@@ -230,7 +230,7 @@ class TournamentGenerateModel: ObservableObject {
         
         if let nextMatch = realm.objects(TournamentMatch.self).filter("matchIndex == %@ AND fixturesRound == %@ AND tournament == %@", nextMatchIndex, nextRound, match.tournament!).first {
             print("Found existing match with matchIndex \(nextMatchIndex) in round \(nextRound)")
-            try? realm.write {
+            RealmManager.safeWrite(realm, operation: "addWinnerToNextRound-update") {
                 // Kontrola, či sa víťaz zmenil a potrebujeme ho aktualizovať
                 if nextMatch.player1 == match.player1 || nextMatch.player1 == match.player2 {
                     nextMatch.player1 = winner
@@ -252,7 +252,7 @@ class TournamentGenerateModel: ObservableObject {
             newMatch.matchIndex = nextMatchIndex
             newMatch.tournament = match.tournament
 
-            try? realm.write {
+            RealmManager.safeWrite(realm, operation: "addWinnerToNextRound-create") {
                 newMatch.player1 = winner
                 realm.add(newMatch)
                 match.tournament?.matches.append(newMatch)
@@ -278,7 +278,7 @@ class TournamentGenerateModel: ObservableObject {
         if let player1Table = tournament.table.first(where: { $0.player == player1 }) {
             if let player2Table = tournament.table.first(where: { $0.player == player2 }) {
                 if let realm = RealmManager.shared.realm {
-                    try? realm.write {
+                    RealmManager.safeWrite(realm, operation: "updateTable") {
                         let refreshScore = remove ? -1 : 1
                         
                         if player1Score > player2Score {

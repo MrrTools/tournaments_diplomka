@@ -34,4 +34,17 @@ class RealmManager: ObservableObject {
             print("Error initializing Realm: \(error)")
         }
     }
+
+    static func safeWrite(_ realm: Realm?, operation: String, _ block: () throws -> Void) {
+        guard let realm = realm else {
+            print("❌ Realm write failed [\(operation)]: Realm instance is nil")
+            return
+        }
+
+        do {
+            try realm.write(block)
+        } catch {
+            print("❌ Realm write failed [\(operation)]: \(error.localizedDescription)")
+        }
+    }
 }

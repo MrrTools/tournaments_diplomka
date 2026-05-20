@@ -14,17 +14,7 @@ struct F1View: View {
     
     var body: some View {
         ZStack {
-            // Background image
-            if let backgroundImageData = viewModel.tournament.backgroundImageData,
-               let uiImage = UIImage(data: backgroundImageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .edgesIgnoringSafeArea(.all)
-                    .opacity(0.3)
-            } else {
-                Color.black.edgesIgnoringSafeArea(.all)
-            }
+            TournamentBackgroundView(backgroundImageData: viewModel.tournament.backgroundImageData)
 
             // Content
             VStack {

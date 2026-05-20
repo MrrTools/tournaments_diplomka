@@ -74,7 +74,7 @@ class F1ViewModel: ObservableObject {
         }
         
         // 2) Potom ich všetky naraz pridáme do Realm
-        try? realm.write {
+        RealmManager.safeWrite(realm, operation: "addRace") {
             realm.add(newRaces)
 
             for race in newRaces {
@@ -116,7 +116,7 @@ class F1ViewModel: ObservableObject {
             .filter("tournament == %@", tournament)
 
         // 2) V write transakcii vyresetujeme body, wins, podiums, fastestLaps
-        try? realm.write {
+        RealmManager.safeWrite(realm, operation: "updateStandings-reset") {
             for pt in allPlayerTables {
                 pt.totalPoints = 0
                 pt.wins = 0
@@ -136,7 +136,7 @@ class F1ViewModel: ObservableObject {
             .filter("tournament == %@", tournament)
 
         // 4) V prvej fáze pripočítame body, wins, podiums
-        try? realm.write {
+        RealmManager.safeWrite(realm, operation: "updateStandings-points") {
             for result in allResults {
                 guard let player = result.player else { continue }
                 let teamName = player.team ?? ""
@@ -182,7 +182,7 @@ class F1ViewModel: ObservableObject {
 
         let racesGrouped = Dictionary(grouping: allResults, by: { $0.raceNumber })
 
-        try? realm.write {
+        RealmManager.safeWrite(realm, operation: "updateStandings-fastestLaps") {
             for (_, raceGroup) in racesGrouped {
                 // Nájdeme pretek (všetky F1Race s rovnakým raceNumber)
                 // Najprv vyfiltrujeme len tie, ktoré majú aspoň nejaký reťazec v fastestLap
@@ -254,7 +254,7 @@ class F1ViewModel: ObservableObject {
                     finished: String? = nil)
     {
         guard let realm = realm else { return }
-        try? realm.write {
+        RealmManager.safeWrite(realm, operation: "updateRace") {
             if let pos = position {
                 race.position = pos
             }

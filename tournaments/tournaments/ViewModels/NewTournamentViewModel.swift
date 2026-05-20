@@ -73,7 +73,7 @@ class NewTournamentViewModel: ObservableObject {
     
     func saveTournament() {
         let players = self.players.enumerated().map { (index, name) -> Player in
-            let photoData = self.playerPhotos[index]?.jpegData(compressionQuality: 1.0)
+            let photoData = self.playerPhotos[index]?.jpegData(compressionQuality: 0.7)
             let team = self.f1Teams.indices.contains(index) ? self.f1Teams[index] : ""
             return Player(name: name, team: team, photoData: photoData)
         }
