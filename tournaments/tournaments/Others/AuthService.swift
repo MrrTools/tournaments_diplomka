@@ -17,8 +17,6 @@ class AuthService: ObservableObject {
 
     @Published var currentUser: AppUser?
 
-    private let userDefaultsKey = "LoggedInUserEmail"
-
     private init() {
         self.realm = RealmManager.shared.realm
         loadCurrentUser()
@@ -28,7 +26,7 @@ class AuthService: ObservableObject {
         guard let realm = realm else { return }
 
         // Načítame email z UserDefaults (perzistentné uloženie)
-        if let savedEmail = UserDefaults.standard.string(forKey: userDefaultsKey),
+        if let savedEmail = UserDefaults.standard.string(forKey: UserDefaultsKeys.loggedInUserEmail),
            let user = realm.objects(AppUser.self).filter("email == %@", savedEmail).first {
             currentUser = user
         } else {
@@ -71,7 +69,7 @@ class AuthService: ObservableObject {
         currentUser = newUser
 
         // Uložíme email do UserDefaults
-        UserDefaults.standard.set(email, forKey: userDefaultsKey)
+        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.loggedInUserEmail)
 
         objectWillChange.send()
 
@@ -89,7 +87,7 @@ class AuthService: ObservableObject {
             currentUser = user
 
             // Uložíme email do UserDefaults
-            UserDefaults.standard.set(email, forKey: userDefaultsKey)
+            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.loggedInUserEmail)
 
             objectWillChange.send()
             completion(true, nil, user)
@@ -102,7 +100,7 @@ class AuthService: ObservableObject {
         currentUser = nil
 
         // Vymažeme email z UserDefaults
-        UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.loggedInUserEmail)
 
         // Explicitne upovedomíme o zmene
         objectWillChange.send()
