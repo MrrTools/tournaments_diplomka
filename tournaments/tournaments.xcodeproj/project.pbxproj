@@ -557,8 +557,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/realm-swift.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.53.0;
 			};
 		};
 		46CB7B4F2F11AAE700972DB7 /* XCRemoteSwiftPackageReference "mongo-swift-driver" */ = {
