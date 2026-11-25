@@ -14,11 +14,11 @@ struct MatchesView: View {
     var body: some View {
         VStack {
             Picker("Rounds", selection: $viewModel.selectedRound) {
-                ForEach(1...viewModel.numberOfRounds, id: \.self) { round in
+                ForEach(1...max(1, viewModel.numberOfRounds), id: \.self) { round in
                     Text("Round \(round)").tag(round)
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
+            .pickerStyle(.menu)
             .padding()
             
             List {

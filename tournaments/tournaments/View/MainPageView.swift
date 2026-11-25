@@ -21,9 +21,11 @@ struct MainPageView: View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text("Tournaments")
-                        .font(.largeTitle)
+                    Text("Tournament Management")
+                        .font(.title2)
                         .bold()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     
                     Spacer()
                     

@@ -63,6 +63,7 @@ struct F1View: View {
     }
     
     struct PlayerStandingsView: View {
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @ObservedObject var viewModel: F1ViewModel
         
         var sortedTableP: [F1PlayerTable] {
@@ -78,6 +79,16 @@ struct F1View: View {
         }
         
         var body: some View {
+            if horizontalSizeClass == .compact {
+                List(Array(sortedTableP.enumerated()), id: \.element._id) { index, entry in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(index + 1). \(entry.player?.name ?? "TBD")").font(.headline)
+                        Text("\(entry.totalPoints) points · \(entry.wins) wins · \(entry.podiums) podiums")
+                            .font(.subheadline)
+                    }
+                }
+                .refreshable { viewModel.loadStandings() }
+            } else {
             Table(sortedTableP) {
                 TableColumn("Position") { entry in
                     if let index = sortedTableP.firstIndex(where: { $0._id == entry._id }) {
@@ -103,10 +114,12 @@ struct F1View: View {
             .refreshable {
                 viewModel.loadStandings()
             }
+            }
         }
     }
     
     struct TeamStandingsView: View {
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @ObservedObject var viewModel: F1ViewModel
         
         var sortedTableT: [F1TeamTable] {
@@ -122,6 +135,16 @@ struct F1View: View {
         }
         
         var body: some View {
+            if horizontalSizeClass == .compact {
+                List(Array(sortedTableT.enumerated()), id: \.element._id) { index, entry in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(index + 1). \(entry.teamName)").font(.headline)
+                        Text("\(entry.totalPoints) points · \(entry.wins) wins · \(entry.podiums) podiums")
+                            .font(.subheadline)
+                    }
+                }
+                .refreshable { viewModel.loadStandings() }
+            } else {
             Table(sortedTableT) {
                 TableColumn("Position") { entry in
                     if let index = sortedTableT.firstIndex(where: { $0._id == entry._id }) {
@@ -146,6 +169,7 @@ struct F1View: View {
             }
             .refreshable {
                 viewModel.loadStandings()
+            }
             }
         }
     }

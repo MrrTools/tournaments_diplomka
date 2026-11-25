@@ -61,7 +61,7 @@
 /* Begin PBXFileReference section */
 		462102CA2C5818D100924E6E /* RoudRobinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoudRobinView.swift; sourceTree = "<group>"; };
 		462102CE2C5956D700924E6E /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
-		462FA4B72BD2E45700175699 /* tournaments.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tournaments.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		462FA4B72BD2E45700175699 /* Tournament Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tournament Management.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		462FA4BA2BD2E45700175699 /* tournamentsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tournamentsApp.swift; sourceTree = "<group>"; };
 		462FA4BE2BD2E45800175699 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		462FA4C12BD2E45800175699 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -126,7 +126,7 @@
 		462FA4B82BD2E45700175699 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				462FA4B72BD2E45700175699 /* tournaments.app */,
+				462FA4B72BD2E45700175699 /* Tournament Management.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -233,9 +233,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		462FA4B62BD2E45700175699 /* tournaments */ = {
+		462FA4B62BD2E45700175699 /* Tournament Management */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 462FA4C52BD2E45800175699 /* Build configuration list for PBXNativeTarget "tournaments" */;
+			buildConfigurationList = 462FA4C52BD2E45800175699 /* Build configuration list for PBXNativeTarget "Tournament Management" */;
 			buildPhases = (
 				462FA4B32BD2E45700175699 /* Sources */,
 				462FA4B42BD2E45700175699 /* Frameworks */,
@@ -249,12 +249,12 @@
 			fileSystemSynchronizedGroups = (
 				468355A72D6BA443005EE2D0 /* ModalView */,
 			);
-			name = tournaments;
+			name = "Tournament Management";
 			packageProductDependencies = (
 				4696CDBD2FBE42CD00D6DBF6 /* RealmSwift */,
 			);
 			productName = tournaments;
-			productReference = 462FA4B72BD2E45700175699 /* tournaments.app */;
+			productReference = 462FA4B72BD2E45700175699 /* Tournament Management.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -272,7 +272,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 462FA4B22BD2E45700175699 /* Build configuration list for PBXProject "tournaments" */;
+			buildConfigurationList = 462FA4B22BD2E45700175699 /* Build configuration list for PBXProject "Tournament Management" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -288,7 +288,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				462FA4B62BD2E45700175699 /* tournaments */,
+				462FA4B62BD2E45700175699 /* Tournament Management */,
 			);
 		};
 /* End PBXProject section */
@@ -401,7 +401,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -458,7 +458,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -481,23 +481,23 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = tournaments/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Tournaments;
+				INFOPLIST_KEY_CFBundleDisplayName = "Tournament Management";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera usage description";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = uhk.tournaments;
+				PRODUCT_BUNDLE_IDENTIFIER = saro.tournamentsManagement;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -511,6 +511,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tournaments/Preview Content\"";
@@ -518,24 +519,25 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = tournaments/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Tournaments;
+				INFOPLIST_KEY_CFBundleDisplayName = "Tournament Management";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera usage description";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = saro.tournaments;
+				PRODUCT_BUNDLE_IDENTIFIER = saro.tournamentsManagement;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -545,7 +547,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		462FA4B22BD2E45700175699 /* Build configuration list for PBXProject "tournaments" */ = {
+		462FA4B22BD2E45700175699 /* Build configuration list for PBXProject "Tournament Management" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				462FA4C32BD2E45800175699 /* Debug */,
@@ -554,7 +556,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		462FA4C52BD2E45800175699 /* Build configuration list for PBXNativeTarget "tournaments" */ = {
+		462FA4C52BD2E45800175699 /* Build configuration list for PBXNativeTarget "Tournament Management" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				462FA4C62BD2E45800175699 /* Debug */,

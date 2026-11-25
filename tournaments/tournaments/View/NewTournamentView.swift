@@ -29,7 +29,7 @@ struct NewTournamentView: View {
             return groupStageKO
         case "Playoff":
             return playOffNHL
-        case "Single Elimination", "Double Elimination":
+        case "Single Elimination", "Double Elimination", "Loser Bracket":
             return eliminationPlayerCounts
         default:
             return Array(2...64)

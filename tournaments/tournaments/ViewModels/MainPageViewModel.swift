@@ -69,7 +69,7 @@ class MainPageViewModel: ObservableObject {
         case "Round Robin":
             RoundRobinView(viewModel: tournamentModel)
             
-        case "Single Elimination", "Double Elimination", "Playoff":
+        case "Single Elimination", "Double Elimination", "Playoff", "Loser Bracket":
             SingleEliminationView(viewModel: tournamentModel)
             
         case "Group Stage and KO":

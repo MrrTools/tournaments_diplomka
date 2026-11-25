@@ -18,7 +18,7 @@ class RealmManager: ObservableObject {
         // Konfigurácia lokálnej Realm databázy bez synchronizácie
         let config = Realm.Configuration(
             schemaVersion: 3,
-            deleteRealmIfMigrationNeeded: true
+            deleteRealmIfMigrationNeeded: false
         )
         Realm.Configuration.defaultConfiguration = config
     }
