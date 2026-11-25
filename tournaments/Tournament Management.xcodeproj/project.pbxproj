@@ -37,6 +37,7 @@
 		468355B22D71186C005EE2D0 /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355B12D71186C005EE2D0 /* RegistrationView.swift */; };
 		468355B42D71188D005EE2D0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468355B32D71188D005EE2D0 /* LoginView.swift */; };
 		4696CDBE2FBE42CD00D6DBF6 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4696CDBD2FBE42CD00D6DBF6 /* RealmSwift */; };
+		4696CDBF2FBE42CD00D6DBF6 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4696CDBD2FBE42CD00D6DBF6 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		469CDB1F2C66E9FA00B1143F /* TournamentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CDB1E2C66E9FA00B1143F /* TournamentSettings.swift */; };
 		46B3CB352D594D1F00FDBBA7 /* GSKOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB342D594D1F00FDBBA7 /* GSKOView.swift */; };
 		46B3CB372D5A590D00FDBBA7 /* LeaderBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3CB362D5A58FC00FDBBA7 /* LeaderBoardView.swift */; };
@@ -52,6 +53,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				4696CDBF2FBE42CD00D6DBF6 /* RealmSwift in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
