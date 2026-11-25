@@ -49,7 +49,7 @@ struct GSKOView: View {
             settingsSheet
         }
         .sheet(isPresented: Binding(
-            get: { showScoreDialog && !gskoVM.showHideComponets },
+            get: { showScoreDialog && selectedMatch != nil },
             set: { showScoreDialog = $0 }
         )) {
             scoreEditSheet
@@ -93,7 +93,7 @@ struct GSKOView: View {
                         .tag(index)
                 }
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.menu)
             .padding(.horizontal)
             .onChange(of: gskoVM.selectedGroupIndex) { newIndex in
                 gskoVM.viewModel.selectedGroupIndex = newIndex

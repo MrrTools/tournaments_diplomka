@@ -37,9 +37,9 @@ class NewTournamentViewModel: ObservableObject {
     @Published var backgroundImage: UIImage? = nil
     
     let sportTypes: [String: [String]] = [
-        "Football": ["Single Elimination", "Double Elimination", "Round Robin", "Group Stage and KO"],
-        "Hockey": ["Single Elimination", "Round Robin", "Playoff", "NHL", "Group Stage and KO"],
-        "Tennis": ["Single Elimination"],
+        "Football": ["Single Elimination", "Double Elimination", "Loser Bracket", "Round Robin", "Group Stage and KO"],
+        "Hockey": ["Single Elimination", "Loser Bracket", "Round Robin", "Playoff", "Group Stage and KO"],
+        "Tennis": ["Single Elimination", "Loser Bracket"],
         "F1": ["Championship"]
     ]
     
@@ -110,42 +110,36 @@ class NewTournamentViewModel: ObservableObject {
             backgroundImageData: backgroundImageData
         )
 
-        if let realm = RealmManager.shared.realm {
-            try? realm.write {
-                realm.add(tournament)
-            }
-
-            onSave()
-        }
-
-        if isF1 {
-            generateF1Standings(tournament: tournament, players: players)
-        } else {
-            generateStandardTournament(tournament: tournament, players: players)
-        }
-
-        onSave()
+        let saved = isF1
+            ? generateF1Standings(tournament: tournament, players: players)
+            : generateStandardTournament(tournament: tournament, players: players)
+        if saved { onSave() }
     }
     
     // GENEROVANIE F1 STANDINGS (BEZ PRETEKOV)
-    private func generateF1Standings(tournament: Tournament, players: [Player]) {
+    private func generateF1Standings(tournament: Tournament, players: [Player]) -> Bool {
         let driverStandings = players.map { F1PlayerTable(player: $0, tournament: tournament) }
 
         let teamStandings = Dictionary(grouping: players, by: { $0.team! }).map { (team, drivers) in
             F1TeamTable(teamName: team, tournament: tournament)
         }
 
-        if let realm = RealmManager.shared.realm {
-            try? realm.write {
+        guard let realm = RealmManager.shared.realm else { return false }
+        do {
+            try realm.write {
                 tournament.f1PlayerTable.append(objectsIn: driverStandings)
                 tournament.f1TeamTable.append(objectsIn: teamStandings)
-                realm.add(tournament, update: .modified)
+                realm.add(tournament)
             }
+            return true
+        } catch {
+            print("Failed to save F1 tournament: \(error)")
+            return false
         }
     }
     
     // GENEROVANIE ŠTANDARDNÝCH TURNAJOV (PRE OSTATNÉ ŠPORTY)
-    private func generateStandardTournament(tournament: Tournament, players: [Player]) {
+    private func generateStandardTournament(tournament: Tournament, players: [Player]) -> Bool {
         var matches: [TournamentMatch] = []
         var table: [TournamentTable] = []
 
@@ -155,6 +149,9 @@ class NewTournamentViewModel: ObservableObject {
             table = players.map { TournamentTable(player: $0, tournament: tournament) }
         case "Single Elimination", "Double Elimination", "Playoff":
             matches = generateElimination(players: players, tournament: tournament)
+            table = players.map { TournamentTable(player: $0, tournament: tournament) }
+        case "Loser Bracket":
+            matches = generateLoserBracket(players: players, tournament: tournament)
             table = players.map { TournamentTable(player: $0, tournament: tournament) }
         case "Group Stage and KO":
             let (gskoMatches, gskoTables) = generateGSKO(players: players, numberOfPlayersInGroup: self.numberOfGroupPlayers ?? 2, advancingPerGroup: self.numberOfAdvancePlayers ?? 2, tournament: tournament, riposeMatches: riposeMateches)
@@ -166,13 +163,18 @@ class NewTournamentViewModel: ObservableObject {
 
         let settings = TournamentSettings(tournament: tournament)
 
-        if let realm = RealmManager.shared.realm {
-            try? realm.write {
+        guard let realm = RealmManager.shared.realm else { return false }
+        do {
+            try realm.write {
                 tournament.matches.append(objectsIn: matches)
                 tournament.table.append(objectsIn: table)
                 tournament.settings.append(settings)
-                realm.add(tournament, update: .modified)
+                realm.add(tournament)
             }
+            return true
+        } catch {
+            print("Failed to save tournament: \(error)")
+            return false
         }
     }
     

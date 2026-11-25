@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct LeaderBoardView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     var table: [TournamentTable]
     @ObservedObject var viewModel: TournamentGenerateModel
     
@@ -26,6 +27,21 @@ struct LeaderBoardView: View {
     }
     
     var body: some View {
+        if horizontalSizeClass == .compact {
+            List(Array(sortedTable.enumerated()), id: \.element._id) { position, entry in
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("\(position + 1). \(entry.player?.name ?? "TBD")")
+                        .font(.headline)
+                    Text("\(entry.points) points · \(entry.goalsScored):\(entry.goalsConceded)")
+                        .font(.subheadline)
+                    Text("W \(entry.wins) · D \(entry.draws) · L \(entry.losses)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
+            .refreshable { viewModel.loadTable() }
+        } else {
         Table(sortedTable) {
             TableColumn("Position") { entry in
                 if let index = sortedTable.firstIndex(where: { $0._id == entry._id }) {
@@ -53,6 +69,7 @@ struct LeaderBoardView: View {
         }
         .refreshable {
             viewModel.loadTable()
+        }
         }
     }
 }

@@ -18,7 +18,7 @@
                BlueprintIdentifier = "462FA4B62BD2E45700175699"
                BuildableName = "tournaments.app"
                BlueprintName = "tournaments"
-               ReferencedContainer = "container:tournaments.xcodeproj">
+               ReferencedContainer = "container:Tournament Management.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "462FA4B62BD2E45700175699"
             BuildableName = "tournaments.app"
             BlueprintName = "tournaments"
-            ReferencedContainer = "container:tournaments.xcodeproj">
+            ReferencedContainer = "container:Tournament Management.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -71,7 +71,7 @@
             BlueprintIdentifier = "462FA4B62BD2E45700175699"
             BuildableName = "tournaments.app"
             BlueprintName = "tournaments"
-            ReferencedContainer = "container:tournaments.xcodeproj">
+            ReferencedContainer = "container:Tournament Management.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
